@@ -1,7 +1,6 @@
-import board
-import busio
 import adafruit_ssd1306
 from PIL import Image, ImageDraw, ImageFont
+
 
 class SSD1308Display:
     def __init__(self, width, height, i2c_bus):
@@ -21,7 +20,7 @@ class SSD1308Display:
         font = ImageFont.load_default()
 
         # Calculate width and height of the text to be displayed
-        text_width, text_height = draw.textsize(text, font=font)
+        text_width, text_height = draw.textlength(text, font=font)
 
         # Calculate position for centered text
         x = (self.width - text_width) // 2
