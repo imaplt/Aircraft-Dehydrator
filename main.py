@@ -16,8 +16,12 @@ def main():
     display = SSD1308Display(128, 64, i2c)
 
     # Display centered text
+    display.display_initializing("Hello, World!")
+    time.sleep(5)
+
+    # Display centered text
     display.display_centered_text("Hello, World!")
-    time.sleep(1)
+    time.sleep(5)
 
     sht30_sensor = Sensor('SHT30', 0x44)
     sht41_sensor = Sensor('SHT41', 0x44)
