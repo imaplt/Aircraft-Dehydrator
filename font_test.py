@@ -44,6 +44,7 @@ def main():
         oled.show()
 
         time.sleep(3)
+
         oled.fill(0)
         oled.show()
 
