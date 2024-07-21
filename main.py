@@ -28,16 +28,16 @@ def main():
 
     while True:
         current_time = time.time()
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
         # Read and print sensor data every 10 seconds
         if int(current_time - start_time) % 10 == 0:
             sht41_output = sht41_sensor.read_sensor()
             print(sht41_output)
 
-            timestamp = time.strftime(current_time)
             logger.log(timestamp, 'SHT41', '01',
                        f"Temperature: {sht41_output['temperature']} C, Humidity: {sht41_output['humidity']} %")
             sht30_output = sht30_sensor.read_sensor()
-            timestamp = time.strftime(current_time)
             logger.log(timestamp, 'SHT30', '02',
                        f"Temperature: {sht30_output['temperature']}C, Humidity: {sht30_output['humidity']}%")
 
@@ -47,7 +47,6 @@ def main():
 
         # Heat the sensors every 30 seconds
         if int(current_time - start_time) % 30 == 0:
-            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             print("Heating SHT41 sensor...")
             sht41_sensor.heat_sensor()
             logger.log(timestamp, 'SHT41', '001', "Heating SHT41 sensor...")
