@@ -26,11 +26,6 @@ def main():
     logger = log('log.csv')
     current_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
-
-    logger.log(current_time, 'Sensor2', '002', 'Humidity reading failed')
-
-    print("Data logging attempted.")
-
     while True:
         current_time = time.time()
         # Read and print sensor data every 10 seconds
