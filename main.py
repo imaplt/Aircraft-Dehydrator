@@ -7,7 +7,34 @@ from logger import Logger as Log
 from display import SSD1308Display
 from sensor import Sensor
 
+    def __init__(self, config_file):
+        self.config_file = config_file
+        self.config = configparser.ConfigParser()
+        self.config.read(config_file)
+        
+        # Example of accessing configuration values
+        self.server = self.config['DEFAULT'].get('server')
+        self.port = self.config['DEFAULT'].getint('port')
+        self.username = self.config['DEFAULT'].get('username')
+        self.password = self.config['DEFAULT'].get('password')
 
+    def display_config(self):
+        print(f"Server: {self.server}")
+        print(f"Port: {self.port}")
+        print(f"Username: {self.username}")
+        print(f"Password: {self.password}")
+
+    def update_config(self, section, key, value):
+        if not self.config.has_section(section):
+            self.config.add_section(section)
+        self.config.set(section, key, value)
+        self.save_config()
+
+    def save_config(self):
+        with open(self.config_file, 'w') as configfile:
+            self.config.write(configfile)
+            
+            
 def main():
     # Initialize I2C bus
     i2c = busio.I2C(board.SCL, board.SDA)
