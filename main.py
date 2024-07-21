@@ -33,11 +33,11 @@ def main():
             sht41_output = sht41_sensor.read_sensor()
             print(sht41_output)
 
-            timestamp = time.strftime({sht41_output['timestamp']})
+            timestamp = time.strftime(current_time)
             logger.log(timestamp, 'SHT41', '01',
                        f"Temperature: {sht41_output['temperature']} C, Humidity: {sht41_output['humidity']} %")
             sht30_output = sht30_sensor.read_sensor()
-            timestamp = time.strftime({sht30_output['timestamp']})
+            timestamp = time.strftime(current_time)
             logger.log(timestamp, 'SHT30', '02',
                        f"Temperature: {sht30_output['temperature']}C, Humidity: {sht30_output['humidity']}%")
 
