@@ -14,7 +14,7 @@ class SSD1308Display:
         self.display.show()
         self.border = 5
         self.font = "Quicksand-Regular.ttf"  # Size: 8, 10, 12, 14, 16
-        self.med_font = "Quicksand-Medium.ttf"
+        self.med_font = "Quicksand-Medium.ttf"  # Size: 20, 24
         self.light_font = "Quicksand-Light.ttf"
         self.bold_font = "Quicksand-Bold.ttf"
 
