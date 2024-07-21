@@ -23,7 +23,7 @@ def main():
     y_position = 0
     for font_size in range(10, 26, 2):
         try:
-            font = ImageFont.truetype("Quicksand-Regular.ttf", font_size)  # Adjust path if necessary
+            font = ImageFont.truetype("Quicksand-Medium.ttf", font_size)  # Adjust path if necessary
         except IOError:
             print(f"Font file not found for size {font_size}.")
             continue
