@@ -47,7 +47,7 @@ def main():
 
         # Heat the sensors every 30 seconds
         if int(current_time - start_time) % 30 == 0:
-            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", current_time)
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             print("Heating SHT41 sensor...")
             sht41_sensor.heat_sensor()
             logger.log(timestamp, 'SHT41', '001', "Heating SHT41 sensor...")
