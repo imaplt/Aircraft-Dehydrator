@@ -36,7 +36,7 @@ def main():
             print(sht41_output)
 
             logger.log(timestamp, 'SHT41', '01',
-                       f"Temperature: {sht41_output['temperature']} C, Humidity: {sht41_output['humidity']} %")
+                       f"Temperature: {sht41_output['temperature']}C, Humidity: {sht41_output['humidity']}%")
             sht30_output = sht30_sensor.read_sensor()
             logger.log(timestamp, 'SHT30', '02',
                        f"Temperature: {sht30_output['temperature']}C, Humidity: {sht30_output['humidity']}%")
@@ -49,11 +49,11 @@ def main():
         if int(current_time - start_time) % 30 == 0:
             print("Heating SHT41 sensor...")
             sht41_sensor.heat_sensor()
-            logger.log(timestamp, 'SHT41', '001', "Heating SHT41 sensor...")
+            logger.log(timestamp, 'SHT41', '01', "Heating SHT41 sensor...")
 
             print("Heating SHT30 sensor...")
             sht30_sensor.heat_sensor()
-            logger.log(timestamp, 'SHT30', '001', "Heating SHT30 sensor...")
+            logger.log(timestamp, 'SHT30', '02', "Heating SHT30 sensor...")
 
         # Sleep for a short duration to avoid multiple reads/heats within the same second
         time.sleep(0.1)

@@ -18,7 +18,7 @@ image = Image.new("1", (WIDTH, HEIGHT))
 draw = ImageDraw.Draw(image)
 
 # Load a larger font
-font_size = 16
+font_size = 24
 font = ImageFont.truetype("arial.ttf", font_size)  # You can use any .ttf font available
 
 # Define the coordinates for the smaller, centered heart shape
