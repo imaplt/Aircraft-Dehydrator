@@ -34,8 +34,6 @@ def main():
         if int(current_time - start_time) % 10 == 0:
             sht41_output = sht41_sensor.read_sensor()
             print(sht41_output)
-#            return f"Timestamp: {data['timestamp']}, Temperature: {data['temperature']} C, Humidity: {data['humidity']} %"
-#            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
             logger.log({sht41_output['timestamp']}, 'SHT41', '001',
                        f"Temperature: {sht41_output['temperature']} C, Humidity: {sht41_output['humidity']} %")
@@ -49,17 +47,17 @@ def main():
 
         # Heat the sensors every 30 seconds
         if int(current_time - start_time) % 30 == 0:
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", current_time)
             print("Heating SHT41 sensor...")
             sht41_sensor.heat_sensor()
+            logger.log(timestamp, 'SHT41', '001', "Heating SHT41 sensor...")
+
             print("Heating SHT30 sensor...")
             sht30_sensor.heat_sensor()
+            logger.log(timestamp, 'SHT30', '001', "Heating SHT41 sensor...")
 
         # Sleep for a short duration to avoid multiple reads/heats within the same second
         time.sleep(0.1)
-        # Check for key press to exit
-        if keyboard.is_pressed('q'):
-            print("Exiting...")
-            break
 
 
 if __name__ == "__main__":
