@@ -21,7 +21,7 @@ def main():
 
     # Load the Arial font and draw text with increasing font sizes
     y_position = 0
-    for font_size in range(16, 32, 2):
+    for font_size in range(20, 32, 2):
         try:
             font = ImageFont.truetype("Quicksand-Medium.ttf", font_size)  # Adjust path if necessary
         except IOError:
