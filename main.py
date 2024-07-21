@@ -6,7 +6,6 @@ import busio
 from logger import Logger as Log
 from display import SSD1308Display
 from sensor import Sensor
-import keyboard
 
 
 def main():
@@ -26,7 +25,6 @@ def main():
     print(start_time)
 
     logger = Log("log.csv")
-    current_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
     while True:
         current_time = time.time()
@@ -35,11 +33,11 @@ def main():
             sht41_output = sht41_sensor.read_sensor()
             print(sht41_output)
 
-            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", {sht41_output['timestamp']})
+            timestamp = time.strftime({sht41_output['timestamp']})
             logger.log(timestamp, 'SHT41', '01',
                        f"Temperature: {sht41_output['temperature']} C, Humidity: {sht41_output['humidity']} %")
             sht30_output = sht30_sensor.read_sensor()
-            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", {sht30_output['timestamp']})
+            timestamp = time.strftime({sht30_output['timestamp']})
             logger.log(timestamp, 'SHT30', '02',
                        f"Temperature: {sht30_output['temperature']}C, Humidity: {sht30_output['humidity']}%")
 
