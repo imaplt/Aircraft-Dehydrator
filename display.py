@@ -13,7 +13,10 @@ class SSD1308Display:
         self.display.fill(0)
         self.display.show()
         self.border = 5
-        self.font = "Quicksand-Medium.ttf"
+        self.font = "Quicksand-Regular.ttf"
+        self.med_font = "Quicksand-Medium.ttf"
+        self.light_font = "Quicksand-Light.ttf"
+        self.bold_font = "Quicksand-Bold.ttf"
 
     def display_initializing(self, text):
         # Initialize I2C interface
@@ -46,7 +49,7 @@ class SSD1308Display:
         )
 
         # Load a larger font
-        font_size = 24
+        font_size = 20
         font = ImageFont.truetype(self.font, font_size)  # You can use any .ttf font available
 
         # Draw Some Text
@@ -69,7 +72,7 @@ class SSD1308Display:
         draw = ImageDraw.Draw(image)
 
         # Load a larger font
-        font_size = 24
+        font_size = 18
         font = ImageFont.truetype(self.font, font_size)  # You can use any .ttf font available
 
         # Calculate width and height of the text to be displayed
