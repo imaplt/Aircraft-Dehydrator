@@ -2,6 +2,7 @@ import board
 import busio
 import adafruit_ssd1306
 from PIL import Image, ImageDraw, ImageFont
+import time
 
 def main():
     # Initialize I2C interface
@@ -20,7 +21,7 @@ def main():
 
     # Load the Arial font and draw text with increasing font sizes
     y_position = 0
-    for font_size in range(10, 26, 2):
+    for font_size in range(8, 26, 2):
         try:
             font = ImageFont.truetype("Quicksand-Regular.ttf", font_size)  # Adjust path if necessary
         except IOError:
@@ -38,9 +39,14 @@ def main():
         draw.text((text_x, y_position), text, font=font, fill=1)
         y_position += text_height
 
-    # Display image
-    oled.image(image)
-    oled.show()
+        # Display image
+        oled.image(image)
+        oled.show()
+
+        time.sleep(3)
+        oled.fill(0)
+        oled.show()
+
 
 if __name__ == "__main__":
     main()
