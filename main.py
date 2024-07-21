@@ -6,6 +6,7 @@ import busio
 from logger import Logger as Log
 from display import SSD1308Display
 from sensor import Sensor
+import keyboard
 
 
 def main():
@@ -33,8 +34,15 @@ def main():
         if int(current_time - start_time) % 10 == 0:
             sht41_output = sht41_sensor.read_sensor()
             print(sht41_output)
-            logger.log(current_time, 'SHT41', '001', 'Temperature reading successful')
+#            return f"Timestamp: {data['timestamp']}, Temperature: {data['temperature']} C, Humidity: {data['humidity']} %"
+#            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+            logger.log({sht41_output['timestamp']}, 'SHT41', '001',
+                       f"Temperature: {sht41_output['temperature']} C, Humidity: {sht41_output['humidity']} %")
             sht30_output = sht30_sensor.read_sensor()
+            logger.log({sht30_output['timestamp']}, 'SHT41', '001',
+                       f"Temperature: {sht30_output['temperature']} C, Humidity: {sht30_output['humidity']} %")
+
             print("SHT41 Sensor Reading:", sht41_output)
             print("SHT30 Sensor Reading:", sht30_output)
             display.display_centered_text(f"SHT41 - {sht41_output['temperature']}°C")
@@ -48,6 +56,10 @@ def main():
 
         # Sleep for a short duration to avoid multiple reads/heats within the same second
         time.sleep(0.1)
+        # Check for key press to exit
+        if keyboard.is_pressed('q'):
+            print("Exiting...")
+            break
 
 
 if __name__ == "__main__":

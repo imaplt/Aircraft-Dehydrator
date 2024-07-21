@@ -31,8 +31,8 @@ class Sensor:
             raise ValueError("Invalid sensor type. Supported types: 'SHT41', 'SHT30'")
 
         # Format the sensor output to one decimal place
-        temperature = round(temperature,1)
-        humidity = round(humidity,1)
+        temperature = round(temperature, 1)
+        humidity = round(humidity, 1)
 
         return {'timestamp': timestamp, 'temperature': temperature, 'humidity': humidity}
 
