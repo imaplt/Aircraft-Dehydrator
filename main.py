@@ -3,9 +3,10 @@
 import time
 import board
 import busio
-import logger as log
+from logger import Logger as Log
 from display import SSD1308Display
 from sensor import Sensor
+
 
 def main():
     # Initialize I2C bus
@@ -23,7 +24,7 @@ def main():
     start_time = time.time()
     print(start_time)
 
-    logger = log('log.csv')
+    logger = Log("log.csv")
     current_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
     while True:
@@ -37,16 +38,17 @@ def main():
             print("SHT41 Sensor Reading:", sht41_output)
             print("SHT30 Sensor Reading:", sht30_output)
             display.display_centered_text(f"SHT41 - {sht41_output['temperature']}°C")
-        
+
         # Heat the sensors every 30 seconds
         if int(current_time - start_time) % 30 == 0:
             print("Heating SHT41 sensor...")
             sht41_sensor.heat_sensor()
             print("Heating SHT30 sensor...")
             sht30_sensor.heat_sensor()
-        
+
         # Sleep for a short duration to avoid multiple reads/heats within the same second
         time.sleep(0.1)
+
 
 if __name__ == "__main__":
     main()

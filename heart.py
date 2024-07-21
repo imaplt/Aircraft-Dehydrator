@@ -1,7 +1,7 @@
 import board
 import busio
 import adafruit_ssd1306
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 # Initialize I2C interface
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -17,18 +17,28 @@ image = Image.new("1", (WIDTH, HEIGHT))
 # Get drawing object to draw on image
 draw = ImageDraw.Draw(image)
 
-# Define the coordinates for the heart shape
+# Load a font
+font = ImageFont.load_default()
+
+# Define the coordinates for the smaller, centered heart shape
 heart = [
-    (64, 32), (68, 28), (72, 24), (76, 20), (80, 18), (84, 18),
-    (88, 20), (92, 24), (96, 28), (100, 32), (96, 36), (92, 40),
-    (88, 44), (84, 48), (80, 52), (76, 56), (72, 60), (68, 64),
-    (64, 68), (60, 64), (56, 60), (52, 56), (48, 52), (44, 48),
-    (40, 44), (36, 40), (32, 36), (28, 32), (32, 28), (36, 24),
-    (40, 20), (44, 18), (48, 18), (52, 20), (56, 24), (60, 28)
+    (64, 38), (66, 36), (68, 34), (70, 32), (72, 30), (74, 30),
+    (76, 32), (78, 34), (80, 36), (82, 38), (80, 40), (78, 42),
+    (76, 44), (74, 46), (72, 48), (70, 50), (68, 52), (66, 54),
+    (64, 56), (62, 54), (60, 52), (58, 50), (56, 48), (54, 46),
+    (52, 44), (50, 42), (48, 40), (46, 38), (48, 36), (50, 34),
+    (52, 32), (54, 30), (56, 30), (58, 32), (60, 34), (62, 36)
 ]
 
 # Draw the heart shape
 draw.polygon(heart, outline=1, fill=1)
+
+# Draw the text 'Love You' above the heart
+text = "Love You"
+text_width, text_height = draw.textsize(text, font=font)
+text_x = (WIDTH - text_width) // 2
+text_y = 20  # Position text above the heart
+draw.text((text_x, text_y), text, font=font, fill=1)
 
 # Display image
 oled.image(image)
