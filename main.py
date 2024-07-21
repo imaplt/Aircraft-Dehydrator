@@ -35,11 +35,13 @@ def main():
             sht41_output = sht41_sensor.read_sensor()
             print(sht41_output)
 
-            logger.log({sht41_output['timestamp']}, 'SHT41', '001',
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", {sht41_output['timestamp']})
+            logger.log(timestamp, 'SHT41', '01',
                        f"Temperature: {sht41_output['temperature']} C, Humidity: {sht41_output['humidity']} %")
             sht30_output = sht30_sensor.read_sensor()
-            logger.log({sht30_output['timestamp']}, 'SHT41', '001',
-                       f"Temperature: {sht30_output['temperature']} C, Humidity: {sht30_output['humidity']} %")
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", {sht30_output['timestamp']})
+            logger.log(timestamp, 'SHT30', '02',
+                       f"Temperature: {sht30_output['temperature']}C, Humidity: {sht30_output['humidity']}%")
 
             print("SHT41 Sensor Reading:", sht41_output)
             print("SHT30 Sensor Reading:", sht30_output)
@@ -54,7 +56,7 @@ def main():
 
             print("Heating SHT30 sensor...")
             sht30_sensor.heat_sensor()
-            logger.log(timestamp, 'SHT30', '001', "Heating SHT41 sensor...")
+            logger.log(timestamp, 'SHT30', '001', "Heating SHT30 sensor...")
 
         # Sleep for a short duration to avoid multiple reads/heats within the same second
         time.sleep(0.1)
