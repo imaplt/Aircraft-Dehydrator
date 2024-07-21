@@ -33,6 +33,3 @@ draw.polygon(heart, outline=1, fill=1)
 # Display image
 oled.image(image)
 oled.show()
-
-# Optional: Save the image to a file for debugging
-image.save("heart.bmp")

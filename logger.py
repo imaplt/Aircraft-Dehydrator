@@ -2,6 +2,7 @@ import time
 import csv
 import os
 
+
 class Logger:
     def __init__(self, filename):
         self.filename = filename

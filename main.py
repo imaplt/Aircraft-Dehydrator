@@ -3,6 +3,7 @@
 import time
 import board
 import busio
+import logger as log
 from display import SSD1308Display
 from sensor import Sensor
 
@@ -22,12 +23,21 @@ def main():
     start_time = time.time()
     print(start_time)
 
+    logger = log('log.csv')
+    current_time = time.strftime("%Y-%m-%d %H:%M:%S")
+
+
+    logger.log(current_time, 'Sensor2', '002', 'Humidity reading failed')
+
+    print("Data logging attempted.")
 
     while True:
         current_time = time.time()
-        # Read and print sensor data every 2 seconds
-        if int(current_time - start_time) % 2 == 0:
+        # Read and print sensor data every 10 seconds
+        if int(current_time - start_time) % 10 == 0:
             sht41_output = sht41_sensor.read_sensor()
+            print(sht41_output)
+            logger.log(current_time, 'SHT41', '001', 'Temperature reading successful')
             sht30_output = sht30_sensor.read_sensor()
             print("SHT41 Sensor Reading:", sht41_output)
             print("SHT30 Sensor Reading:", sht30_output)
