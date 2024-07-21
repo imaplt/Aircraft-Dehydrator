@@ -16,7 +16,7 @@ def main():
     display = SSD1308Display(128, 64, i2c)
 
     # Display centered text
-    display.display_initializing("Hello, World!")
+    display.display_initializing("Initializing...")
     time.sleep(5)
 
     # Display centered text
