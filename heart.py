@@ -17,8 +17,9 @@ image = Image.new("1", (WIDTH, HEIGHT))
 # Get drawing object to draw on image
 draw = ImageDraw.Draw(image)
 
-# Load a font
-font = ImageFont.load_default()
+# Load a larger font
+font_size = 16
+font = ImageFont.truetype("arial.ttf", font_size)  # You can use any .ttf font available
 
 # Define the coordinates for the smaller, centered heart shape
 heart = [
@@ -33,11 +34,12 @@ heart = [
 # Draw the heart shape
 draw.polygon(heart, outline=1, fill=1)
 
-# Draw the text 'Love You' above the heart
+# Draw the text 'Love You' at the top of the display
 text = "Love You"
-text_width, text_height = draw.textsize(text, font=font)
-text_x = (WIDTH - text_width) // 2
-text_y = 20  # Position text above the heart
+text_length = len(text)
+# Calculate the position to center the text
+text_x = (WIDTH - (text_length * font_size // 2)) // 2
+text_y = 0  # Position text at the top of the display
 draw.text((text_x, text_y), text, font=font, fill=1)
 
 # Display image
