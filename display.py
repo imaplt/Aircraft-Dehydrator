@@ -17,14 +17,11 @@ class SSD1308Display:
         self.font = "Quicksand-Regular.ttf"  # Size: 8 , 10, 12, 14, 16
 
     def display_initializing(self, text):
-        # Initialize I2C interface
-        i2c = busio.I2C(board.SCL, board.SDA)
-
         image = Image.new('1', (self.width, self.height))
         draw = ImageDraw.Draw(image)
 
-        i2c = board.I2C()
-        oled = adafruit_ssd1306.SSD1306_I2C(self.width, self.height, i2c, addr=0x3C)
+        #i2c = board.I2C()
+        oled = adafruit_ssd1306.SSD1306_I2C(self.width, self.height, self.i2c, addr=0x3C)
         # Clear display.
         oled.fill(0)
         oled.show()
@@ -49,7 +46,7 @@ class SSD1308Display:
         bbox = font.getbbox(text)
         (font_width, font_height) = bbox[2] - bbox[0], bbox[3] - bbox[1]
         draw.text(
-            (oled.width // 2 - font_width // 2, oled.height // 2 - font_height // 2), text, font=font, fill=255,)
+            (oled.width // 2 - font_width // 2, oled.height // 2 - font_height // 2), text, font=font, fill=255, )
         time.sleep(3)
 
         # Display image
@@ -59,12 +56,11 @@ class SSD1308Display:
         bbox = font.getbbox(text)
         (font_width, font_height) = bbox[2] - bbox[0], bbox[3] - bbox[1]
         draw.text(
-            (oled.width // 2 - font_width // 2, oled.height // 2 - font_height // 2), text, font=font, fill=255,)
+            (oled.width // 2 - font_width // 2, oled.height // 2 - font_height // 2), text, font=font, fill=255, )
 
         # Display image
         self.display.image(image)
         self.display.show()
-
 
     def display_centered_text(self, text):
         # Create a blank image for drawing.
