@@ -43,6 +43,8 @@ if __name__ == "__main__":
 
     sht30_sensor = Sensor('SHT30', 0x44)
     sht41_sensor = Sensor('SHT41', 0x44)
+
+    Log.initialize_file()
     logger = Log(module.logfile, module.max_log_size, module.max_archive_size)
 
     # Initialize previous output values to None
@@ -72,7 +74,7 @@ if __name__ == "__main__":
                 print('SHT41 Measurements matched or humidity change is less than 0.3 --> skipping....')
 
             sht30_output = sht30_sensor.read_sensor()
-            if (abs(sht30_output['temperature'] - sht30_previous_output['temperature'] ) > 0.1 or
+            if (abs(sht30_output['temperature'] - sht30_previous_output['temperature']) > 0.1 or
                     abs(sht30_output['humidity'] - sht30_previous_output['humidity']) > 0.3):
                 logger.log(timestamp, 'SHT30', '02',
                            f"Temperature: {sht30_output['temperature']}C, Humidity: {sht30_output['humidity']}%")
