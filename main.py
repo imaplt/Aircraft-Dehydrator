@@ -44,9 +44,8 @@ if __name__ == "__main__":
     sht30_sensor = Sensor('SHT30', 0x44)
     sht41_sensor = Sensor('SHT41', 0x44)
 
-    Log.initialize_file()
     logger = Log(module.logfile, module.max_log_size, module.max_archive_size)
-
+    logger.initialize_file()
     # Initialize previous output values to None
     sht30_previous_output = {'temperature': 0, 'humidity': 0}
     sht41_previous_output = {'temperature': 0, 'humidity': 0}
@@ -89,6 +88,7 @@ if __name__ == "__main__":
 
         # Heat the sensors every 90 seconds
         if int(current_time - start_time) % 90 == 0:
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             print("Heating SHT41 sensor...")
             sht41_sensor.heat_sensor()
             logger.log(timestamp, 'SHT41', '01', "Heating SHT41 sensor...")
