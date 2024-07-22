@@ -5,7 +5,9 @@ import board
 import busio
 from logger import Logger as Log
 from display import SSD1308Display
-from sensor import Sensor
+from sensor import Sensor  
+from config_manager import ConfigManager
+
 class MyDehydrator:
     def __init__(self, config_manager):
         self.config_manager = config_manager
@@ -20,9 +22,7 @@ class MyDehydrator:
         print(f"Username: {self.username}")
         print(f"Password: {self.password}")
         
-      
-            
-def main():
+if __name__ == "__main__":
 
     config_manager = ConfigManager('config.ini')
     module = MyModule(config_manager)
@@ -91,6 +91,3 @@ def main():
         # Sleep for a short duration to avoid multiple reads/heats within the same second
         time.sleep(0.1)
 
-
-if __name__ == "__main__":
-    main()
