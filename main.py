@@ -67,6 +67,8 @@ if __name__ == "__main__":
                 # Update previous output values
                 sht41_previous_output['temperature'] = sht41_output['temperature']
                 sht41_previous_output['humidity'] = sht41_output['humidity']
+            else:
+                print('SHT41 Measurements did not match')
 
             sht30_output = sht30_sensor.read_sensor()
             if (sht30_output['temperature'] != sht30_previous_output['temperature'] or
@@ -76,6 +78,8 @@ if __name__ == "__main__":
                 # Update previous output values
                 sht30_previous_output['temperature'] = sht30_output['temperature']
                 sht30_previous_output['humidity'] = sht30_output['humidity']
+            else:
+                print('SHT30 Measurements did not match')
 
             print("SHT41 Sensor Reading:", sht41_output)
             print("SHT41 Mode: ", sht41_sensor.sensor_mode())
