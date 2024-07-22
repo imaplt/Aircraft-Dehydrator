@@ -12,15 +12,13 @@ class MyDehydrator:
     def __init__(self, config_manager):
         self.config_manager = config_manager
         self.logfile = self.config_manager.get_config('DEFAULT', 'logfile')
-        self.port = self.config_manager.get_int_config('DEFAULT', 'port')
         self.minimum = self.config_manager.get_int_config('DEFAULT', 'minimum')
         self.maximum = self.config_manager.get_int_config('DEFAULT', 'maximum')
 
     def display_config(self):
-        print(f"Server: {self.server}")
-        print(f"Port: {self.port}")
-        print(f"Username: {self.username}")
-        print(f"Password: {self.password}")
+        print(f"Server: {self.logfile}")
+        print(f"Port: {self.minimum}")
+        print(f"Username: {self.maximum}")
         
 if __name__ == "__main__":
 
@@ -29,10 +27,10 @@ if __name__ == "__main__":
     module.display_config()
     
     # Update configuration
-    config_manager.update_config('DEFAULT', 'server', 'newserver.com')
-    config_manager.update_config('DEFAULT', 'port', '9090')
-    config_manager.update_config('DEFAULT', 'username', 'newuser')
-    config_manager.update_config('DEFAULT', 'password', 'newpass')
+    #config_manager.update_config('DEFAULT', 'server', 'newserver.com')
+    #config_manager.update_config('DEFAULT', 'port', '9090')
+    #config_manager.update_config('DEFAULT', 'username', 'newuser')
+    #config_manager.update_config('DEFAULT', 'password', 'newpass')
     
     # Display updated configuration
     module = MyDehydrator(config_manager)
