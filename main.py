@@ -21,19 +21,12 @@ class MyDehydrator:
         self.max_log_size = self.config_manager.get_int_config('max_log_size')
         self.max_archive_size = self.config_manager.get_int_config('max_archive_size')
 
-    def display_config(self):
-        print(f"logfile: {self.logfile}")
-        print(f"minimum: {self.minimum}")
-        print(f"maximum: {self.maximum}")
-        print(f"fontsize: {self.fontsize}")
-        print(f"font: {self.font}")
-
 
 if __name__ == "__main__":
 
     config_manager = ConfigManager('config.ini')
     module = MyDehydrator(config_manager)
-    module.display_config()
+    config_manager.display_config()
 
     # Update configuration
     # config_manager.update_config('CUSTOM', 'minimum', '21')
