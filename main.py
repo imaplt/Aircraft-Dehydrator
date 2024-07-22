@@ -5,7 +5,7 @@ import board
 import busio
 from logger import Logger as Log
 from display import SSD1308Display
-from sensor import Sensor  
+from sensor import Sensor
 from config_manager import ConfigManager
 
 
@@ -13,14 +13,13 @@ class MyDehydrator:
 
     def __init__(self, config_manager):
         self.config_manager = config_manager
-        self.logfile = self.config_manager.get_config('DEFAULT', 'logfile')
-        self.minimum = self.config_manager.get_int_config('DEFAULT', 'minimum')
-        self.maximum = self.config_manager.get_int_config('DEFAULT', 'maximum')
-        self.fontsize = self.config_manager.get_int_config('DEFAULT', 'fontsize')
-        self.font = self.config_manager.get_config('DEFAULT', 'font')
+        self.logfile = self.config_manager.get_config('logfile')
+        self.minimum = self.config_manager.get_int_config('minimum')
+        self.maximum = self.config_manager.get_int_config('maximum')
+        self.fontsize = self.config_manager.get_int_config('fontsize')
+        self.font = self.config_manager.get_config('font')
 
     def display_config(self):
-
         print(f"logfile: {self.logfile}")
         print(f"minimum: {self.minimum}")
         print(f"maximum: {self.maximum}")
@@ -33,15 +32,11 @@ if __name__ == "__main__":
     config_manager = ConfigManager('config.ini')
     module = MyDehydrator(config_manager)
     module.display_config()
-    
-    # Update configuration
-    config_manager.update_config('CUSTOM', 'minimum', '21')
-    config_manager.update_config('CUSTOM', 'maximum', '35')
 
-    # Display updated configuration
-    module = MyDehydrator(config_manager)
-    module.display_config()
-    
+    # Update configuration
+    # config_manager.update_config('CUSTOM', 'minimum', '21')
+    # config_manager.update_config('CUSTOM', 'maximum', '35')
+
     # Initialize I2C bus
     i2c = busio.I2C(board.SCL, board.SDA)
 
@@ -52,16 +47,15 @@ if __name__ == "__main__":
     display.display_initializing("Initializing...")
     time.sleep(5)
 
-    # Display centered text
-    display.display_centered_text("Hello, World!")
-    time.sleep(5)
-
     sht30_sensor = Sensor('SHT30', 0x44)
     sht41_sensor = Sensor('SHT41', 0x44)
     start_time = time.time()
-    print(start_time)
 
-    logger = Log("log.csv")
+    logger = Log(module.logfile)
+
+    # Initialize previous output values to None
+    sht30_previous_output = {'temperature': None, 'humidity': None}
+    sht41_previous_output = {'temperature': None, 'humidity': None}
 
     while True:
         current_time = time.time()
@@ -69,13 +63,24 @@ if __name__ == "__main__":
 
         # Read and print sensor data every 10 seconds
         if int(current_time - start_time) % 10 == 0:
+
             sht41_output = sht41_sensor.read_sensor()
-            logger.log(timestamp, 'SHT41', '01',
-                       f"Temperature: {sht41_output['temperature']}C, Humidity: {sht41_output['humidity']}%")
+            if (sht41_output['temperature'] != sht41_previous_output['temperature'] or
+                    sht41_output['humidity'] != sht41_previous_output['humidity']):
+                logger.log(timestamp, 'SHT41', '01',
+                           f"Temperature: {sht41_output['temperature']}C, Humidity: {sht41_output['humidity']}%")
+                # Update previous output values
+                sht41_previous_output['temperature'] = sht41_output['temperature']
+                sht41_previous_output['humidity'] = sht41_output['humidity']
 
             sht30_output = sht30_sensor.read_sensor()
-            logger.log(timestamp, 'SHT30', '02',
-                       f"Temperature: {sht30_output['temperature']}C, Humidity: {sht30_output['humidity']}%")
+            if (sht30_output['temperature'] != sht30_previous_output['temperature'] or
+                    sht30_output['humidity'] != sht30_previous_output['humidity']):
+                logger.log(timestamp, 'SHT30', '02',
+                           f"Temperature: {sht30_output['temperature']}C, Humidity: {sht30_output['humidity']}%")
+                # Update previous output values
+                sht30_previous_output['temperature'] = sht30_output['temperature']
+                sht30_previous_output['humidity'] = sht30_output['humidity']
 
             print("SHT41 Sensor Reading:", sht41_output)
             print("SHT41 Mode: ", sht41_sensor.sensor_mode())
@@ -97,4 +102,3 @@ if __name__ == "__main__":
 
         # Sleep for a short duration to avoid multiple reads/heats within the same second
         time.sleep(0.1)
-

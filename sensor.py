@@ -38,6 +38,16 @@ class SHT4XHeater(Enum):
     LOW_HEATER_1S = "Low Heater 1s"
     LOW_HEATER_100MS = "Low Heater 100ms"
 
+# # Example usage
+# print(f"High precision no heater code: {SHT4X_NOHEAT_HIGHPRECISION}")
+# print(f"Soft reset code: {SHT4X_SOFTRESET}")
+#
+# # Using enums
+# precision = SHT4XPrecision.HIGH_PRECISION
+# heater_setting = SHT4XHeater.HIGH_HEATER_1S
+#
+# print(f"Selected precision: {precision}")
+# print(f"Selected heater setting: {heater_setting}")
 
 class Sensor:
     def __init__(self, sensor_type, address):
@@ -67,7 +77,6 @@ class Sensor:
         return mode
 
     def read_sensor(self):
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
         if self.sensor_type == 'SHT41':
             temperature, humidity = self.sensor.measurements
@@ -81,7 +90,7 @@ class Sensor:
         temperature = round(temperature, 1)
         humidity = round(humidity, 1)
 
-        return {'timestamp': timestamp, 'temperature': temperature, 'humidity': humidity}
+        return {'temperature': temperature, 'humidity': humidity}
 
     def heat_sensor(self):
         if self.sensor_type == 'SHT41':
