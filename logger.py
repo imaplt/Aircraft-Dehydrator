@@ -23,10 +23,10 @@ class Logger:
         self.logger = self.setup_logging()
 
     def initialize_file(self):
+        print('Initializing log file....')
         try:
             # Ensure the file is initialized with headers if it doesn't exist
             if not os.path.isfile(self.filename):
-                print('Initializing log file....')
                 with open(self.filename, mode='w', newline='') as file:
                     writer = csv.writer(file)
                     writer.writerow(['Timestamp', 'Name', 'ID', 'Message'])
@@ -61,7 +61,6 @@ class Logger:
 
     def log(self, timestamp, name, id, message):
         log_entry = f'{timestamp},{name},{id},{message}'
-        print('Log entry called....')
         try:
             self.logger.info(log_entry)
             self.manage_archives()

@@ -2,6 +2,7 @@ import adafruit_ssd1306
 from PIL import Image, ImageDraw, ImageFont
 import board
 import busio
+import time
 
 
 class SSD1308Display:
@@ -48,13 +49,22 @@ class SSD1308Display:
         bbox = font.getbbox(text)
         (font_width, font_height) = bbox[2] - bbox[0], bbox[3] - bbox[1]
         draw.text(
-            (oled.width // 2 - font_width // 2, oled.height // 2 - font_height // 2), text,
-            font=font, fill=255,
-        )
+            (oled.width // 2 - font_width // 2, oled.height // 2 - font_height // 2), text, font=font, fill=255,)
+        time.sleep(3)
 
         # Display image
         self.display.image(image)
         self.display.show()
+        text = 'Testing...'
+        bbox = font.getbbox(text)
+        (font_width, font_height) = bbox[2] - bbox[0], bbox[3] - bbox[1]
+        draw.text(
+            (oled.width // 2 - font_width // 2, oled.height // 2 - font_height // 2), text, font=font, fill=255,)
+
+        # Display image
+        self.display.image(image)
+        self.display.show()
+
 
     def display_centered_text(self, text):
         # Create a blank image for drawing.
