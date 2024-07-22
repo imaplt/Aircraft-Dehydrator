@@ -38,6 +38,7 @@ class Logger:
     def setup_logging(self):
         print('Setting up log file....')
         logger = logging.getLogger('CustomLogger')
+        logger.handlers.clear()  # Clear existing handlers
         logger.setLevel(logging.INFO)
         handler = RotatingFileHandler(self.filename, maxBytes=self.max_log_size, backupCount=10)
         formatter = logging.Formatter('%(message)s')
