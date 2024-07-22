@@ -8,18 +8,26 @@ from display import SSD1308Display
 from sensor import Sensor  
 from config_manager import ConfigManager
 
+
 class MyDehydrator:
+
     def __init__(self, config_manager):
         self.config_manager = config_manager
         self.logfile = self.config_manager.get_config('DEFAULT', 'logfile')
         self.minimum = self.config_manager.get_int_config('DEFAULT', 'minimum')
         self.maximum = self.config_manager.get_int_config('DEFAULT', 'maximum')
+        self.fontsize = self.config_manager.get_int_config('DEFAULT', 'fontsize')
+        self.font = self.config_manager.get_config('DEFAULT', 'font')
 
     def display_config(self):
-        print(f"Log File: {self.logfile}")
-        print(f"Minimum: {self.minimum}")
-        print(f"Maximum: {self.maximum}")
-        
+
+        print(f"logfile: {self.logfile}")
+        print(f"minimum: {self.minimum}")
+        print(f"maximum: {self.maximum}")
+        print(f"fontsize: {self.fontsize}")
+        print(f"font: {self.font}")
+
+
 if __name__ == "__main__":
 
     config_manager = ConfigManager('config.ini')
@@ -27,11 +35,9 @@ if __name__ == "__main__":
     module.display_config()
     
     # Update configuration
-    #config_manager.update_config('DEFAULT', 'server', 'newserver.com')
-    #config_manager.update_config('DEFAULT', 'port', '9090')
-    #config_manager.update_config('DEFAULT', 'username', 'newuser')
-    #config_manager.update_config('DEFAULT', 'password', 'newpass')
-    
+    config_manager.update_config('CUSTOM', 'minimum', '21')
+    config_manager.update_config('CUSTOM', 'maximum', '35')
+
     # Display updated configuration
     module = MyDehydrator(config_manager)
     module.display_config()
@@ -64,20 +70,23 @@ if __name__ == "__main__":
         # Read and print sensor data every 10 seconds
         if int(current_time - start_time) % 10 == 0:
             sht41_output = sht41_sensor.read_sensor()
-            print(sht41_output)
-
             logger.log(timestamp, 'SHT41', '01',
                        f"Temperature: {sht41_output['temperature']}C, Humidity: {sht41_output['humidity']}%")
+
             sht30_output = sht30_sensor.read_sensor()
             logger.log(timestamp, 'SHT30', '02',
                        f"Temperature: {sht30_output['temperature']}C, Humidity: {sht30_output['humidity']}%")
 
             print("SHT41 Sensor Reading:", sht41_output)
+            print("SHT41 Mode: ", sht41_sensor.sensor_mode())
+
             print("SHT30 Sensor Reading:", sht30_output)
+            print("SHT30 Mode: ", sht41_sensor.sensor_mode())
+
             display.display_centered_text(f"SHT41 - {sht41_output['temperature']}°C")
 
         # Heat the sensors every 30 seconds
-        if int(current_time - start_time) % 30 == 0:
+        if int(current_time - start_time) % 60 == 0:
             print("Heating SHT41 sensor...")
             sht41_sensor.heat_sensor()
             logger.log(timestamp, 'SHT41', '01', "Heating SHT41 sensor...")

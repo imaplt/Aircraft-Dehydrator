@@ -13,10 +13,7 @@ class SSD1308Display:
         self.display.fill(0)
         self.display.show()
         self.border = 5
-        self.font = "Quicksand-Regular.ttf"  # Size: 8, 10, 12, 14, 16
-        self.med_font = "Quicksand-Medium.ttf"  # Size: 20, 24
-        self.light_font = "Quicksand-Light.ttf"
-        self.bold_font = "Quicksand-Bold.ttf"
+        self.font = "Quicksand-Regular.ttf"  # Size: 8 , 10, 12, 14, 16
 
     def display_initializing(self, text):
         # Initialize I2C interface
@@ -31,11 +28,8 @@ class SSD1308Display:
         oled.fill(0)
         oled.show()
 
-        # Create blank image for drawing.
-        # Make sure to create image with mode '1' for 1-bit color.
+        # Create blank image for drawing andcreate image with mode '1' for 1-bit color.
         image = Image.new("1", (oled.width, oled.height))
-
-        # Get drawing object to draw on image.
         draw = ImageDraw.Draw(image)
 
         # Draw a white background
@@ -44,9 +38,7 @@ class SSD1308Display:
         # Draw a smaller inner rectangle
         draw.rectangle(
             (self.border, self.border, oled.width - self.border - 1, oled.height - self.border - 1),
-            outline=0,
-            fill=0,
-        )
+            outline=0, fill=0, )
 
         # Load a larger font
         font_size = 20
