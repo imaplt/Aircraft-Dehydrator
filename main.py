@@ -53,7 +53,7 @@ if __name__ == "__main__":
     sht41_sensor = Sensor('SHT41', 0x44)
     start_time = time.time()
 
-    logger = Log(module.logfile, max_log_size, max_archive_size)
+    logger = Log(module.logfile, module.max_log_size, module.max_archive_size)
 
     # Initialize previous output values to None
     sht30_previous_output = {'temperature': None, 'humidity': None}
