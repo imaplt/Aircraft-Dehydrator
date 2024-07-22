@@ -49,6 +49,7 @@ class SHT4XHeater(Enum):
 # print(f"Selected precision: {precision}")
 # print(f"Selected heater setting: {heater_setting}")
 
+
 class Sensor:
     def __init__(self, sensor_type, address):
         self.sensor_type = sensor_type
