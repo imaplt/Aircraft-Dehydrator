@@ -12,6 +12,17 @@ class Logger:
         self.max_archive_size = max_archive_size
         self.logger = self.setup_logging()
 
+        self.filename = filename
+        self.max_log_size = max_log_size
+        self.max_archive_size = max_archive_size
+
+        # Initialize the file before setting up logging
+        self.initialize_file()
+
+        # Setup logging after the file has been initialized
+        self.logger = self.setup_logging()
+
+    def initialize_file(self):
         try:
             # Ensure the file is initialized with headers if it doesn't exist
             if not os.path.isfile(self.filename):
@@ -20,7 +31,6 @@ class Logger:
                     writer.writerow(['Timestamp', 'Name', 'ID', 'Message'])
                     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                     writer.writerow([timestamp, '', '', 'Initial Log File Creation...'])
-
         except IOError as e:
             print(f"Error initializing log file: {e}")
 

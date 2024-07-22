@@ -74,7 +74,7 @@ class Sensor:
 
     def sensor_mode(self):
         mode = self.sensor.mode
-        return mode
+        return hex(mode).upper()
 
     def read_sensor(self):
 
