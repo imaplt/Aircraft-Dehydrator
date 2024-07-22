@@ -11,10 +11,10 @@ from config_manager import ConfigManager
 class MyDehydrator:
     def __init__(self, config_manager):
         self.config_manager = config_manager
-        self.server = self.config_manager.get_config('DEFAULT', 'server')
+        self.log_file = self.config_manager.get_config('DEFAULT', 'log_file')
         self.port = self.config_manager.get_int_config('DEFAULT', 'port')
-        self.username = self.config_manager.get_config('DEFAULT', 'username')
-        self.password = self.config_manager.get_config('DEFAULT', 'password')
+        self.minimum = self.config_manager.get_int_config('DEFAULT', 'minimum')
+        self.maximum = self.config_manager.get_int_config('DEFAULT', 'maximum')
 
     def display_config(self):
         print(f"Server: {self.server}")
@@ -25,7 +25,7 @@ class MyDehydrator:
 if __name__ == "__main__":
 
     config_manager = ConfigManager('config.ini')
-    module = MyModule(config_manager)
+    module = MyDehydrator(config_manager)
     module.display_config()
     
     # Update configuration
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     config_manager.update_config('DEFAULT', 'password', 'newpass')
     
     # Display updated configuration
-    module = MyModule(config_manager)
+    module = MyDehydrator(config_manager)
     module.display_config()
     
     # Initialize I2C bus
