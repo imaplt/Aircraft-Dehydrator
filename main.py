@@ -18,6 +18,8 @@ class MyDehydrator:
         self.maximum = self.config_manager.get_int_config('maximum')
         self.fontsize = self.config_manager.get_int_config('fontsize')
         self.font = self.config_manager.get_config('font')
+        self.max_log_size = self.config_manager.get_int_config('max_log_size')
+        self.max_archive_size = self.config_manager.get_int_config('max_archive_size')
 
     def display_config(self):
         print(f"logfile: {self.logfile}")
@@ -51,7 +53,7 @@ if __name__ == "__main__":
     sht41_sensor = Sensor('SHT41', 0x44)
     start_time = time.time()
 
-    logger = Log(module.logfile)
+    logger = Log(module.logfile, max_log_size, max_archive_size)
 
     # Initialize previous output values to None
     sht30_previous_output = {'temperature': None, 'humidity': None}
