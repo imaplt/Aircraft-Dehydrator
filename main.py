@@ -62,7 +62,7 @@ if __name__ == "__main__":
         if int(current_time - start_time) % 10 == 0:
 
             sht41_output = sht41_sensor.read_sensor()
-            if (sht41_output['temperature'] != sht41_previous_output['temperature'] or
+            if (abs(sht41_output['temperature'] - sht41_previous_output['temperature']) > .1 or
                     abs(sht41_output['humidity'] - sht41_previous_output['humidity']) > 0.3):
                 logger.log(timestamp, 'SHT41', '01',
                            f"Temperature: {sht41_output['temperature']}C, Humidity: {sht41_output['humidity']}%")
@@ -71,10 +71,10 @@ if __name__ == "__main__":
                 sht41_previous_output['humidity'] = sht41_output['humidity']
                 print("SHT41 Sensor Reading:", sht41_output)
             else:
-                print('SHT41 Measurements matched or humidity change is less than 0.2 --> skipping....')
+                print('SHT41 Measurements matched or humidity change is less than 0.3 --> skipping....')
 
             sht30_output = sht30_sensor.read_sensor()
-            if (sht30_output['temperature'] != sht30_previous_output['temperature'] or
+            if (abs(sht30_output['temperature'] - sht30_previous_output['temperature'] ) > .1 or
                     abs(sht30_output['humidity'] - sht30_previous_output['humidity']) > 0.3):
                 logger.log(timestamp, 'SHT30', '02',
                            f"Temperature: {sht30_output['temperature']}C, Humidity: {sht30_output['humidity']}%")
@@ -83,7 +83,7 @@ if __name__ == "__main__":
                 sht30_previous_output['humidity'] = sht30_output['humidity']
                 print("SHT30 Sensor Reading:", sht30_output)
             else:
-                print('SHT30 Measurements matched or humidity change is less than 0.2 --> skipping....')
+                print('SHT30 Measurements matched or humidity change is less than 0.3 --> skipping....')
 
             display.display_centered_text(f"SHT41 - {sht41_output['temperature']}°C")
 
