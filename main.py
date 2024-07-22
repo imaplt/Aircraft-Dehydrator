@@ -6,36 +6,38 @@ import busio
 from logger import Logger as Log
 from display import SSD1308Display
 from sensor import Sensor
-
-    def __init__(self, config_file):
-        self.config_file = config_file
-        self.config = configparser.ConfigParser()
-        self.config.read(config_file)
-        
-        # Example of accessing configuration values
-        self.server = self.config['DEFAULT'].get('server')
-        self.port = self.config['DEFAULT'].getint('port')
-        self.username = self.config['DEFAULT'].get('username')
-        self.password = self.config['DEFAULT'].get('password')
+class MyDehydrator:
+    def __init__(self, config_manager):
+        self.config_manager = config_manager
+        self.server = self.config_manager.get_config('DEFAULT', 'server')
+        self.port = self.config_manager.get_int_config('DEFAULT', 'port')
+        self.username = self.config_manager.get_config('DEFAULT', 'username')
+        self.password = self.config_manager.get_config('DEFAULT', 'password')
 
     def display_config(self):
         print(f"Server: {self.server}")
         print(f"Port: {self.port}")
         print(f"Username: {self.username}")
         print(f"Password: {self.password}")
-
-    def update_config(self, section, key, value):
-        if not self.config.has_section(section):
-            self.config.add_section(section)
-        self.config.set(section, key, value)
-        self.save_config()
-
-    def save_config(self):
-        with open(self.config_file, 'w') as configfile:
-            self.config.write(configfile)
-            
+        
+      
             
 def main():
+
+    config_manager = ConfigManager('config.ini')
+    module = MyModule(config_manager)
+    module.display_config()
+    
+    # Update configuration
+    config_manager.update_config('DEFAULT', 'server', 'newserver.com')
+    config_manager.update_config('DEFAULT', 'port', '9090')
+    config_manager.update_config('DEFAULT', 'username', 'newuser')
+    config_manager.update_config('DEFAULT', 'password', 'newpass')
+    
+    # Display updated configuration
+    module = MyModule(config_manager)
+    module.display_config()
+    
     # Initialize I2C bus
     i2c = busio.I2C(board.SCL, board.SDA)
 
