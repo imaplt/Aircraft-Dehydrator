@@ -16,9 +16,9 @@ class MyDehydrator:
         self.maximum = self.config_manager.get_int_config('DEFAULT', 'maximum')
 
     def display_config(self):
-        print(f"Server: {self.logfile}")
-        print(f"Port: {self.minimum}")
-        print(f"Username: {self.maximum}")
+        print(f"Log File: {self.logfile}")
+        print(f"Minimum: {self.minimum}")
+        print(f"Maximum: {self.maximum}")
         
 if __name__ == "__main__":
 
