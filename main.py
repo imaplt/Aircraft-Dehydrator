@@ -53,7 +53,7 @@ if __name__ == "__main__":
     print("SHT30 Mode: ", sht41_sensor.sensor_mode())
 
     display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."])
-
+    time.sleep(2)
     start_time = time.time()
     while True:
         current_time = time.time()
