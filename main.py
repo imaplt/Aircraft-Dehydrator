@@ -4,7 +4,7 @@ import time
 import board
 import busio
 from logger import Logger as Log
-from display import SSD1308Display
+from display import SSD1306Display
 from sensor import Sensor
 from config_manager import ConfigManager
 
@@ -36,10 +36,10 @@ if __name__ == "__main__":
     i2c = busio.I2C(board.SCL, board.SDA)
 
     # Create an instance of the SSD1308Display class
-    display = SSD1308Display(128, 64, i2c)
+    display = SSD1306Display(128, 64, i2c)
 
     # Display centered text
-    display.display_initializing("Initializing...")
+    display.display_text_center("Initializing...")
     time.sleep(3)
 
     sht30_sensor = Sensor('SHT30', 0x44)
@@ -85,7 +85,7 @@ if __name__ == "__main__":
             else:
                 print('SHT30 Measurements matched or humidity change is less than 0.3 --> skipping....')
 
-            display.display_centered_text(f"SHT41 - {sht41_output['temperature']}°C")
+            display.display_text_center(f"SHT41 - {sht41_output['temperature']}°C")
 
         # Heat the sensors every 90 seconds
         if int(current_time - start_time) % 90 == 0:

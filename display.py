@@ -1,86 +1,91 @@
-import adafruit_ssd1306
 from PIL import Image, ImageDraw, ImageFont
-import board
-import busio
-import time
+import Adafruit_SSD1306
 
 
-class SSD1308Display:
-    def __init__(self, width, height, i2c_bus):
+class ConfigManager:
+    def __init__(self, font_path=None, font_size=10, border_size=1):
+        self.font_path = font_path
+        self.font_size = font_size
+        self.border_size = border_size
+
+    def get_font_path(self):
+        return self.font_path
+
+    def get_font_size(self):
+        return self.font_size
+
+    def get_border_size(self):
+        return self.border_size
+
+
+class SSD1306Display:
+    def __init__(self, config_manager, width=128, height=64, rst=None, i2c_address=0x3C):
         self.width = width
         self.height = height
-        self.i2c = i2c_bus
-        self.display = adafruit_ssd1306.SSD1306_I2C(width, height, i2c_bus)
-        self.display.fill(0)
-        self.display.show()
-        self.border = 5
-        self.font = "Quicksand-Regular.ttf"  # Size: 8 , 10, 12, 14, 16
+        self.rst = rst
+        self.i2c_address = i2c_address
+        self.config_manager = config_manager
 
-    def display_initializing(self, text):
-        image = Image.new('1', (self.width, self.height))
-        draw = ImageDraw.Draw(image)
+        # Initialize display.
+        self.disp = Adafruit_SSD1306.SSD1306_128_64(rst=self.rst, i2c=self.i2c_address)
+        self.disp.begin()
 
-        #i2c = board.I2C()
-        oled = adafruit_ssd1306.SSD1306_I2C(self.width, self.height, self.i2c, addr=0x3C)
-        # Clear display.
-        oled.fill(0)
-        oled.show()
+        # Create blank image for drawing.
+        self.image = Image.new('1', (self.width, self.height))
+        self.draw = ImageDraw.Draw(self.image)
 
-        # Create blank image for drawing andcreate image with mode '1' for 1-bit color.
-        image = Image.new("1", (oled.width, oled.height))
-        draw = ImageDraw.Draw(image)
+        # Set the font using config_manager
+        self.set_font(self.config_manager.get_font_path(), self.config_manager.get_font_size())
 
-        # Draw a white background
-        draw.rectangle((0, 0, oled.width, oled.height), outline=255, fill=255)
+    def reset_screen(self):
+        self.disp.clear()
+        self.clear_screen()
 
-        # Draw a smaller inner rectangle
-        draw.rectangle(
-            (self.border, self.border, oled.width - self.border - 1, oled.height - self.border - 1),
-            outline=0, fill=0, )
+    def clear_screen(self):
+        self.disp.clear()
+        self.disp.display()
 
-        # Load a larger font
-        font_size = 20
-        font = ImageFont.truetype(self.font, font_size)  # You can use any .ttf font available
+    def set_font(self, font_path=None, font_size=10):
+        if font_path:
+            self.font = ImageFont.truetype(font_path, font_size)
+        else:
+            self.font = ImageFont.load_default()
 
-        # Draw Some Text
-        bbox = font.getbbox(text)
-        (font_width, font_height) = bbox[2] - bbox[0], bbox[3] - bbox[1]
-        draw.text(
-            (oled.width // 2 - font_width // 2, oled.height // 2 - font_height // 2), text, font=font, fill=255, )
-        time.sleep(3)
+    def display_text_center(self, text):
+        self.clear_screen()
+        text_width, text_height = self.draw.textlength(text, font=self.font)
+        position = ((self.width - text_width) // 2, (self.height - text_height) // 2)
+        self.draw.text(position, text, font=self.font, fill=255)
+        self.disp.image(self.image)
+        self.disp.display()
 
-        # Display image
-        self.display.image(image)
-        self.display.show()
-        text = 'Testing...'
-        bbox = font.getbbox(text)
-        (font_width, font_height) = bbox[2] - bbox[0], bbox[3] - bbox[1]
-        draw.text(
-            (oled.width // 2 - font_width // 2, oled.height // 2 - font_height // 2), text, font=font, fill=255, )
+    def display_four_rows_center(self, texts):
+        self.clear_screen()
+        num_lines = min(4, len(texts))
+        line_height = self.height // num_lines
+        for i in range(num_lines):
+            text = texts[i]
+            text_width, text_height = self.draw.textlength(text=text, font=self.font)
+            position = ((self.width - text_width) // 2, i * line_height + (line_height - text_height) // 2)
+            self.draw.text(position, text, font=self.font, fill=255)
+        self.disp.image(self.image)
+        self.disp.display()
 
-        # Display image
-        self.display.image(image)
-        self.display.show()
+    def display_text_center_with_border(self, text):
+        self.clear_screen()
+        border_size = self.config_manager.get_border_size()
+        self.draw.rectangle((border_size, border_size, self.width - border_size - 1, self.height - border_size - 1),
+                            outline=255, fill=0)
+        text_width, text_height = self.draw.textlength(text=text, font=self.font)
+        position = ((self.width - text_width) // 2, (self.height - text_height) // 2)
+        self.draw.text(position, text, font=self.font, fill=255)
+        self.disp.image(self.image)
+        self.disp.display()
 
-    def display_centered_text(self, text):
-        # Create a blank image for drawing.
-        image = Image.new('1', (self.width, self.height))
-        draw = ImageDraw.Draw(image)
 
-        # Load a larger font
-        font_size = 18
-        font = ImageFont.truetype(self.font, font_size)  # You can use any .ttf font available
-
-        # Calculate width and height of the text to be displayed
-        text_width = draw.textlength(text, font=font)
-        text_height = 1
-        # Calculate position for centered text
-        x = (self.width - text_width) // 2
-        y = (self.height - text_height) // 2
-
-        # Draw the text
-        draw.text((x, y), text, font=font, fill=255)
-
-        # Display image
-        self.display.image(image)
-        self.display.show()
+# Example usage:
+config_manager = ConfigManager(font_path='path/to/font.ttf', font_size=12, border_size=2)
+display = SSD1306Display(config_manager)
+display.display_text_center("Hello World!")
+display.display_four_rows_center(["Line 1", "Line 2", "Line 3", "Line 4"])
+display.display_text_center_with_border("Border Text")
