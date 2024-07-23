@@ -36,17 +36,6 @@ if __name__ == "__main__":
     display_config = DisplayConfig(font_path='Quicksand-Regular.ttf', font_size=16, border_size=5)
     display = SSD1306Display(display_config)
     print("Max characters per line:", display.get_max_characters())
-    display.display_text_center("Initializing")
-    time.sleep(2)
-    display.clear_screen()
-    display.display_four_rows_center(["Line 1", "Line 2", "Line 3", "Line 4"])
-    time.sleep(2)
-    display.update_line(2, "Updated Line 3")
-    time.sleep(2)
-    display.clear_screen()
-    display.display_text_center_with_border("Getting Ready...")
-    time.sleep(2)
-    display.clear_screen()
 
     # Display centered text
     display.display_text_center("Initializing...")
@@ -82,8 +71,7 @@ if __name__ == "__main__":
                 sht41_previous_output['temperature'] = sht41_output['temperature']
                 sht41_previous_output['humidity'] = sht41_output['humidity']
                 print("SHT41 Sensor Reading:", sht41_output)
-                lines[1] = f"{sht41_output['humidity']}% - {sht41_output['temperature']}°C"
-                display.update_line(1, lines[1])
+                display.update_line(1,  f"{sht41_output['humidity']}% - {sht41_output['temperature']}°C")
             else:
                 print('SHT41 Measurements matched or humidity change is less than 0.3 --> skipping....')
 
@@ -96,8 +84,7 @@ if __name__ == "__main__":
                 sht30_previous_output['temperature'] = sht30_output['temperature']
                 sht30_previous_output['humidity'] = sht30_output['humidity']
                 print("SHT30 Sensor Reading:", sht30_output)
-                lines[3] = f"{sht30_output['humidity']}% - {sht30_output['temperature']}°C"
-                display.update_line(3, lines[3])
+                display.update_line(3, f"{sht30_output['humidity']}% - {sht30_output['temperature']}°C")
             else:
                 print('SHT30 Measurements matched or humidity change is less than 0.3 --> skipping....')
 
