@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
 
 
-class ConfigManager:
+class DisplayConfig:
     def __init__(self, font_path=None, font_size=10, border_size=1):
         self.font_path = font_path
         self.font_size = font_size
@@ -56,7 +56,7 @@ class SSD1306Display:
 
     def display_text_center(self, text):
         self.clear_screen()
-        text_width, text_height = self.draw.textsize(text, font=self.font)
+        text_width, text_height = self.draw.textlength(text=text, font=self.font)
         position = ((self.width - text_width) // 2, (self.height - text_height) // 2)
         self.draw.text(position, text, font=self.font, fill=255)
         self.disp.image(self.image)
@@ -68,7 +68,7 @@ class SSD1306Display:
         line_height = self.height // num_lines
         for i in range(num_lines):
             text = texts[i]
-            text_width, text_height = self.draw.textsize(text, font=self.font)
+            text_width, text_height = self.draw.textlength(text=text, font=self.font)
             position = ((self.width - text_width) // 2, i * line_height + (line_height - text_height) // 2)
             self.draw.text(position, text, font=self.font, fill=255)
         self.disp.image(self.image)
@@ -79,7 +79,7 @@ class SSD1306Display:
         border_size = self.config_manager.get_border_size()
         self.draw.rectangle((border_size, border_size, self.width - border_size - 1, self.height - border_size - 1),
                             outline=255, fill=0)
-        text_width, text_height = self.draw.textsize(text, font=self.font)
+        text_width, text_height = self.draw.textlength(text.text, font=self.font)
         position = ((self.width - text_width) // 2, (self.height - text_height) // 2)
         self.draw.text(position, text, font=self.font, fill=255)
         self.disp.image(self.image)

@@ -4,15 +4,15 @@ import time
 import board
 import busio
 from logger import Logger as Log
-from display import SSD1306Display
+from display import SSD1306Display, DisplayConfig
 from sensor import Sensor
 from config_manager import ConfigManager
 
 
 class MyDehydrator:
 
-    def __init__(self, config_manager):
-        self.config_manager = config_manager
+    def __init__(self, configuration):
+        self.config_manager = configuration
         self.logger = Log
         self.logfile = self.config_manager.get_config('logfile')
         self.minimum = self.config_manager.get_int_config('minimum')
@@ -31,6 +31,16 @@ if __name__ == "__main__":
     # Update configuration
     # config_manager.update_config('CUSTOM', 'minimum', '21')
     # config_manager.update_config('CUSTOM', 'maximum', '35')
+    # Example usage:
+    display_config = DisplayConfig(font_path='Quicksand-Regular.ttf', font_size=12, border_size=2)
+    display = SSD1306Display(display_config)
+    time.sleep(2)
+    display.display_text_center("Hello World!")
+    time.sleep(2)
+    display.display_four_rows_center(["Line 1", "Line 2", "Line 3", "Line 4"])
+    time.sleep(2)
+    display.display_text_center_with_border("Border Text")
+    time.sleep(2)
 
     # Initialize I2C bus
     i2c = busio.I2C(board.SCL, board.SDA)
