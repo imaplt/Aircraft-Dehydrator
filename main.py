@@ -35,8 +35,7 @@ if __name__ == "__main__":
 
     display_config = DisplayConfig(font_path='Quicksand-Regular.ttf', font_size=12, border_size=2)
     display = SSD1306Display(display_config)
-    time.sleep(2)
-    display.clear_screen()
+    print("Max characters per line:", display.get_max_characters())
     display.display_text_center("Hello World!")
     time.sleep(2)
     display.clear_screen()

@@ -60,6 +60,14 @@ class SSD1306Display:
         else:
             self.font = ImageFont.load_default()
 
+    def get_max_characters(self):
+        # Get the bounding box of a single character
+        bbox = self.draw.textbbox((0, 0), "W", font=self.font)
+        char_width = bbox[2] - bbox[0]
+        # Calculate the maximum number of characters that can fit in the display width
+        max_chars = self.width // char_width
+        return max_chars
+
     def display_text_center(self, text):
         self.clear_screen()
         bbox = self.draw.textbbox((0, 0), text, font=self.font)
