@@ -63,9 +63,7 @@ if __name__ == "__main__":
     print("SHT41 Mode: ", sht41_sensor.sensor_mode())
     print("SHT30 Mode: ", sht41_sensor.sensor_mode())
 
-    display.display_four_rows_center(["Line 1", "Line 2", "Line 3", "Line 4"])
-    lines[0] = 'Internal:'
-    lines[2] = 'External:'
+    display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."])
 
     start_time = time.time()
     while True:
