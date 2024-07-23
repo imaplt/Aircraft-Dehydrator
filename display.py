@@ -21,11 +21,11 @@ class DisplayConfig:
 
 
 class SSD1306Display:
-    def __init__(self, config_manager, width=128, height=64, i2c_address=0x3C):
+    def __init__(self, configuration, width=128, height=64, i2c_address=0x3C):
         self.width = width
         self.height = height
         self.i2c_address = i2c_address
-        self.config_manager = config_manager
+        self.config_manager = configuration
 
         # Initialize I2C interface.
         self.i2c = busio.I2C(board.SCL, board.SDA)
@@ -56,7 +56,9 @@ class SSD1306Display:
 
     def display_text_center(self, text):
         self.clear_screen()
-        text_width, text_height = self.draw.textlength(text=text, font=self.font)
+        bbox = self.draw.textbbox((0, 0), text, font=self.font)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
         position = ((self.width - text_width) // 2, (self.height - text_height) // 2)
         self.draw.text(position, text, font=self.font, fill=255)
         self.disp.image(self.image)
@@ -68,7 +70,9 @@ class SSD1306Display:
         line_height = self.height // num_lines
         for i in range(num_lines):
             text = texts[i]
-            text_width, text_height = self.draw.textlength(text=text, font=self.font)
+            bbox = self.draw.textbbox((0, 0), text, font=self.font)
+            text_width = bbox[2] - bbox[0]
+            text_height = bbox[3] - bbox[1]
             position = ((self.width - text_width) // 2, i * line_height + (line_height - text_height) // 2)
             self.draw.text(position, text, font=self.font, fill=255)
         self.disp.image(self.image)
@@ -79,7 +83,9 @@ class SSD1306Display:
         border_size = self.config_manager.get_border_size()
         self.draw.rectangle((border_size, border_size, self.width - border_size - 1, self.height - border_size - 1),
                             outline=255, fill=0)
-        text_width, text_height = self.draw.textlength(text.text, font=self.font)
+        bbox = self.draw.textbbox((0, 0), text, font=self.font)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
         position = ((self.width - text_width) // 2, (self.height - text_height) // 2)
         self.draw.text(position, text, font=self.font, fill=255)
         self.disp.image(self.image)
