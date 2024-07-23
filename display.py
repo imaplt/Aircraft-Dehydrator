@@ -40,6 +40,9 @@ class SSD1306Display:
         # Set the font using config_manager
         self.set_font(self.config_manager.get_font_path(), self.config_manager.get_font_size())
 
+        # Initialize lines
+        self.lines = [""] * 4
+
     def reset_screen(self):
         self.disp.fill(0)
         self.disp.show()
@@ -84,6 +87,24 @@ class SSD1306Display:
         line_height = self.height // num_lines
         for i in range(num_lines):
             text = texts[i]
+            bbox = self.draw.textbbox((0, 0), text, font=self.font)
+            text_width = bbox[2] - bbox[0]
+            text_height = bbox[3] - bbox[1]
+            position = ((self.width - text_width) // 2, i * line_height + (line_height - text_height) // 2)
+            self.draw.text(position, text, font=self.font, fill=255)
+        self.disp.image(self.image)
+        self.disp.show()
+
+    def update_line(self, line_number, text):
+        if line_number < 0 or line_number >= 4:
+            raise ValueError("line_number must be between 0 and 3")
+
+        self.lines[line_number] = text
+        self.clear_screen()
+        num_lines = 4
+        line_height = self.height // num_lines
+        for i in range(num_lines):
+            text = self.lines[i]
             bbox = self.draw.textbbox((0, 0), text, font=self.font)
             text_width = bbox[2] - bbox[0]
             text_height = bbox[3] - bbox[1]
