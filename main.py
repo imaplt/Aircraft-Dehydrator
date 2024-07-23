@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
     display.display_four_rows_center(["Line 1", "Line 2", "Line 3", "Line 4"])
     lines[0] = 'Internal:'
-    lines[3] = 'External:'
+    lines[2] = 'External:'
 
     start_time = time.time()
     while True:
@@ -85,7 +85,7 @@ if __name__ == "__main__":
                 sht41_previous_output['humidity'] = sht41_output['humidity']
                 print("SHT41 Sensor Reading:", sht41_output)
                 lines[1] = f"{sht41_output['humidity']}% - {sht41_output['temperature']}°C"
-                display.update_line(1,lines[1])
+                display.update_line(1, lines[1])
             else:
                 print('SHT41 Measurements matched or humidity change is less than 0.3 --> skipping....')
 
@@ -99,11 +99,9 @@ if __name__ == "__main__":
                 sht30_previous_output['humidity'] = sht30_output['humidity']
                 print("SHT30 Sensor Reading:", sht30_output)
                 lines[3] = f"{sht30_output['humidity']}% - {sht30_output['temperature']}°C"
-                display.update_line(1, lines[3])
+                display.update_line(3, lines[3])
             else:
                 print('SHT30 Measurements matched or humidity change is less than 0.3 --> skipping....')
-
-            display.display_text_center(f"SHT41 - {sht41_output['temperature']}°C")
 
         # Heat the sensors every 90 seconds
         if int(current_time - start_time) % 90 == 0:
