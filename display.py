@@ -98,7 +98,6 @@ class SSD1306Display:
     def update_line(self, line_number, text):
         if line_number < 0 or line_number >= 4:
             raise ValueError("line_number must be between 0 and 3")
-
         self.lines[line_number] = text
         self.clear_screen()
         num_lines = 4
