@@ -1,8 +1,6 @@
 # main.py
 
 import time
-import board
-import busio
 from logger import Logger as Log
 from display import SSD1306Display, DisplayConfig
 from sensor import Sensor
@@ -25,6 +23,8 @@ class MyDehydrator:
 
 if __name__ == "__main__":
 
+    # Initialize lines
+    lines = [""] * 4  # For four line display...
     config_manager = ConfigManager('config.ini')
     module = MyDehydrator(config_manager)
     # config_manager.display_config()
@@ -48,12 +48,6 @@ if __name__ == "__main__":
     time.sleep(2)
     display.clear_screen()
 
-    # Initialize I2C bus
-    # i2c = busio.I2C(board.SCL, board.SDA)
-
-    # Create an instance of the SSD1308Display class
-    # display = SSD1306Display(128, 64, i2c)
-
     # Display centered text
     display.display_text_center("Initializing...")
     time.sleep(3)
@@ -68,6 +62,10 @@ if __name__ == "__main__":
     sht41_previous_output = {'temperature': 0, 'humidity': 0}
     print("SHT41 Mode: ", sht41_sensor.sensor_mode())
     print("SHT30 Mode: ", sht41_sensor.sensor_mode())
+
+    display.display_four_rows_center(["Line 1", "Line 2", "Line 3", "Line 4"])
+    lines[0] = 'Internal:'
+    lines[3] = 'External:'
 
     start_time = time.time()
     while True:
@@ -86,6 +84,8 @@ if __name__ == "__main__":
                 sht41_previous_output['temperature'] = sht41_output['temperature']
                 sht41_previous_output['humidity'] = sht41_output['humidity']
                 print("SHT41 Sensor Reading:", sht41_output)
+                lines[1] = f"{sht41_output['humidity']}% - {sht41_output['temperature']}°C"
+                display.update_line(1,lines[1])
             else:
                 print('SHT41 Measurements matched or humidity change is less than 0.3 --> skipping....')
 
@@ -98,6 +98,8 @@ if __name__ == "__main__":
                 sht30_previous_output['temperature'] = sht30_output['temperature']
                 sht30_previous_output['humidity'] = sht30_output['humidity']
                 print("SHT30 Sensor Reading:", sht30_output)
+                lines[3] = f"{sht30_output['humidity']}% - {sht30_output['temperature']}°C"
+                display.update_line(1, lines[3])
             else:
                 print('SHT30 Measurements matched or humidity change is less than 0.3 --> skipping....')
 
