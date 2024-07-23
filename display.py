@@ -1,5 +1,7 @@
+import board
+import busio
 from PIL import Image, ImageDraw, ImageFont
-import Adafruit_SSD1306
+import adafruit_ssd1306
 
 
 class ConfigManager:
@@ -19,16 +21,17 @@ class ConfigManager:
 
 
 class SSD1306Display:
-    def __init__(self, config_manager, width=128, height=64, rst=None, i2c_address=0x3C):
+    def __init__(self, config_manager, width=128, height=64, i2c_address=0x3C):
         self.width = width
         self.height = height
-        self.rst = rst
         self.i2c_address = i2c_address
         self.config_manager = config_manager
 
+        # Initialize I2C interface.
+        self.i2c = busio.I2C(board.SCL, board.SDA)
+
         # Initialize display.
-        self.disp = Adafruit_SSD1306.SSD1306_128_64(rst=self.rst, i2c=self.i2c_address)
-        self.disp.begin()
+        self.disp = adafruit_ssd1306.SSD1306_I2C(self.width, self.height, self.i2c, addr=self.i2c_address)
 
         # Create blank image for drawing.
         self.image = Image.new('1', (self.width, self.height))
@@ -38,12 +41,12 @@ class SSD1306Display:
         self.set_font(self.config_manager.get_font_path(), self.config_manager.get_font_size())
 
     def reset_screen(self):
-        self.disp.clear()
-        self.clear_screen()
+        self.disp.fill(0)
+        self.disp.show()
 
     def clear_screen(self):
-        self.disp.clear()
-        self.disp.display()
+        self.disp.fill(0)
+        self.disp.show()
 
     def set_font(self, font_path=None, font_size=10):
         if font_path:
@@ -53,11 +56,11 @@ class SSD1306Display:
 
     def display_text_center(self, text):
         self.clear_screen()
-        text_width, text_height = self.draw.textlength(text, font=self.font)
+        text_width, text_height = self.draw.textsize(text, font=self.font)
         position = ((self.width - text_width) // 2, (self.height - text_height) // 2)
         self.draw.text(position, text, font=self.font, fill=255)
         self.disp.image(self.image)
-        self.disp.display()
+        self.disp.show()
 
     def display_four_rows_center(self, texts):
         self.clear_screen()
@@ -65,27 +68,19 @@ class SSD1306Display:
         line_height = self.height // num_lines
         for i in range(num_lines):
             text = texts[i]
-            text_width, text_height = self.draw.textlength(text=text, font=self.font)
+            text_width, text_height = self.draw.textsize(text, font=self.font)
             position = ((self.width - text_width) // 2, i * line_height + (line_height - text_height) // 2)
             self.draw.text(position, text, font=self.font, fill=255)
         self.disp.image(self.image)
-        self.disp.display()
+        self.disp.show()
 
     def display_text_center_with_border(self, text):
         self.clear_screen()
         border_size = self.config_manager.get_border_size()
         self.draw.rectangle((border_size, border_size, self.width - border_size - 1, self.height - border_size - 1),
                             outline=255, fill=0)
-        text_width, text_height = self.draw.textlength(text=text, font=self.font)
+        text_width, text_height = self.draw.textsize(text, font=self.font)
         position = ((self.width - text_width) // 2, (self.height - text_height) // 2)
         self.draw.text(position, text, font=self.font, fill=255)
         self.disp.image(self.image)
-        self.disp.display()
-
-
-# Example usage:
-config_manager = ConfigManager(font_path='path/to/font.ttf', font_size=12, border_size=2)
-display = SSD1306Display(config_manager)
-display.display_text_center("Hello World!")
-display.display_four_rows_center(["Line 1", "Line 2", "Line 3", "Line 4"])
-display.display_text_center_with_border("Border Text")
+        self.disp.show()
