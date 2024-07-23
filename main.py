@@ -48,10 +48,10 @@ if __name__ == "__main__":
     display.clear_screen()
 
     # Initialize I2C bus
-    i2c = busio.I2C(board.SCL, board.SDA)
+    # i2c = busio.I2C(board.SCL, board.SDA)
 
     # Create an instance of the SSD1308Display class
-    display = SSD1306Display(128, 64, i2c)
+    # display = SSD1306Display(128, 64, i2c)
 
     # Display centered text
     display.display_text_center("Initializing...")
