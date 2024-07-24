@@ -1,6 +1,7 @@
 # main.py
 
 import time
+from humidity_controller import HumidityController
 from logger import Logger as Log
 from display import SSD1306Display, DisplayConfig
 from sensor import Sensor
@@ -13,8 +14,8 @@ class MyDehydrator:
         self.config_manager = configuration
         self.logger = Log
         self.logfile = self.config_manager.get_config('logfile')
-        self.minimum = self.config_manager.get_int_config('minimum')
-        self.maximum = self.config_manager.get_int_config('maximum')
+        self.min_humidity = self.config_manager.get_int_config('min_humidity')
+        self.max_humidity = self.config_manager.get_int_config('max_humidity')
         self.font = self.config_manager.get_config('font')
         self.fontsize = self.config_manager.get_int_config('fontsize')
         self.border = self.config_manager.get_int_config('border')
@@ -56,6 +57,7 @@ if __name__ == "__main__":
     start_time = time.time()
     while True:
         current_time = time.time()
+        controller = HumidityController()
 
         # Read and print sensor data every 10 seconds
         if int(current_time - start_time) % 10 == 0:
@@ -88,6 +90,20 @@ if __name__ == "__main__":
                                     text=f"{internaloutput['humidity']}% - {internaloutput['temperature']}°C")
             else:
                 print('Internal Measurements matched or humidity change is less than 0.3 --> skipping....')
+
+            if internaloutput['humidity'] > module.max_humidity:
+                engaged = HumidityController.engage_fan()
+                logger.log(timestamp, 'Fan', '', "Fan started...")
+            elif internaloutput['humidity'] < module.min_humidity:
+                engaged, run_time = HumidityController.disengage_fan()
+                logger.log(timestamp, 'Fan', '', "Fan stopped...")
+                logger.log(timestamp, 'Fan', '', f"Fan run time: , {run_time}")
+
+            time.sleep(1)  # Adjust as needed
+
+            # Example logging for fan status
+            # status, rpm = self.fan_status()
+            # logging.info(f"Fan status: {status}, RPM: {rpm}")
 
         # Heat the sensors every 90 seconds
         if int(current_time - start_time) % 90 == 0:
