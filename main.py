@@ -51,7 +51,7 @@ if __name__ == "__main__":
     print("External Mode: ", externalsensor.sensor_mode())
     print("Internal Mode: ", internalsensor.sensor_mode())
 
-    display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."])
+    display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], justification='left')
     time.sleep(2)
     start_time = time.time()
     while True:
