@@ -70,7 +70,8 @@ if __name__ == "__main__":
                 externalprevious_output['temperature'] = externaloutput['temperature']
                 externalprevious_output['humidity'] = externaloutput['humidity']
                 print("External Sensor Reading:", externaloutput)
-                display.update_line(1,  f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
+                display.update_line(1, justification='left',
+                                    text=f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
             else:
                 print('External Measurements matched or humidity change is less than 0.3 --> skipping....')
 
@@ -83,7 +84,8 @@ if __name__ == "__main__":
                 internalprevious_output['temperature'] = internaloutput['temperature']
                 internalprevious_output['humidity'] = internaloutput['humidity']
                 print("Internal Sensor Reading:", internaloutput)
-                display.update_line(3, f"{internaloutput['humidity']}% - {internaloutput['temperature']}°C")
+                display.update_line(3, justification='left',
+                                    text=f"{internaloutput['humidity']}% - {internaloutput['temperature']}°C")
             else:
                 print('Internal Measurements matched or humidity change is less than 0.3 --> skipping....')
 
