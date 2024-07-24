@@ -71,7 +71,8 @@ class SSD1306Display:
         max_chars = self.width // char_width
         return max_chars
 
-      def display_text_center(self, text, justification='center'): #The justification parameter can be 'left', 'right', or 'center' (default).
+    # The justification parameter can be 'left', 'right', or 'center' (default).
+    def display_text_center(self, text, justification='center'):
         self.clear_screen()
         bbox = self.draw.textbbox((0, 0), text, font=self.font)
         text_width = bbox[2] - bbox[0]
