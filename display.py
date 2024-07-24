@@ -99,7 +99,10 @@ class SSD1306Display:
         if line_number < 0 or line_number >= 4:
             raise ValueError("line_number must be between 0 and 3")
         self.lines[line_number] = text
-        self.clear_screen()
+        # Check the output
+        for i in range(4):
+            print(self.lines[i])
+        # self.clear_screen()
         num_lines = 4
         line_height = self.height // num_lines
         for i in range(num_lines):
