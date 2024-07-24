@@ -49,7 +49,7 @@ if __name__ == "__main__":
     internalprevious_output = {'temperature': 0, 'humidity': 0}
     externalprevious_output = {'temperature': 0, 'humidity': 0}
     print("External Mode: ", externalsensor.sensor_mode())
-    print("Internal Mode: ", externalsensor.sensor_mode())
+    print("Internal Mode: ", internalsensor.sensor_mode())
 
     display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."])
     time.sleep(2)
