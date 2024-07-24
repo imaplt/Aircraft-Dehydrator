@@ -40,8 +40,8 @@ if __name__ == "__main__":
     display.display_text_center("Initializing...")
     time.sleep(3)
 
-    internalsensor = Sensor('Internal', 0x44)
-    externalsensor = Sensor('External', 0x44)
+    internalsensor = Sensor('SHT41', 0x44)
+    externalsensor = Sensor('SHT30', 0x44)
 
     logger = module.logger(module.logfile, module.max_log_size, module.max_archive_size)
 
