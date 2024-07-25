@@ -49,14 +49,41 @@ class EMC2101:
 
     def read_status(self):
         status = self.read_register(self.STATUS_REG)
-        return status
+        status_description = []
+        if status & 0x01:
+            status_description.append("Internal temperature sensor fault")
+        if status & 0x02:
+            status_description.append("External temperature sensor fault")
+        if status & 0x04:
+            status_description.append("Fan speed fault")
+        if status & 0x08:
+            status_description.append("Device reset")
+
+        if not status_description:
+            status_description.append("No faults")
+        return ", ".join(status_description)
 
     def reset_device(self):
         self.write_register(self.RESET_REG, 0xFF)
 
     def read_config(self):
         config = self.read_register(self.CONFIG_REG)
-        return config
+        config_description = []
+
+        if config & 0x01:
+            config_description.append("Device enabled")
+        else:
+            config_description.append("Device disabled")
+        if config & 0x02:
+            config_description.append("Fan control enabled")
+        else:
+            config_description.append("Fan control disabled")
+        if config & 0x04:
+            config_description.append("Temperature monitoring enabled")
+        else:
+            config_description.append("Temperature monitoring disabled")
+        return ", ".join(config_description)
+
 
     # print("Internal Temperature:", emc2101.read_internal_temp(), "°C")
     # print("External Temperature:", emc2101.read_external_temp(), "°C")
