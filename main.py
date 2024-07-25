@@ -96,7 +96,7 @@ if __name__ == "__main__":
                         logger.log(timestamp, 'Fan', '',
                                    f"Fan started, exceeded MAX humidity of: {module.max_humidity}%")
                         print(f"Fan started, exceeded set humidity of: {module.max_humidity}%")
-                        display.display_four_rows_center('Fan Started...')
+                        display.display_text_center_with_border('Fan Started...')
                         time.sleep(1)
                         display.display_default_four_rows()
                 elif internaloutput['humidity'] < module.min_humidity:
@@ -105,7 +105,7 @@ if __name__ == "__main__":
                         print("Fan stopped...")
                         logger.log(timestamp, 'Fan', '', f"Fan stopped, passed MIN humidity of: {module.min_humidity}%")
                         logger.log(timestamp, 'Fan', '', f"Fan run time: { str(timedelta(seconds=run_time))}")
-                        display.display_four_rows_center('Fan Stopped...')
+                        display.display_text_center_with_border('Fan Stopped...')
                         time.sleep(1)
                         display.display_default_four_rows()
                 # else:
