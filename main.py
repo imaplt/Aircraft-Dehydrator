@@ -1,6 +1,7 @@
 # main.py
 
 import time
+from datetime import timedelta
 from humidity_controller import HumidityController
 from logger import Logger as Log
 from display import SSD1306Display, DisplayConfig
@@ -99,9 +100,9 @@ if __name__ == "__main__":
                     if stopped:
                         print("Fan stopped...")
                         logger.log(timestamp, 'Fan', '', "Fan stopped...")
-                        logger.log(timestamp, 'Fan', '', f"Fan run time: ,{time.strftime('%H:%M:%S', run_time)}")
-                else:
-                    print('Internal Measurements matched or humidity change is less than 0.3 --> skipping....')
+                        logger.log(timestamp, 'Fan', '', f"Fan run time: ,{ str(timedelta(seconds=run_time))}")
+                # else:
+                    # print('Internal Measurements matched or humidity change is less than 0.3 --> skipping....')
 
             time.sleep(.1)  # Adjust as needed
 
