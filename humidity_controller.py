@@ -15,7 +15,6 @@ class HumidityController:
             self.fan_engaged = True
             return True
         else:
-            self.fan_engaged = False
             return False
 
     @staticmethod
