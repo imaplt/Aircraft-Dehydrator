@@ -54,6 +54,7 @@ if __name__ == "__main__":
     print("Internal Mode: ", internalsensor.sensor_mode())
 
     display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], justification='left')
+    display.display_default_four_rows()
     time.sleep(2)
     start_time = time.time()
     controller = HumidityController()
@@ -89,19 +90,24 @@ if __name__ == "__main__":
                 print("Internal Sensor Reading:", internaloutput)
                 display.update_line(1, justification='left',
                                     text=f"{internaloutput['humidity']}% - {internaloutput['temperature']}°C")
-                print(internaloutput['humidity'], module.max_humidity)
                 if internaloutput['humidity'] > module.max_humidity:
                     started = controller.engage_fan(controller)
                     if started:
                         logger.log(timestamp, 'Fan', '',
-                                   f"Fan started, exceeded MAX humidity of: {internaloutput['humidity']}%")
-                        print(f"Fan started, exceeded set humidity of: {internaloutput['humidity']}%")
+                                   f"Fan started, exceeded MAX humidity of: {module.max_humidity}%")
+                        print(f"Fan started, exceeded set humidity of: {module.max_humidity}%")
+                        display.display_four_rows_center('Fan Started...')
+                        time.sleep(1)
+                        display.display_default_four_rows()
                 elif internaloutput['humidity'] < module.min_humidity:
                     stopped, run_time = controller.disengage_fan(controller)
                     if stopped:
                         print("Fan stopped...")
-                        logger.log(timestamp, 'Fan', '', f"Fan stopped, passed MIN humidity of: {internaloutput['humidity']}%")
+                        logger.log(timestamp, 'Fan', '', f"Fan stopped, passed MIN humidity of: {module.min_humidity}%")
                         logger.log(timestamp, 'Fan', '', f"Fan run time: { str(timedelta(seconds=run_time))}")
+                        display.display_four_rows_center('Fan Stopped...')
+                        time.sleep(1)
+                        display.display_default_four_rows()
                 # else:
                     # print('Internal Measurements matched or humidity change is less than 0.3 --> skipping....')
 

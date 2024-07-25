@@ -91,6 +91,9 @@ class SSD1306Display:
         self.disp.image(self.image)
         self.disp.show()
 
+    def display_default_four_rows(self):
+        self.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], justification='left')
+
     def display_four_rows_center(self, texts, justification='center'):
         self.clear_screen()
         num_lines = min(4, len(texts))
