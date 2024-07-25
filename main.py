@@ -64,29 +64,27 @@ if __name__ == "__main__":
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
             externaloutput = externalsensor.read_sensor()
-            if (abs(externaloutput['temperature'] - externalprevious_output['temperature']) > 0.1 or
-                    abs(externaloutput['humidity'] - externalprevious_output['humidity']) > 0.3):
+            if abs(externaloutput['humidity'] - externalprevious_output['humidity']) > 0.3:
                 logger.log(timestamp, 'External', '01',
                            f"Temperature: {externaloutput['temperature']}C, Humidity: {externaloutput['humidity']}%")
                 # Update previous output values
                 externalprevious_output['temperature'] = externaloutput['temperature']
                 externalprevious_output['humidity'] = externaloutput['humidity']
                 print("External Sensor Reading:", externaloutput)
-                display.update_line(1, justification='left',
+                display.update_line(3, justification='left',
                                     text=f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
             else:
                 print('External Measurements matched or humidity change is less than 0.3 --> skipping....')
 
             internaloutput = internalsensor.read_sensor()
-            if (abs(internaloutput['temperature'] - internalprevious_output['temperature']) > 0.1 or
-                    abs(internaloutput['humidity'] - internalprevious_output['humidity']) > 0.3):
+            if abs(internaloutput['humidity'] - internalprevious_output['humidity']) > 0.3:
                 logger.log(timestamp, 'Internal', '02',
                            f"Temperature: {internaloutput['temperature']}C, Humidity: {internaloutput['humidity']}%")
                 # Update previous output values
                 internalprevious_output['temperature'] = internaloutput['temperature']
                 internalprevious_output['humidity'] = internaloutput['humidity']
                 print("Internal Sensor Reading:", internaloutput)
-                display.update_line(3, justification='left',
+                display.update_line(1, justification='left',
                                     text=f"{internaloutput['humidity']}% - {internaloutput['temperature']}°C")
             else:
                 print('Internal Measurements matched or humidity change is less than 0.3 --> skipping....')
@@ -95,8 +93,10 @@ if __name__ == "__main__":
                 started = controller.engage_fan(controller)
                 if started:
                     logger.log(timestamp, 'Fan', '', "Fan started...")
+                    print("Fan started...")
             elif internaloutput['humidity'] < module.min_humidity:
                 stopped, run_time = controller.disengage_fan(controller)
+                print("Fan stopped...")
                 logger.log(timestamp, 'Fan', '', "Fan stopped...")
                 logger.log(timestamp, 'Fan', '', f"Fan run time: , {run_time}")
 
