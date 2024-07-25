@@ -75,8 +75,8 @@ if __name__ == "__main__":
                 print("External Sensor Reading:", externaloutput)
                 display.update_line(3, justification='left',
                                     text=f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
-            else:
-                print('External Measurements matched or humidity change is less than 0.3 --> skipping....')
+            # else:
+                # print('External Measurements matched or humidity change is less than 0.3 --> skipping....')
 
             time.sleep(.1)
             internaloutput = internalsensor.read_sensor()
@@ -93,14 +93,15 @@ if __name__ == "__main__":
                 if internaloutput['humidity'] > module.max_humidity:
                     started = controller.engage_fan(controller)
                     if started:
-                        logger.log(timestamp, 'Fan', '', "Fan started...")
-                        print("Fan started...")
+                        logger.log(timestamp, 'Fan', '',
+                                   f"Fan started, exceeded MAX humidity of: {internaloutput['humidity']}%")
+                        print(f"Fan started, exceeded set humidity of: {internaloutput['humidity']}%")
                 elif internaloutput['humidity'] < module.min_humidity:
                     stopped, run_time = controller.disengage_fan(controller)
                     if stopped:
                         print("Fan stopped...")
-                        logger.log(timestamp, 'Fan', '', "Fan stopped...")
-                        logger.log(timestamp, 'Fan', '', f"Fan run time: ,{ str(timedelta(seconds=run_time))}")
+                        logger.log(timestamp, 'Fan', '', f"Fan stopped, passed MIN humidity of: {internaloutput['humidity']}%")
+                        logger.log(timestamp, 'Fan', '', f"Fan run time: { str(timedelta(seconds=run_time))}")
                 # else:
                     # print('Internal Measurements matched or humidity change is less than 0.3 --> skipping....')
 
