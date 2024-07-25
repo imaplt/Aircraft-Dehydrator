@@ -109,7 +109,7 @@ if __name__ == "__main__":
                     display.update_line(1, justification='left',
                                         text=f"{internaloutput['humidity']}% - {internaloutput['temperature']}°C")
                     if internaloutput['humidity'] > module.max_humidity:
-                        started = controller.engage_fan(controller)
+                        started = controller.engage_fan()
                         if started:
                             logger.log(timestamp, 'Fan', '',
                                        f"Fan started, exceeded MAX humidity of: {module.max_humidity}%")
@@ -118,7 +118,7 @@ if __name__ == "__main__":
                             time.sleep(1)
                             display.display_default_four_rows()
                     elif internaloutput['humidity'] < module.min_humidity:
-                        stopped, run_time = controller.disengage_fan(controller)
+                        stopped, run_time = controller.disengage_fan()
                         if stopped:
                             print("Fan stopped...")
                             logger.log(timestamp, 'Fan', '',
