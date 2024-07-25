@@ -72,6 +72,7 @@ if __name__ == "__main__":
         time.sleep(2)
         start_time = time.time()
         controller = HumidityController()
+        controller.engage_fan()
         fan_status = controller.fan_status()
         print(fan_status)
         print()
