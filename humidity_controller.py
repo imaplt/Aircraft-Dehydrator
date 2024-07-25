@@ -8,6 +8,7 @@ class HumidityController:
         self.start_time = time.time()
         self.fan_engage_start_time = None
 
+    @staticmethod
     def engage_fan(self):
         if not self.fan_engaged:
             # Put code here to start fan...
@@ -16,6 +17,7 @@ class HumidityController:
         else:
             return False
 
+    @staticmethod
     def disengage_fan(self):
         if self.fan_engaged:
             # Put code here to stop the fan.
