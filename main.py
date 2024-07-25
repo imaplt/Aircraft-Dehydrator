@@ -92,10 +92,11 @@ if __name__ == "__main__":
                 print('Internal Measurements matched or humidity change is less than 0.3 --> skipping....')
 
             if internaloutput['humidity'] > module.max_humidity:
-                engaged = controller.engage_fan(controller)
-                logger.log(timestamp, 'Fan', '', "Fan started...")
+                started = controller.engage_fan(controller)
+                if started:
+                    logger.log(timestamp, 'Fan', '', "Fan started...")
             elif internaloutput['humidity'] < module.min_humidity:
-                engaged, run_time = controller.disengage_fan(controller)
+                stopped, run_time = controller.disengage_fan(controller)
                 logger.log(timestamp, 'Fan', '', "Fan stopped...")
                 logger.log(timestamp, 'Fan', '', f"Fan run time: , {run_time}")
 
