@@ -1,4 +1,5 @@
 import time
+from fan_controller import EMC2101
 
 
 class HumidityController:
@@ -7,6 +8,7 @@ class HumidityController:
         self.fan_engaged_time = 0
         self.start_time = time.time()
         self.fan_engage_start_time = None
+        self.emc2101 = EMC2101()
 
     @staticmethod
     def engage_fan(self):
@@ -29,7 +31,12 @@ class HumidityController:
 
     def fan_status(self):
         # Placeholder for actual fan status and RPM retrieval logic
-        status = "on" if self.fan_engaged else "off"
-        rpm = 1200 if self.fan_engaged else 0  # Example RPM values
+        # status = "on" if self.fan_engaged else "off"
+        status = self.emc2101.read_status()
+        config = self.emc2101.read_config()
+        rpm = self.emc2101.read_fan_speed()
+        print("Device Status:", status)
+        print("Device Configuration:", config)
+        # rpm = 1200 if self.fan_engaged else 0  # Example RPM values
         last_run_time = time.time() - self.start_time
-        return status, rpm, last_run_time
+        return status, config, rpm, last_run_time
