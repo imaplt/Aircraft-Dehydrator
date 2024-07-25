@@ -89,6 +89,7 @@ if __name__ == "__main__":
             else:
                 print('Internal Measurements matched or humidity change is less than 0.3 --> skipping....')
 
+            print(internaloutput['humidity'], module.max_humidity)
             if internaloutput['humidity'] > module.max_humidity:
                 started = controller.engage_fan(controller)
                 if started:
