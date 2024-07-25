@@ -74,6 +74,7 @@ if __name__ == "__main__":
         controller = HumidityController()
         fan_status = controller.fan_status()
         print(fan_status)
+        print()
         while True:
             current_time = time.time()
             # Read and print sensor data every 2 seconds

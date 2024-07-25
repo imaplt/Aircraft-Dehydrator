@@ -35,8 +35,11 @@ class HumidityController:
         status = self.emc2101.read_status()
         config = self.emc2101.read_config()
         rpm = self.emc2101.read_fan_speed()
+        temp = self.emc2101.read_internal_temp()
         print("Device Status:", status)
         print("Device Configuration:", config)
+        print("RPM:", rpm)
+        print("Temperature:", temp)
         # rpm = 1200 if self.fan_engaged else 0  # Example RPM values
         last_run_time = time.time() - self.start_time
         return status, config, rpm, last_run_time

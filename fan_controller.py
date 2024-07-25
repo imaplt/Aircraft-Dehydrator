@@ -14,7 +14,7 @@ class EMC2101:
     CONFIG_REG = 0x03
     RESET_REG = 0x05
 
-    def __init__(self, bus=1):
+    def __init__(self):
         self.i2c = busio.I2C(board.SCL, board.SDA)
         self.device = I2CDevice(self.i2c, self.I2C_ADDRESS)
 
@@ -83,7 +83,6 @@ class EMC2101:
         else:
             config_description.append("Temperature monitoring disabled")
         return ", ".join(config_description)
-
 
     # print("Internal Temperature:", emc2101.read_internal_temp(), "°C")
     # print("External Temperature:", emc2101.read_external_temp(), "°C")
