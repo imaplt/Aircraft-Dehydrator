@@ -5,7 +5,7 @@ import adafruit_sht4x
 import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import adafruit_ssd1306
 from adafruit_bus_device.i2c_device import I2CDevice
-import configparser
+import adafruit_bitbangio
 
 
 class SystemStatus:
@@ -81,9 +81,11 @@ def query_i2c_devices(installed_devices):
 
     if "SHT30" in installed_devices:
         try:
-            sht30 = adafruit_sht31d.SHT31D(i2c)
+            # The SHT30 uses a non-standard I2C interface
+            i2c = adafruit_bitbangio.I2C(board.D27, board.D22)
+            sensor = adafruit_sht31d.SHT31D(i2c, 0x44)
             devices["SHT30"]["status"] = ("Detected, temperature: {:.2f} C,"
-                                          " humidity: {:.2f} %").format(sht30.temperature, sht30.relative_humidity)
+                                          " humidity: {:.2f} %").format(sensor.temperature, sensor.relative_humidity)
         except Exception as e:
             devices["SHT30"]["status"] = f"Error: {str(e)}"
             overall_status = "bad"
@@ -135,19 +137,3 @@ def query_i2c_devices(installed_devices):
         statuses.append(f"{device}: {devices[device]['status']}")
 
     return overall_status, statuses
-
-
-
-# if __name__ == "__main__":
-#     overall_status, statuses = query_i2c_devices()
-#     print(f"Overall status: {overall_status}")
-#     for status in statuses:
-#         print(status)
-#
-#
-# if __name__ == "__main__":
-#     installed_devices = read_installed_devices()
-#     overall_status, statuses = query_i2c_devices(installed_devices)
-#     print(f"Overall status: {overall_status}")
-#     for status in statuses:
-#         print(status)
