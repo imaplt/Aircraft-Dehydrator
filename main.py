@@ -162,7 +162,7 @@ if __name__ == "__main__":
 
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}
-    button_hold_time = 2
+    button_hold_time = 3
     button_pressed = {'up': False, 'dn': False}
     humidity_changed = {'up': False, 'dn': False}
     mode = None
