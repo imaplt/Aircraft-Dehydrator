@@ -98,9 +98,9 @@ if __name__ == "__main__":
     lcd_display = LCD2004Display(config)
 
     lcd_display.display_default_four_rows()
-    time.sleep(2)
+    time.sleep(5)
     lcd_display.update_line(1, "Updated reading")
-    time.sleep(2)
+    time.sleep(5)
     lcd_display.display_text_center("Centered Text")
-    time.sleep(2)
-    lcd_display.clear_screen()
+    time.sleep(5)
+
