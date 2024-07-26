@@ -93,6 +93,7 @@ def query_i2c_devices(installed_devices):
 
     if "SHT41" in installed_devices:
         try:
+            i2c = busio.I2C(board.SCL, board.SDA)
             sht41 = adafruit_sht4x.SHT4x(i2c)
             devices["SHT41"]["status"] = ("Detected, temperature: {:.2f} C,"
                                           " humidity: {:.2f} %").format(sht41.temperature, sht41.relative_humidity)
