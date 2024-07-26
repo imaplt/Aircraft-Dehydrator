@@ -243,7 +243,7 @@ if __name__ == "__main__":
                     print("Internal Sensor Reading:", internaloutput)
                     ssd1306_display.update_line(1, justification='left',
                                                 text=f"{internaloutput['humidity']}% - {internaloutput['temperature']}°C")
-                    if internaloutput['humidity'] > module.max_humidity:
+                    if internaloutput['humidity'] > max_humidity:
                         started = controller.engage_fan()
                         print("Engage Fan Started:", started)
                         if started:
@@ -253,7 +253,7 @@ if __name__ == "__main__":
                             ssd1306_display.display_text_center_with_border('Fan Started...')
                             time.sleep(1)
                             ssd1306_display.display_default_four_rows()
-                    elif internaloutput['humidity'] < module.min_humidity:
+                    elif internaloutput['humidity'] < min_humidity:
                         stopped, run_time = controller.disengage_fan()
                         if stopped:
                             print("Fan stopped...")
