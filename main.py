@@ -2,14 +2,14 @@
 
 import time
 from datetime import timedelta
+import threading
+from gpiozero import Button
 import system_status as SystemStatus
 from humidity_controller import HumidityController
 from logger import Logger as Log
 from display import SSD1306Display, DisplayConfig, LCD2004Display
 from sensor import Sensor
 from config_manager import ConfigManager
-import threading
-from gpiozero import Button
 
 
 class MyDehydrator:
@@ -115,7 +115,7 @@ def button_hold_check():
                             display_min_humidity(min_humidity)
                         humidity_changed[button_name] = True
                     last_press_time[button_name] = now
-            elif humidity_changed[button_name] and now - last_press_time[button_name] > button_hold_time:
+            elif humidity_changed[button_name] and now - last_press_time[button_name] > 3:
                 save_config()
                 humidity_changed[button_name] = False
 
@@ -183,16 +183,10 @@ if __name__ == "__main__":
     lines = [""] * 4  # For four line ssd1306_display...
 
     try:
-        # config_manager.display_config()
-        # Update configuration
-        # config_manager.update_config('CUSTOM', 'minimum', '21')
-
         ssd1306_display_config = DisplayConfig(font_path=module.font, font_size=module.fontsize,
                                                border_size=module.border)
         ssd1306_display = SSD1306Display(ssd1306_display_config)
         lcd2004_display = LCD2004Display()
-
-        # print("Max characters per line:", ssd1306_display.get_max_characters())
 
         # Display centered text
         ssd1306_display.display_text_center("Initializing...")
