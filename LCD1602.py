@@ -12,8 +12,8 @@ class CharLCD1602(object):
         self.PCF8574_address = 0x27  # I2C address of the PCF8574 chip.
         self.PCF8574A_address = 0x3f  # I2C address of the PCF8574A chip.
         self.LCD_ADDR = self.PCF8574_address
-        self.lcd_columns = 16
-        self.lcd_rows = 2
+        self.lcd_columns = 20
+        self.lcd_rows = 4
         self.lines = [""] * self.lcd_rows
 
     def write_word(self, addr, data):
@@ -158,7 +158,7 @@ def loop():
     while True:
         lcd1602.clear_screen()
         lcd1602.display_text_center_with_border("Hello World!")
-        time.sleep(2)
+        time.sleep(3)
         lcd1602.display_four_rows_center(["Counter:", str(count), "Line 3", "Line 4"])
         time.sleep(2)
         lcd1602.update_line(1, "Updated Line 2")
