@@ -245,6 +245,7 @@ if __name__ == "__main__":
                                                 text=f"{internaloutput['humidity']}% - {internaloutput['temperature']}°C")
                     if internaloutput['humidity'] > module.max_humidity:
                         started = controller.engage_fan()
+                        print("Engage Fan Started:", started)
                         if started:
                             logger.log(timestamp, 'Fan', '',
                                        f"Fan started, exceeded MAX humidity of: {module.max_humidity}%")
