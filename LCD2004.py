@@ -5,13 +5,13 @@ import time
 from adafruit_character_lcd.character_lcd_i2c import Character_LCD_I2C
 
 class LCD2004Display:
-    def __init__(self, configuration, i2c_type='busio', i2c_address=0x27):
+    def __init__(self, configuration, i2c_type='bitbangio', i2c_address=0x27):
         self.i2c_address = i2c_address
         self.config_manager = configuration
 
         # Initialize I2C interface based on i2c_type.
         if i2c_type == 'bitbangio':
-            self.i2c = bitbangio.I2C(board.SCL, board.SDA)
+            self.i2c = bitbangio.I2C(board.D27, board.D22)
         else:
             self.i2c = busio.I2C(board.SCL, board.SDA)
 
