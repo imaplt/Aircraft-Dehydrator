@@ -4,7 +4,7 @@ import smbus
 import subprocess
 
 
-class CharLCD1602(object):
+class CharLCD2004(object):
     def __init__(self):
         # Note you need to change the bus number to 0 if running on a revision 1 Raspberry Pi.
         self.bus = smbus.SMBus(1)
@@ -103,12 +103,12 @@ class CharLCD1602(object):
     def write(self, x, y, str):
         if x < 0:
             x = 0
-        if x > 15:
-            x = 15
+        if x > self.lcd_columns - 1:
+            x = self.lcd_columns - 1
         if y < 0:
             y = 0
-        if y > 1:
-            y = 1
+        if y > self.lcd_rows - 1:
+            y = self.lcd_rows - 1
         # Move cursor
         addr = 0x80 + 0x40 * y + x
         self.send_command(addr)
@@ -144,38 +144,45 @@ class CharLCD1602(object):
     def display_default_four_rows(self):
         self.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."])
 
-    def update_line(self, line_number, text):
+    def update_line(self, line_number, text, justification='center'):
         if line_number < 0 or line_number >= self.lcd_rows:
-            raise ValueError("line_number must be between 0 and 1")
+            raise ValueError("line_number must be between 0 and 3")
 
         self.lines[line_number] = text
-        centered_text = text.center(self.lcd_columns)
-        self.write(0, line_number, centered_text)
+        max_chars = self.lcd_columns
+
+        if justification == 'left':
+            display_text = text.ljust(max_chars)
+        elif justification == 'right':
+            display_text = text.rjust(max_chars)
+        else:  # default to center
+            display_text = text.center(max_chars)
+        self.write(0, line_number, display_text)
 
 
 def loop():
     count = 0
     while True:
-        lcd1602.clear_screen()
-        lcd1602.display_text_center_with_border("Hello World!")
-        time.sleep(3)
-        lcd1602.display_four_rows_center(["Counter:", str(count), "Line 3", "Line 4"])
+        lcd2004.clear_screen()
+        lcd2004.display_text_center_with_border("Hello World!")
         time.sleep(2)
-        lcd1602.update_line(1, "Updated Line 2")
+        lcd2004.display_four_rows_center(["Counter:", str(count), "Line 3", "Line 4"])
         time.sleep(2)
-        lcd1602.display_default_four_rows()
+        lcd2004.update_line(2, "Updated Line 3")
+        time.sleep(2)
+        lcd2004.display_default_four_rows()
         time.sleep(2)
         count += 1
 
 
 def destroy():
-    lcd1602.clear()
+    lcd2004.clear()
 
 
-lcd1602 = CharLCD1602()
+lcd2004 = CharLCD2004()
 if __name__ == '__main__':
     print('Program is starting ... ')
-    lcd1602.init_lcd(addr=None, bl=1)
+    lcd2004.init_lcd(addr=None, bl=1)
     try:
         loop()
     except KeyboardInterrupt:
