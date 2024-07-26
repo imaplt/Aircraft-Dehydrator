@@ -86,7 +86,9 @@ class LCD2004Display:
         self.lcd.message += centered_text + "\n"
         self.lcd.message += border_line
 
+
 if __name__ == "__main__":
+
     config_manager = ConfigManager(font_path='path/to/font.ttf', font_size=12, border_size=2)
     display = LCD2004Display(config_manager)
     print("Max characters per line:", display.get_max_characters())
