@@ -185,13 +185,13 @@ if __name__ == "__main__":
         ssd1306_display_config = DisplayConfig(font_path=module.font, font_size=module.fontsize,
                                                border_size=module.border)
         ssd1306_display = SSD1306Display(ssd1306_display_config)
-        # lcd2004_display = LCD2004Display(i2c_type='bitbangio')
+        lcd2004_display = LCD2004Display()
 
         # print("Max characters per line:", ssd1306_display.get_max_characters())
 
         # Display centered text
         ssd1306_display.display_text_center("Initializing...")
-        # lcd2004_display.display_text_center_with_border('Initializing...')
+        lcd2004_display.display_text_center_with_border('Initializing...')
         time.sleep(3)
 
         internalsensor = Sensor('SHT41', 0x44)
