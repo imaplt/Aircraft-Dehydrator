@@ -245,10 +245,8 @@ if __name__ == "__main__":
                     print("Internal Sensor Reading:", internaloutput)
                     ssd1306_display.update_line(1, justification='left',
                                                 text=f"{internaloutput['humidity']}% - {internaloutput['temperature']}°C")
-                    print(max_humidity,min_humidity)
                     if internaloutput['humidity'] > max_humidity:
                         started = controller.engage_fan()
-                        print("Engage Fan Started:", started)
                         if started:
                             logger.log(timestamp, 'Fan', '',
                                        f"Fan started, exceeded MAX humidity of: {module.max_humidity}%")
