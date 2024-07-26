@@ -37,7 +37,7 @@ class ConfigManager:
     def update_config(self, key, value):
         if not self.config.has_section("CUSTOM"):
             self.config.add_section("CUSTOM")
-        self.config.set("CUSTOM", key, value)
+        self.config.set("CUSTOM", key, str(value))
         self.save_config()
 
     def save_config(self):
