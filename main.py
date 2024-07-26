@@ -211,10 +211,8 @@ if __name__ == "__main__":
         time.sleep(2)
         start_time = time.time()
         controller = HumidityController()
-        controller.engage_fan()
         fan_status = controller.fan_status()
         print(fan_status)
-        initial_start = True
         while True:
             current_time = time.time()
             # Read and print sensor data every 2 seconds
@@ -254,7 +252,7 @@ if __name__ == "__main__":
                             ssd1306_display.display_text_center_with_border('Fan Started...')
                             time.sleep(1)
                             ssd1306_display.display_default_four_rows()
-                    elif internaloutput['humidity'] < min_humidity and not initial_start:
+                    elif internaloutput['humidity'] < min_humidity:
                         stopped, run_time = controller.disengage_fan()
                         if stopped:
                             print("Fan stopped...")
