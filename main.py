@@ -58,9 +58,11 @@ def button_pressed_callback(button):
     # Show the current setting when the button is pressed and released
     if now - last_press_time[button_name] <= button_hold_time:
         if button_name == 'up':
+            print('Up Button Pressed...')
             display_max_humidity(max_humidity)
             mode = 'max'
         else:
+            print('DN Button Pressed...')
             display_min_humidity(min_humidity)
             mode = 'min'
 
@@ -76,9 +78,11 @@ def button_released_callback(button):
     # Check if the button was held for more than the hold time
     if now - last_press_time[button_name] > button_hold_time:
         if button_name == 'up':
+            print('Up Button Released...')
             display_max_humidity(max_humidity)
             mode = 'max'
         else:
+            print('DN Button Released...')
             display_min_humidity(min_humidity)
             mode = 'min'
 
@@ -153,7 +157,7 @@ if __name__ == "__main__":
 
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}
-    button_hold_time = 3
+    button_hold_time = 2
     button_pressed = {'up': False, 'dn': False}
     humidity_changed = {'up': False, 'dn': False}
     mode = None
