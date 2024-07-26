@@ -124,10 +124,12 @@ def cleanup():
     # Want to add code here to update display, update log with run time etc
     print('Cleaning Up')
     ssd1306_display.display_text_center_with_border('Shutting down...')
+    lcd2004_display.display_text_center_with_border('Shutting down...')
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                'System', '', "Shutting down...")
     time.sleep(3)
     ssd1306_display.clear_screen()
+    lcd2004_display.clear_screen()
 
 
 def read_installed_devices(config):
