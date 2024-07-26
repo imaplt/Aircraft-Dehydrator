@@ -5,7 +5,7 @@ from datetime import timedelta
 import system_status as SystemStatus
 from humidity_controller import HumidityController
 from logger import Logger as Log
-from display import SSD1306Display, DisplayConfig
+from display import SSD1306Display, DisplayConfig, LCD2004Display
 from sensor import Sensor
 from config_manager import ConfigManager
 import threading
@@ -123,15 +123,14 @@ def cleanup():
     # Test
     # Want to add code here to update display, update log with run time etc
     print('Cleaning Up')
-    display.display_text_center_with_border('Shutting down...')
+    ssd1306_display.display_text_center_with_border('Shutting down...')
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                'System', '', "Shutting down...")
     time.sleep(3)
-    display.clear_screen()
+    ssd1306_display.clear_screen()
 
 
 def read_installed_devices(config):
-
     devices = config.get_config('installed_devices').split(',')
     devices = [device.strip() for device in devices]  # Remove any extra whitespace
     return devices
@@ -175,7 +174,7 @@ if __name__ == "__main__":
         print(status)
 
     # Initialize lines
-    lines = [""] * 4  # For four line display...
+    lines = [""] * 4  # For four line ssd1306_display...
     module = MyDehydrator(config_manager)
 
     try:
@@ -183,12 +182,17 @@ if __name__ == "__main__":
         # Update configuration
         # config_manager.update_config('CUSTOM', 'minimum', '21')
 
-        display_config = DisplayConfig(font_path=module.font, font_size=module.fontsize, border_size=module.border)
-        display = SSD1306Display(display_config)
-        # print("Max characters per line:", display.get_max_characters())
+        ssd1306_display_config = DisplayConfig(font_path=module.font, font_size=module.fontsize,
+                                               border_size=module.border)
+        ssd1306_display = SSD1306Display(ssd1306_display_config)
+        lcd2004_display_config = DisplayConfig(i2c_type='bitbangio')
+        lcd2004_display = LCD2004Display(lcd2004_display_config)
+
+        # print("Max characters per line:", ssd1306_display.get_max_characters())
 
         # Display centered text
-        display.display_text_center("Initializing...")
+        ssd1306_display.display_text_center("Initializing...")
+        lcd2004_display.display_text_center_with_border('Initializing...')
         time.sleep(3)
 
         internalsensor = Sensor('SHT41', 0x44)
@@ -202,8 +206,9 @@ if __name__ == "__main__":
         print("External Mode: ", externalsensor.sensor_mode())
         print("Internal Mode: ", internalsensor.sensor_mode())
 
-        display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], justification='left')
-        display.display_default_four_rows()
+        ssd1306_display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."],
+                                                 justification='left')
+        ssd1306_display.display_default_four_rows()
         time.sleep(2)
         start_time = time.time()
         controller = HumidityController()
@@ -226,8 +231,8 @@ if __name__ == "__main__":
                     externalprevious_output['temperature'] = externaloutput['temperature']
                     externalprevious_output['humidity'] = externaloutput['humidity']
                     print("External Sensor Reading:", externaloutput)
-                    display.update_line(3, justification='left',
-                                        text=f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
+                    ssd1306_display.update_line(3, justification='left',
+                                                text=f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
 
                 time.sleep(.1)
                 internaloutput = internalsensor.read_sensor()
@@ -239,17 +244,17 @@ if __name__ == "__main__":
                     internalprevious_output['temperature'] = internaloutput['temperature']
                     internalprevious_output['humidity'] = internaloutput['humidity']
                     print("Internal Sensor Reading:", internaloutput)
-                    display.update_line(1, justification='left',
-                                        text=f"{internaloutput['humidity']}% - {internaloutput['temperature']}°C")
+                    ssd1306_display.update_line(1, justification='left',
+                                                text=f"{internaloutput['humidity']}% - {internaloutput['temperature']}°C")
                     if internaloutput['humidity'] > module.max_humidity:
                         started = controller.engage_fan()
                         if started:
                             logger.log(timestamp, 'Fan', '',
                                        f"Fan started, exceeded MAX humidity of: {module.max_humidity}%")
                             print(f"Fan started, exceeded set humidity of: {module.max_humidity}%")
-                            display.display_text_center_with_border('Fan Started...')
+                            ssd1306_display.display_text_center_with_border('Fan Started...')
                             time.sleep(1)
-                            display.display_default_four_rows()
+                            ssd1306_display.display_default_four_rows()
                     elif internaloutput['humidity'] < module.min_humidity:
                         stopped, run_time = controller.disengage_fan()
                         if stopped:
@@ -257,9 +262,9 @@ if __name__ == "__main__":
                             logger.log(timestamp, 'Fan', '',
                                        f"Fan stopped, passed MIN humidity of: {module.min_humidity}%")
                             logger.log(timestamp, 'Fan', '', f"Fan run time: {str(timedelta(seconds=run_time))}")
-                            display.display_text_center_with_border('Fan Stopped...')
+                            ssd1306_display.display_text_center_with_border('Fan Stopped...')
                             time.sleep(1)
-                            display.display_default_four_rows()
+                            ssd1306_display.display_default_four_rows()
 
                 time.sleep(.1)  # Adjust as needed
 
