@@ -10,7 +10,6 @@ from sensor import Sensor
 from config_manager import ConfigManager
 import threading
 from gpiozero import Button
-from signal import pause
 
 
 class MyDehydrator:
@@ -115,7 +114,6 @@ def button_hold_check():
 
         time.sleep(0.1)
 
-# Attach event handlers
 
 def cleanup():
     # Test
