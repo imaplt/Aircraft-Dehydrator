@@ -2,6 +2,8 @@
 
 import time
 from datetime import timedelta
+
+import system_status as SystemStatus
 from humidity_controller import HumidityController
 from logger import Logger as Log
 from display import SSD1306Display, DisplayConfig
@@ -35,15 +37,27 @@ def cleanup():
     display.clear_screen()
 
 
+def read_installed_devices(config):
+
+    devices = config.get('installed_devices').split(',')
+    devices = [device.strip() for device in devices]  # Remove any extra whitespace
+    return devices
+
+
 if __name__ == "__main__":
 
-    try:
-        # Initialize lines
-        lines = [""] * 4  # For four line display...
-        config_manager = ConfigManager('config.ini')
-        module = MyDehydrator(config_manager)
+    config_manager = ConfigManager('config.ini')
+    installed_devices = read_installed_devices(config_manager)
+    overall_status, statuses = SystemStatus.query_i2c_devices(installed_devices)
+    print(f"Overall status: {overall_status}")
+    for status in statuses:
+        print(status)
 
-        print()
+    # Initialize lines
+    lines = [""] * 4  # For four line display...
+    module = MyDehydrator(config_manager)
+
+    try:
         # config_manager.display_config()
         # Update configuration
         # config_manager.update_config('CUSTOM', 'minimum', '21')
