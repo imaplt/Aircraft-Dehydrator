@@ -137,8 +137,9 @@ def read_installed_devices(config):
 
 
 if __name__ == "__main__":
-
     config_manager = ConfigManager('config.ini')
+    module = MyDehydrator(config_manager)
+    logger = module.logger(module.logfile, module.max_log_size, module.max_archive_size)
     installed_devices = read_installed_devices(config_manager)
     overall_status, statuses = SystemStatus.query_i2c_devices(installed_devices)
     print(f"Overall status: {overall_status}")
@@ -175,7 +176,6 @@ if __name__ == "__main__":
 
     # Initialize lines
     lines = [""] * 4  # For four line ssd1306_display...
-    module = MyDehydrator(config_manager)
 
     try:
         # config_manager.display_config()
@@ -196,8 +196,6 @@ if __name__ == "__main__":
 
         internalsensor = Sensor('SHT41', 0x44)
         externalsensor = Sensor('SHT30', 0x44)
-
-        logger = module.logger(module.logfile, module.max_log_size, module.max_archive_size)
 
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}
