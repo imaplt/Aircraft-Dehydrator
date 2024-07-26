@@ -165,7 +165,7 @@ class SSD1306Display:
 
 
 class LCD2004Display:
-    def __init__(self, i2c_type='busio', i2c_address=0x27):
+    def __init__(self, i2c_type='bitbangio', i2c_address=0x27):
         self.i2c_address = i2c_address
 
         # Initialize I2C interface based on i2c_type.
