@@ -1,6 +1,7 @@
 import board
 import digitalio
 import adafruit_character_lcd.character_lcd as character_lcd
+import time
 
 
 class ConfigManager:
@@ -88,11 +89,14 @@ class LCD2004Display:
         self.lcd.message += border_line
 
 
-# Example usage:
-# config_manager = ConfigManager(font_path='path/to/font.ttf', font_size=12, border_size=2)
-# display = LCD2004Display(config_manager)
-# print("Max characters per line:", display.get_max_characters())
-# display.display_text_center("Hello World!")
-# display.display_four_rows_center(["Line 1", "Line 2", "Line 3", "Line 4"])
-# display.display_text_center_with_border("Border Text")
-# display.update_line(2, "Updated Line 3")
+if __name__ == "__main__":
+    config_manager = ConfigManager(font_path='path/to/font.ttf', font_size=12, border_size=2)
+    display = LCD2004Display(config_manager)
+    print("Max characters per line:", display.get_max_characters())
+    display.display_text_center("Hello World!")
+    time.sleep(2)
+    display.display_four_rows_center(["Line 1", "Line 2", "Line 3", "Line 4"])
+    time.sleep(2)
+    display.display_text_center_with_border("Border Text")
+    time.sleep(2)
+    display.update_line(2, "Updated Line 3")
