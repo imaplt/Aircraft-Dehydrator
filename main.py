@@ -39,6 +39,9 @@ def display_max_humidity(value):
 # Save configuration
 def save_config():
     global min_humidity, max_humidity
+    print("Saving config...")
+    print("Min Humidity: ", min_humidity)
+    print("Max Humidity: ", max_humidity)
     config_manager.update_config('min_humidity', min_humidity)
     config_manager.update_config('max_humidity', max_humidity)
 
