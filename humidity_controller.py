@@ -40,6 +40,7 @@ class HumidityController:
         print("Device Configuration:", config)
         print("RPM:", rpm)
         print("Temperature:", temp)
+        print("Fan Engaged:", self.fan_engaged)
         # rpm = 1200 if self.fan_engaged else 0  # Example RPM values
         last_run_time = time.time() - self.start_time
         return status, config, rpm, last_run_time

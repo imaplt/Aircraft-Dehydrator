@@ -254,7 +254,7 @@ if __name__ == "__main__":
                             ssd1306_display.display_text_center_with_border('Fan Started...')
                             time.sleep(1)
                             ssd1306_display.display_default_four_rows()
-                    elif internaloutput['humidity'] < min_humidity:
+                    elif internaloutput['humidity'] < min_humidity and not initial_start:
                         stopped, run_time = controller.disengage_fan()
                         if stopped:
                             print("Fan stopped...")
@@ -266,7 +266,7 @@ if __name__ == "__main__":
                             ssd1306_display.display_default_four_rows()
 
                 time.sleep(.1)  # Adjust as needed
-
+            initial_start = False
             # Heat the sensors every 90 seconds
             if int(current_time - start_time) % 90 == 0:
                 timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
