@@ -39,7 +39,7 @@ def cleanup():
 
 def read_installed_devices(config):
 
-    devices = config.get('installed_devices').split(',')
+    devices = config.get_config('installed_devices').split(',')
     devices = [device.strip() for device in devices]  # Remove any extra whitespace
     return devices
 
