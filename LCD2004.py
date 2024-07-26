@@ -4,8 +4,9 @@ import adafruit_bitbangio as bitbangio
 import time
 from adafruit_character_lcd.character_lcd_i2c import Character_LCD_I2C
 
+
 class LCD2004Display:
-    def __init__(self, configuration, i2c_type='bitbangio', i2c_address=0x27):
+    def __init__(self, configuration, i2c_type='busio', i2c_address=0x27):
         self.i2c_address = i2c_address
         self.config_manager = configuration
 
@@ -17,7 +18,7 @@ class LCD2004Display:
 
         # Initialize display.
         self.lcd = Character_LCD_I2C(self.i2c, self.i2c_address, 20, 4)
-
+        self.lcd.message("LCD Display")
         # Initialize lines
         self.lines = [""] * 4
 
@@ -26,10 +27,6 @@ class LCD2004Display:
 
     def clear_screen(self):
         self.lcd.clear()
-
-    def set_font(self, font_path=None, font_size=10):
-        # Not applicable for Character_LCD_I2C, but kept for interface consistency.
-        pass
 
     def get_max_characters(self):
         # Returns the maximum number of characters per line for the display.
@@ -82,6 +79,7 @@ class LCD2004Display:
         # Borders are not applicable for Character_LCD_I2C, but kept for interface consistency.
         self.display_text_center(text)
 
+
 # Example usage
 if __name__ == "__main__":
     class MockConfiguration:
@@ -99,8 +97,7 @@ if __name__ == "__main__":
 
     lcd_display.display_default_four_rows()
     time.sleep(5)
-    lcd_display.update_line(1, "Updated reading")
-    time.sleep(5)
-    lcd_display.display_text_center("Centered Text")
-    time.sleep(5)
-
+    # lcd_display.update_line(1, "Updated reading")
+    # time.sleep(5)
+    # lcd_display.display_text_center("Centered Text")
+    # time.sleep(5)
