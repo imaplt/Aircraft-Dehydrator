@@ -185,8 +185,7 @@ if __name__ == "__main__":
         ssd1306_display_config = DisplayConfig(font_path=module.font, font_size=module.fontsize,
                                                border_size=module.border)
         ssd1306_display = SSD1306Display(ssd1306_display_config)
-        lcd2004_display_config = DisplayConfig(i2c_type='bitbangio')
-        lcd2004_display = LCD2004Display(lcd2004_display_config)
+        lcd2004_display = LCD2004Display(i2c_type='bitbangio')
 
         # print("Max characters per line:", ssd1306_display.get_max_characters())
 
