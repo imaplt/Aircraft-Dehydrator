@@ -1,7 +1,8 @@
-import board
-import digitalio
-import adafruit_character_lcd.character_lcd as character_lcd
 import time
+import board
+import busio
+import bitbangio
+from adafruit_character_lcd.character_lcd_i2c import Character_LCD_I2C
 
 
 class ConfigManager:
@@ -21,24 +22,21 @@ class ConfigManager:
 
 
 class LCD2004Display:
-    def __init__(self, config_manager):
+    def __init__(self, config_manager, i2c_address=0x27, i2c_type='busio'):
         self.config_manager = config_manager
 
-        # Define the LCD pin configuration
-        lcd_rs = digitalio.DigitalInOut(board.D7)
-        lcd_en = digitalio.DigitalInOut(board.D8)
-        lcd_d4 = digitalio.DigitalInOut(board.D9)
-        lcd_d5 = digitalio.DigitalInOut(board.D10)
-        lcd_d6 = digitalio.DigitalInOut(board.D11)
-        lcd_d7 = digitalio.DigitalInOut(board.D12)
+        # Initialize I2C interface based on i2c_type.
+        if i2c_type == 'bitbangio':
+            self.i2c = bitbangio.I2C(board.SCL, board.SDA)
+        else:
+            self.i2c = busio.I2C(board.SCL, board.SDA)
 
         # Define LCD column and row size for 20x4 LCD.
         self.lcd_columns = 20
         self.lcd_rows = 4
 
-        # Initialize the LCD class
-        self.lcd = character_lcd.Character_LCD_Mono(lcd_rs, lcd_en, lcd_d4, lcd_d5, lcd_d6, lcd_d7, self.lcd_columns,
-                                                    self.lcd_rows)
+        # Initialize the LCD class using I2C
+        self.lcd = Character_LCD_I2C(self.i2c, i2c_address, self.lcd_columns, self.lcd_rows)
 
         # Initialize lines
         self.lines = [""] * 4
@@ -87,7 +85,6 @@ class LCD2004Display:
         centered_text = text.center(self.lcd_columns)
         self.lcd.message += centered_text + "\n"
         self.lcd.message += border_line
-
 
 if __name__ == "__main__":
     config_manager = ConfigManager(font_path='path/to/font.ttf', font_size=12, border_size=2)
