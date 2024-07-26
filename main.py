@@ -10,6 +10,7 @@ from sensor import Sensor
 from config_manager import ConfigManager
 import threading
 from gpiozero import Button
+from signal import pause
 
 
 class MyDehydrator:
@@ -44,7 +45,7 @@ def save_config():
 
 
 def button_pressed_callback(button):
-    global min_humidity, max_humidity, last_press_time, button_pressed, humidity_changed
+    global last_press_time, button_pressed, mode
 
     now = time.time()
     button_name = 'up' if button.pin.number == up_button_pin else 'dn'
@@ -52,44 +53,69 @@ def button_pressed_callback(button):
     if button_pressed[button_name]:
         return  # Ignore if button is already pressed
 
-    if now - last_press_time[button_name] > button_hold_time:
-        if button_name == 'up':
-            print(f"UpButton pressed: Current max_humidity = {max_humidity}")
-            display_max_humidity(max_humidity)
-        else:
-            print(f"DnButton pressed: Current min_humidity = {min_humidity}")
-            display_min_humidity(min_humidity)
-
     last_press_time[button_name] = now
     button_pressed[button_name] = True
 
+    # Show the current setting when the button is pressed and released
+    if now - last_press_time[button_name] <= button_hold_time:
+        if button_name == 'up':
+            display_max_humidity(max_humidity)
+            mode = 'max'
+        else:
+            display_min_humidity(min_humidity)
+            mode = 'min'
+
+
+def button_released_callback(button):
+    global last_press_time, button_pressed, mode
+
+    button_name = 'up' if button.pin.number == up_button_pin else 'dn'
+    button_pressed[button_name] = False
+
+    now = time.time()
+
+    # Check if the button was held for more than the hold time
+    if now - last_press_time[button_name] > button_hold_time:
+        if button_name == 'up':
+            display_max_humidity(max_humidity)
+            mode = 'max'
+        else:
+            display_min_humidity(min_humidity)
+            mode = 'min'
+
 
 def button_hold_check():
-    global min_humidity, max_humidity, button_pressed, humidity_changed
+    global min_humidity, max_humidity, button_pressed, humidity_changed, mode
 
     while True:
         now = time.time()
         for button_name in ['up', 'dn']:
             if button_pressed[button_name]:
                 if now - last_press_time[button_name] > button_hold_time:
-                    if button_name == 'up':
-                        max_humidity += 1
-                        print(f"UpButton held: Incremented max_humidity to {max_humidity}")
-                        display_max_humidity(max_humidity)
-                    else:
-                        min_humidity -= 1
-                        print(f"DnButton held: Decremented min_humidity to {min_humidity}")
-                        display_min_humidity(min_humidity)
-                    humidity_changed[button_name] = True
+                    if mode == 'max':
+                        if button_name == 'up':
+                            max_humidity += 1
+                            display_max_humidity(max_humidity)
+                        else:
+                            max_humidity -= 1
+                            display_max_humidity(max_humidity)
+                        humidity_changed[button_name] = True
+                    elif mode == 'min':
+                        if button_name == 'up':
+                            min_humidity += 1
+                            display_min_humidity(min_humidity)
+                        else:
+                            min_humidity -= 1
+                            display_min_humidity(min_humidity)
+                        humidity_changed[button_name] = True
                     last_press_time[button_name] = now
-
             elif humidity_changed[button_name] and now - last_press_time[button_name] > button_hold_time:
                 save_config()
-                print("Configuration saved.")
                 humidity_changed[button_name] = False
 
         time.sleep(0.1)
 
+# Attach event handlers
 
 def cleanup():
     # Test
@@ -132,10 +158,13 @@ if __name__ == "__main__":
     button_hold_time = 3
     button_pressed = {'up': False, 'dn': False}
     humidity_changed = {'up': False, 'dn': False}
+    mode = None
 
     # Attach event handlers
     up_button.when_pressed = lambda: button_pressed_callback(up_button)
+    up_button.when_released = lambda: button_released_callback(up_button)
     dn_button.when_pressed = lambda: button_pressed_callback(dn_button)
+    dn_button.when_released = lambda: button_released_callback(dn_button)
 
     # Start the button hold check thread
     threading.Thread(target=button_hold_check, daemon=True).start()
