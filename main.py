@@ -2,13 +2,14 @@
 
 import time
 from datetime import timedelta
-
 import system_status as SystemStatus
 from humidity_controller import HumidityController
 from logger import Logger as Log
 from display import SSD1306Display, DisplayConfig
 from sensor import Sensor
 from config_manager import ConfigManager
+import threading
+from gpiozero import Button
 
 
 class MyDehydrator:
@@ -26,6 +27,70 @@ class MyDehydrator:
         self.max_archive_size = self.config_manager.get_int_config('max_archive_size')
 
 
+# Display function placeholders
+def display_min_humidity(value):
+    print(f"Min Humidity: {value}%")
+
+
+def display_max_humidity(value):
+    print(f"Max Humidity: {value}%")
+
+
+# Save configuration
+def save_config():
+    global min_humidity, max_humidity
+    config_manager.update_config('min_humidity', min_humidity)
+    config_manager.update_config('max_humidity', max_humidity)
+
+
+def button_pressed_callback(button):
+    global min_humidity, max_humidity, last_press_time, button_pressed, humidity_changed
+
+    now = time.time()
+    button_name = 'up' if button.pin.number == up_button_pin else 'dn'
+
+    if button_pressed[button_name]:
+        return  # Ignore if button is already pressed
+
+    if now - last_press_time[button_name] > button_hold_time:
+        if button_name == 'up':
+            print(f"UpButton pressed: Current max_humidity = {max_humidity}")
+            display_max_humidity(max_humidity)
+        else:
+            print(f"DnButton pressed: Current min_humidity = {min_humidity}")
+            display_min_humidity(min_humidity)
+
+    last_press_time[button_name] = now
+    button_pressed[button_name] = True
+
+
+def button_hold_check():
+    global min_humidity, max_humidity, button_pressed, humidity_changed
+
+    while True:
+        now = time.time()
+        for button_name in ['up', 'dn']:
+            if button_pressed[button_name]:
+                if now - last_press_time[button_name] > button_hold_time:
+                    if button_name == 'up':
+                        max_humidity += 1
+                        print(f"UpButton held: Incremented max_humidity to {max_humidity}")
+                        display_max_humidity(max_humidity)
+                    else:
+                        min_humidity -= 1
+                        print(f"DnButton held: Decremented min_humidity to {min_humidity}")
+                        display_min_humidity(min_humidity)
+                    humidity_changed[button_name] = True
+                    last_press_time[button_name] = now
+
+            elif humidity_changed[button_name] and now - last_press_time[button_name] > button_hold_time:
+                save_config()
+                print("Configuration saved.")
+                humidity_changed[button_name] = False
+
+        time.sleep(0.1)
+
+
 def cleanup():
     # Test
     # Want to add code here to update display, update log with run time etc
@@ -33,7 +98,7 @@ def cleanup():
     display.display_text_center_with_border('Shutting down...')
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                'System', '', "Shutting down...")
-    time.sleep(5)
+    time.sleep(3)
     display.clear_screen()
 
 
@@ -50,6 +115,31 @@ if __name__ == "__main__":
     installed_devices = read_installed_devices(config_manager)
     overall_status, statuses = SystemStatus.query_i2c_devices(installed_devices)
     print(f"Overall status: {overall_status}")
+
+    # Get initial values
+    min_humidity = config_manager.get_int_config('min_humidity')
+    max_humidity = config_manager.get_int_config('max_humidity')
+    # Get button pins
+    up_button_pin = config_manager.get_int_config('up_button_pin')
+    dn_button_pin = config_manager.get_int_config('dn_button_pin')
+
+    # GPIO setup using gpiozero
+    up_button = Button(up_button_pin, pull_up=True, bounce_time=0.2)
+    dn_button = Button(dn_button_pin, pull_up=True, bounce_time=0.2)
+
+    # Variables to manage button state and humidity values
+    last_press_time = {'up': 0, 'dn': 0}
+    button_hold_time = 3
+    button_pressed = {'up': False, 'dn': False}
+    humidity_changed = {'up': False, 'dn': False}
+
+    # Attach event handlers
+    up_button.when_pressed = lambda: button_pressed_callback(up_button)
+    dn_button.when_pressed = lambda: button_pressed_callback(dn_button)
+
+    # Start the button hold check thread
+    threading.Thread(target=button_hold_check, daemon=True).start()
+
     for status in statuses:
         print(status)
 
@@ -89,7 +179,7 @@ if __name__ == "__main__":
         controller.engage_fan()
         fan_status = controller.fan_status()
         print(fan_status)
-        print()
+        initial_start = True
         while True:
             current_time = time.time()
             # Read and print sensor data every 2 seconds
@@ -107,8 +197,6 @@ if __name__ == "__main__":
                     print("External Sensor Reading:", externaloutput)
                     display.update_line(3, justification='left',
                                         text=f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
-                # else:
-                # print('External Measurements matched or humidity change is less than 0.3 --> skipping....')
 
                 time.sleep(.1)
                 internaloutput = internalsensor.read_sensor()
@@ -141,14 +229,8 @@ if __name__ == "__main__":
                             display.display_text_center_with_border('Fan Stopped...')
                             time.sleep(1)
                             display.display_default_four_rows()
-                    # else:
-                    # print('Internal Measurements matched or humidity change is less than 0.3 --> skipping....')
 
                 time.sleep(.1)  # Adjust as needed
-
-                # Example logging for fan status
-                # status, rpm = self.fan_status()
-                # logging.info(f"Fan status: {status}, RPM: {rpm}")
 
             # Heat the sensors every 90 seconds
             if int(current_time - start_time) % 90 == 0:

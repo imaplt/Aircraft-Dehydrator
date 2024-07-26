@@ -6,7 +6,7 @@ class ConfigManager:
         self.config_file = config_file
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
-    
+
     def get_config(self, key):
         if "CUSTOM" in self.config and key in self.config["CUSTOM"]:
             return self.config["CUSTOM"][key]
