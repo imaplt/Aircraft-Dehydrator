@@ -101,25 +101,25 @@ def button_hold_check():
                 max_humidity += 1
                 display_max_humidity(max_humidity)
                 humidity_changed = True
-                last_press_time['up'] = int(now)
+                last_press_time['up'] = now
             elif button_pressed['dn']:
                 max_humidity -= 1
                 display_max_humidity(max_humidity)
                 humidity_changed = True
-                last_press_time['dn'] = int(now)
+                last_press_time['dn'] = now
         elif mode == 'min':
             if button_pressed['up']:
                 min_humidity += 1
                 display_min_humidity(min_humidity)
                 humidity_changed = True
-                last_press_time['up'] = int(now)
+                last_press_time['up'] = now
             elif button_pressed['dn']:
                 min_humidity -= 1
                 display_min_humidity(min_humidity)
                 humidity_changed = True
-                last_press_time['dn'] = int(now)
+                last_press_time['dn'] = now
 
-        if humidity_changed and (int(now) - last_press_time['up'] > 3 and int(now) - last_press_time['dn'] > 3):
+        if humidity_changed and (now - last_press_time['up'] > 3 and now - last_press_time['dn'] > 3):
             save_config()
             humidity_changed = False
 

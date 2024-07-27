@@ -6,6 +6,7 @@ import subprocess
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
 
+
 class DisplayConfig:
     def __init__(self, font_path=None, font_size=10, border_size=1):
         self.font_path = font_path
