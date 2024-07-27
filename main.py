@@ -182,10 +182,11 @@ if __name__ == "__main__":
     # Start the button hold check thread
     threading.Thread(target=button_hold_check, daemon=True).start()
 
-    controller.emc2101.set_fan_speed(controller, 25)
+    controller.engage_fan()
 
     for status in statuses:
         print(status)
+    controller.disengage_fan()
 
     # Initialize lines
     lines = [""] * 4  # For four line ssd1306_display...
