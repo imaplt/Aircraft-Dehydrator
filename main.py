@@ -182,7 +182,7 @@ if __name__ == "__main__":
     # Start the button hold check thread
     threading.Thread(target=button_hold_check, daemon=True).start()
 
-    controller.emc2101.set_fan_speed(controller, speed=25)
+    controller.emc2101.set_fan_speed(controller, 25)
 
     for status in statuses:
         print(status)
