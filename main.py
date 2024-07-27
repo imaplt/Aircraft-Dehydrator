@@ -5,7 +5,6 @@ from datetime import timedelta
 import threading
 from gpiozero import Button
 
-import fan_controller
 import system_status as SystemStatus
 from humidity_controller import HumidityController
 from logger import Logger as Log
@@ -97,29 +96,32 @@ def button_hold_check():
 
     while True:
         now = time.time()
-        for button_name in ['up', 'dn']:
-            if button_pressed[button_name]:
-                if now - last_press_time[button_name] > button_hold_time:
-                    if mode == 'max':
-                        if button_name == 'up':
-                            max_humidity += 1
-                            display_max_humidity(max_humidity)
-                        else:
-                            max_humidity -= 1
-                            display_max_humidity(max_humidity)
-                        humidity_changed[button_name] = True
-                    elif mode == 'min':
-                        if button_name == 'up':
-                            min_humidity += 1
-                            display_min_humidity(min_humidity)
-                        else:
-                            min_humidity -= 1
-                            display_min_humidity(min_humidity)
-                        humidity_changed[button_name] = True
-                    last_press_time[button_name] = now
-            elif humidity_changed[button_name] and now - last_press_time[button_name] > 3:
-                save_config()
-                humidity_changed[button_name] = False
+        if mode == 'max':
+            if button_pressed['up']:
+                max_humidity += 1
+                display_max_humidity(max_humidity)
+                humidity_changed = True
+                last_press_time['up'] = int(now)
+            elif button_pressed['dn']:
+                max_humidity -= 1
+                display_max_humidity(max_humidity)
+                humidity_changed = True
+                last_press_time['dn'] = int(now)
+        elif mode == 'min':
+            if button_pressed['up']:
+                min_humidity += 1
+                display_min_humidity(min_humidity)
+                humidity_changed = True
+                last_press_time['up'] = int(now)
+            elif button_pressed['dn']:
+                min_humidity -= 1
+                display_min_humidity(min_humidity)
+                humidity_changed = True
+                last_press_time['dn'] = int(now)
+
+        if humidity_changed and (int(now) - last_press_time['up'] > 3 and int(now) - last_press_time['dn'] > 3):
+            save_config()
+            humidity_changed = False
 
         time.sleep(0.1)
 
@@ -147,6 +149,8 @@ if __name__ == "__main__":
     config_manager = ConfigManager('config.ini')
     module = MyDehydrator(config_manager)
     logger = module.logger(module.logfile, module.max_log_size, module.max_archive_size)
+    controller = HumidityController()
+
     installed_devices = read_installed_devices(config_manager)
     overall_status, statuses = SystemStatus.query_i2c_devices(installed_devices)
     print(f"Overall status: {overall_status}")
@@ -164,9 +168,9 @@ if __name__ == "__main__":
 
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}
-    button_hold_time = 3
+    button_hold_time = 2
     button_pressed = {'up': False, 'dn': False}
-    humidity_changed = {'up': False, 'dn': False}
+    humidity_changed = False
     mode = None
 
     # Attach event handlers
@@ -177,6 +181,8 @@ if __name__ == "__main__":
 
     # Start the button hold check thread
     threading.Thread(target=button_hold_check, daemon=True).start()
+
+    controller.emc2101.set_fan_speed(controller, spped=25)
 
     for status in statuses:
         print(status)
@@ -210,7 +216,6 @@ if __name__ == "__main__":
         time.sleep(2)
         start_time = time.time()
         controller = HumidityController()
-        fan_controller.EMC2101.set_fan_speed(fan_controller, 75)
         fan_status = controller.fan_status()
         print(fan_status)
         while True:
