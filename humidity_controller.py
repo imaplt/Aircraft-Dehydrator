@@ -13,7 +13,7 @@ class HumidityController:
     def engage_fan(self):
         if not self.fan_engaged:
             # Put code here to start fan...
-            self.emc2101.set_fan_speed(25)
+            self.emc2101.set_fan_speed(100)
             self.fan_engaged = True
             return True
         else:
