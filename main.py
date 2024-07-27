@@ -4,6 +4,8 @@ import time
 from datetime import timedelta
 import threading
 from gpiozero import Button
+
+import fan_controller
 import system_status as SystemStatus
 from humidity_controller import HumidityController
 from logger import Logger as Log
@@ -208,6 +210,7 @@ if __name__ == "__main__":
         time.sleep(2)
         start_time = time.time()
         controller = HumidityController()
+        fan_controller.EMC2101.set_fan_speed(fan_controller, 75)
         fan_status = controller.fan_status()
         print(fan_status)
         while True:

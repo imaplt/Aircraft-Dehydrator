@@ -32,7 +32,6 @@ class HumidityController:
     def fan_status(self):
         # Placeholder for actual fan status and RPM retrieval logic
         # status = "on" if self.fan_engaged else "off"
-        self.engage_fan(25)
         status = self.emc2101.read_status()
         config = self.emc2101.read_config()
         rpm = self.emc2101.read_fan_speed()
@@ -42,7 +41,6 @@ class HumidityController:
         print("RPM:", rpm)
         print("Temperature:", temp)
         print("Fan Engaged:", self.fan_engaged)
-        self.disengage_fan()
         # rpm = 1200 if self.fan_engaged else 0  # Example RPM values
         last_run_time = time.time() - self.start_time
         return status, config, rpm, last_run_time
