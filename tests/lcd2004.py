@@ -9,7 +9,7 @@ class LCD2004Display:
         self.i2c = busio.I2C(board.SCL, board.SDA)
         self.lcd_columns = 20
         self.lcd_rows = 4
-        self.lcd = Character_LCD_I2C(self.i2c,self.lcd_columns, self.lcd_rows, i2c_address)
+        self.lcd = Character_LCD_I2C(self.i2c, self.lcd_columns, self.lcd_rows, i2c_address)
         self.lines = [""] * self.lcd_rows
 
     def reset_screen(self):
@@ -44,7 +44,6 @@ class LCD2004Display:
 
 def test_lcd2004():
     lcd = LCD2004Display(i2c_address=0x27)
-
     # Test clear screen
     print("Testing clear_screen...")
     lcd.clear_screen()
