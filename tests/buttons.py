@@ -85,19 +85,17 @@ def button_released_callback(button):
 
 
 def button_hold_callback(button):
-    global last_press_time, button_pressed, mode
+    global min_humidity, max_humidity, button_pressed, humidity_changed, mode
 
     button_name = 'up' if button.pin.number == up_button_pin else 'dn'
     button_pressed[button_name] = False
 
-    now = time.time()
-
     if button_name == 'up':
-        print('Up Button Released...')
+        print('Up Button Held...')
         display_max_humidity(max_humidity)
         mode = 'max'
     else:
-        print('DN Button Released...')
+        print('DN Button Held...')
         display_min_humidity(min_humidity)
         mode = 'min'
 
