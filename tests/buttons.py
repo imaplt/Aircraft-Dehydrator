@@ -3,7 +3,6 @@
 import time
 import threading
 from gpiozero import Button
-from humidity_controller import HumidityController
 from logger import Logger as Log
 from display import LCD2004Display
 from config_manager import ConfigManager
@@ -143,7 +142,6 @@ if __name__ == "__main__":
     config_manager = ConfigManager('config.ini')
     module = Buttons(config_manager)
     logger = module.logger(module.logfile, module.max_log_size, module.max_archive_size)
-    controller = HumidityController()
 
     # Get initial values
     min_humidity = config_manager.get_int_config('min_humidity')
