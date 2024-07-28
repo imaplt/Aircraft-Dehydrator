@@ -178,7 +178,7 @@ if __name__ == "__main__":
     # Attach event handlers
     up_button.when_pressed = button_pressed_callback
     up_button.when_released = button_released_callback
-    up_button.when_hold_check = button_hold_callback
+    up_button.when_held = button_hold_callback
 
     dn_button.when_pressed = button_pressed_callback
     dn_button.when_released = button_released_callback
