@@ -3,7 +3,7 @@
 import time
 import threading
 from gpiozero import Button
-from logger import Logger as Log
+from ..logger import Logger as Log
 from display import LCD2004Display
 from config_manager import ConfigManager
 
