@@ -45,6 +45,7 @@ def button_pressed_callback(button):
 
     now = time.time()
     button_name = 'up' if button.pin.number == up_button_pin else 'dn'
+    print("Mode is: ", mode)
 
     if button_pressed[button_name]:
         return  # Ignore if button is already pressed
@@ -55,31 +56,11 @@ def button_pressed_callback(button):
     # Show the current setting when the button is pressed and released
     if now - last_press_time[button_name] <= button_hold_time:
         if button_name == 'up':
-            print('Up Button Pressed...')
+            print('Up Button Pressed...', mode)
             display_max_humidity(max_humidity)
             mode = 'max'
         else:
             print('DN Button Pressed...')
-            display_min_humidity(min_humidity)
-            mode = 'min'
-
-
-def button_released_callback(button):
-    global last_press_time, button_pressed, mode
-
-    button_name = 'up' if button.pin.number == up_button_pin else 'dn'
-    button_pressed[button_name] = False
-
-    now = time.time()
-
-    # Check if the button was held for more than the hold time
-    if now - last_press_time[button_name] > button_hold_time:
-        if button_name == 'up':
-            print('Up Button Released...')
-            display_max_humidity(max_humidity)
-            mode = 'max'
-        else:
-            print('DN Button Released...')
             display_min_humidity(min_humidity)
             mode = 'min'
 
@@ -175,11 +156,9 @@ if __name__ == "__main__":
 
     # Attach event handlers
     up_button.when_pressed = button_pressed_callback
-    up_button.when_released = button_released_callback
     up_button.when_held = button_hold_callback
 
     dn_button.when_pressed = button_pressed_callback
-    dn_button.when_released = button_released_callback
     dn_button.when_held = button_hold_callback
 
     # Start the button hold check thread
