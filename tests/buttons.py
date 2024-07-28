@@ -67,23 +67,23 @@ def button_pressed_callback(button):
     else:
         now = time.time()
         if mode == 'max':
-            if button_pressed['up']:
+            if button_name == 'up':
                 max_humidity += 1
                 display_max_humidity(max_humidity)
                 humidity_changed = True
                 last_press_time['up'] = now
-            elif button_pressed['dn']:
+            elif button_name == 'dn':
                 max_humidity -= 1
                 display_max_humidity(max_humidity)
                 humidity_changed = True
                 last_press_time['dn'] = now
         elif mode == 'min':
-            if button_pressed['up']:
+            if button_name == 'up':
                 min_humidity += 1
                 display_min_humidity(min_humidity)
                 humidity_changed = True
                 last_press_time['up'] = now
-            elif button_pressed['dn']:
+            elif button_name == 'dn':
                 min_humidity -= 1
                 display_min_humidity(min_humidity)
                 humidity_changed = True
@@ -169,7 +169,7 @@ if __name__ == "__main__":
                 time.sleep(.1)  # Adjust as needed
 
             # Heat the sensors every 90 seconds
-            if int(current_time - start_time) % 90 == 0:
+            if int(current_time - start_time) % 30 == 0:
                 timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 print("Heating External sensor...")
                 logger.log(timestamp, 'External', '01', "Heating External sensor...")
@@ -178,7 +178,7 @@ if __name__ == "__main__":
                 logger.log(timestamp, 'Internal', '02', "Heating Internal sensor...")
 
             # Sleep for a short duration to avoid multiple reads/heats within the same second
-            time.sleep(0.5)
+            time.sleep(0.3)
 
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected!")
