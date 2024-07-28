@@ -50,7 +50,7 @@ def button_pressed_callback(button):
     button_pressed[button_name] = True
 
     # Show the current setting when the button is pressed and released
-    if now - last_press_time[button_name] <= button_hold_time:
+    if mode == None:
         if button_name == 'up':
             print('Up Button Pressed...', mode)
             display_max_humidity(max_humidity)
@@ -59,36 +59,36 @@ def button_pressed_callback(button):
             print('DN Button Pressed...')
             display_min_humidity(min_humidity)
             mode = 'min'
+    else:
+        while True:
+            now = time.time()
+            if mode == 'max':
+                if button_pressed['up']:
+                    max_humidity += 1
+                    display_max_humidity(max_humidity)
+                    humidity_changed = True
+                    last_press_time['up'] = now
+                elif button_pressed['dn']:
+                    max_humidity -= 1
+                    display_max_humidity(max_humidity)
+                    humidity_changed = True
+                    last_press_time['dn'] = now
+            elif mode == 'min':
+                if button_pressed['up']:
+                    min_humidity += 1
+                    display_min_humidity(min_humidity)
+                    humidity_changed = True
+                    last_press_time['up'] = now
+                elif button_pressed['dn']:
+                    min_humidity -= 1
+                    display_min_humidity(min_humidity)
+                    humidity_changed = True
+                    last_press_time['dn'] = now
 
-    while True:
-        now = time.time()
-        if mode == 'max':
-            if button_pressed['up']:
-                max_humidity += 1
-                display_max_humidity(max_humidity)
-                humidity_changed = True
-                last_press_time['up'] = now
-            elif button_pressed['dn']:
-                max_humidity -= 1
-                display_max_humidity(max_humidity)
-                humidity_changed = True
-                last_press_time['dn'] = now
-        elif mode == 'min':
-            if button_pressed['up']:
-                min_humidity += 1
-                display_min_humidity(min_humidity)
-                humidity_changed = True
-                last_press_time['up'] = now
-            elif button_pressed['dn']:
-                min_humidity -= 1
-                display_min_humidity(min_humidity)
-                humidity_changed = True
-                last_press_time['dn'] = now
-
-        if humidity_changed and (now - last_press_time['up'] > 3 and now - last_press_time['dn'] > 3):
-            save_config()
-            humidity_changed = False
-            mode = None
+    if humidity_changed and (now - last_press_time['up'] > 3 and now - last_press_time['dn'] > 3):
+        save_config()
+        humidity_changed = False
+        mode = None
 
         time.sleep(0.1)
 
