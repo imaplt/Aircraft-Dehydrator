@@ -44,10 +44,15 @@ def button_pressed_callback(button):
 
     now = time.time()
     button_name = 'up' if button.pin.number == up_button_pin else 'dn'
-    print("Mode is: ", mode)
+    print(f"Button: {button_name} Mode: {mode} Button Pressed: {button_pressed} last Pressed: {last_press_time}")
 
     # last_press_time[button_name] = now
     button_pressed[button_name] = True
+
+    if humidity_changed and (now - last_press_time['up'] > 3 and now - last_press_time['dn'] > 3):
+        save_config()
+        humidity_changed = False
+        mode = None
 
     # Show the current setting when the button is pressed and released
     if mode == None:
@@ -81,11 +86,6 @@ def button_pressed_callback(button):
                 display_min_humidity(min_humidity)
                 humidity_changed = True
                 last_press_time['dn'] = now
-
-    if humidity_changed and (now - last_press_time['up'] > 3 and now - last_press_time['dn'] > 3):
-        save_config()
-        humidity_changed = False
-        mode = None
 
 
 def button_hold_callback(button):
