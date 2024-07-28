@@ -44,10 +44,12 @@ def button_pressed_callback(button):
 
     now = time.time()
     button_name = 'up' if button.pin.number == up_button_pin else 'dn'
-    print(f"Button: {button_name} Mode: {mode} Button Pressed: {button_pressed} last Pressed: {last_press_time}")
-
     # last_press_time[button_name] = now
     button_pressed[button_name] = True
+
+    print(f"Button: {button_name} Mode: {mode} Button Pressed: {button_pressed}")
+    print(f"Up last pressed: {last_press_time['up']} DN last pressed: {last_press_time['dn']}")
+    print("Humidity Changed: ", humidity_changed)
 
     if humidity_changed and (now - last_press_time['up'] > 3 and now - last_press_time['dn'] > 3):
         save_config()
