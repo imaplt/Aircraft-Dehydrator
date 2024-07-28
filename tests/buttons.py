@@ -46,7 +46,7 @@ def button_pressed_callback(button):
     button_name = 'up' if button.pin.number == up_button_pin else 'dn'
     print("Mode is: ", mode)
 
-    last_press_time[button_name] = now
+    # last_press_time[button_name] = now
     button_pressed[button_name] = True
 
     # Show the current setting when the button is pressed and released
@@ -88,8 +88,6 @@ def button_pressed_callback(button):
         save_config()
         humidity_changed = False
         mode = None
-
-        time.sleep(0.1)
 
 
 def button_hold_callback(button):
@@ -137,8 +135,8 @@ if __name__ == "__main__":
     dn_button_pin = config_manager.get_int_config('dn_button_pin')
 
     # GPIO setup using gpiozero
-    up_button = Button(up_button_pin, pull_up=True, bounce_time=0.2, hold_time=2)
-    dn_button = Button(dn_button_pin, pull_up=True, bounce_time=0.2, hold_time=2)
+    up_button = Button(up_button_pin, pull_up=True, bounce_time=0.2, hold_time=3)
+    dn_button = Button(dn_button_pin, pull_up=True, bounce_time=0.2, hold_time=3)
 
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}
