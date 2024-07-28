@@ -60,30 +60,29 @@ def button_pressed_callback(button):
             display_min_humidity(min_humidity)
             mode = 'min'
     else:
-        while True:
-            now = time.time()
-            if mode == 'max':
-                if button_pressed['up']:
-                    max_humidity += 1
-                    display_max_humidity(max_humidity)
-                    humidity_changed = True
-                    last_press_time['up'] = now
-                elif button_pressed['dn']:
-                    max_humidity -= 1
-                    display_max_humidity(max_humidity)
-                    humidity_changed = True
-                    last_press_time['dn'] = now
-            elif mode == 'min':
-                if button_pressed['up']:
-                    min_humidity += 1
-                    display_min_humidity(min_humidity)
-                    humidity_changed = True
-                    last_press_time['up'] = now
-                elif button_pressed['dn']:
-                    min_humidity -= 1
-                    display_min_humidity(min_humidity)
-                    humidity_changed = True
-                    last_press_time['dn'] = now
+        now = time.time()
+        if mode == 'max':
+            if button_pressed['up']:
+                max_humidity += 1
+                display_max_humidity(max_humidity)
+                humidity_changed = True
+                last_press_time['up'] = now
+            elif button_pressed['dn']:
+                max_humidity -= 1
+                display_max_humidity(max_humidity)
+                humidity_changed = True
+                last_press_time['dn'] = now
+        elif mode == 'min':
+            if button_pressed['up']:
+                min_humidity += 1
+                display_min_humidity(min_humidity)
+                humidity_changed = True
+                last_press_time['up'] = now
+            elif button_pressed['dn']:
+                min_humidity -= 1
+                display_min_humidity(min_humidity)
+                humidity_changed = True
+                last_press_time['dn'] = now
 
     if humidity_changed and (now - last_press_time['up'] > 3 and now - last_press_time['dn'] > 3):
         save_config()
