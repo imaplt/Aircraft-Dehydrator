@@ -54,11 +54,9 @@ def button_pressed_callback(button):
         if button_name == 'up':
             print('Up Button Pressed...', mode)
             display_max_humidity(max_humidity)
-            mode = 'max'
         else:
             print('DN Button Pressed...')
             display_min_humidity(min_humidity)
-            mode = 'min'
     else:
         now = time.time()
         if mode == 'max':
