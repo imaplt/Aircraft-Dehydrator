@@ -84,6 +84,24 @@ def button_released_callback(button):
             mode = 'min'
 
 
+def button_hold_callback(button):
+    global last_press_time, button_pressed, mode
+
+    button_name = 'up' if button.pin.number == up_button_pin else 'dn'
+    button_pressed[button_name] = False
+
+    now = time.time()
+
+    if button_name == 'up':
+        print('Up Button Released...')
+        display_max_humidity(max_humidity)
+        mode = 'max'
+    else:
+        print('DN Button Released...')
+        display_min_humidity(min_humidity)
+        mode = 'min'
+
+
 def button_hold_check():
     global min_humidity, max_humidity, button_pressed, humidity_changed, mode
 
@@ -147,8 +165,8 @@ if __name__ == "__main__":
     dn_button_pin = config_manager.get_int_config('dn_button_pin')
 
     # GPIO setup using gpiozero
-    up_button = Button(up_button_pin, pull_up=True, bounce_time=0.2)
-    dn_button = Button(dn_button_pin, pull_up=True, bounce_time=0.2)
+    up_button = Button(up_button_pin, pull_up=True, bounce_time=0.2, hold_time=2)
+    dn_button = Button(dn_button_pin, pull_up=True, bounce_time=0.2, hold_time=2)
 
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}
@@ -158,13 +176,16 @@ if __name__ == "__main__":
     mode = None
 
     # Attach event handlers
-    up_button.when_pressed = lambda: button_pressed_callback(up_button)
-    up_button.when_released = lambda: button_released_callback(up_button)
-    dn_button.when_pressed = lambda: button_pressed_callback(dn_button)
-    dn_button.when_released = lambda: button_released_callback(dn_button)
+    up_button.when_pressed = button_pressed_callback
+    up_button.when_released = button_released_callback
+    up_button.when_hold_check = button_hold_check
+
+    dn_button.when_pressed = button_pressed_callback
+    dn_button.when_released = button_released_callback
+    dn_button.when_held = button_hold_callback
 
     # Start the button hold check thread
-    threading.Thread(target=button_hold_check, daemon=True).start()
+    # threading.Thread(target=button_hold_check, daemon=True).start()
 
     # Initialize lines
     lines = [""] * 4  # For four line ssd1306_display...
