@@ -1,10 +1,8 @@
 # main.py
-
 import time
 import threading
 from gpiozero import Button
-from ..logger import Logger as Log
-from display import LCD2004Display
+from logger import Logger as Log
 from config_manager import ConfigManager
 
 
@@ -125,11 +123,9 @@ def cleanup():
     # Test
     # Want to add code here to update display, update log with run time etc
     print('Cleaning Up')
-    lcd2004_display.display_text_center_with_border('Shutting down...')
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                'System', '', "Shutting down...")
     time.sleep(3)
-    lcd2004_display.clear_screen()
 
 
 def read_installed_devices(config):
@@ -174,15 +170,8 @@ if __name__ == "__main__":
     lines = [""] * 4  # For four line ssd1306_display...
 
     try:
-
-        lcd2004_display = LCD2004Display()
-
-        # Display centered text
-        lcd2004_display.display_text_center_with_border('Initializing...')
         time.sleep(3)
-
         start_time = time.time()
-
         while True:
             current_time = time.time()
             # Read and print sensor data every 2 seconds
