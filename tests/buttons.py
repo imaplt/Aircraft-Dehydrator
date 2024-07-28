@@ -1,6 +1,5 @@
 # main.py
 import time
-import threading
 from gpiozero import Button
 from logger import Logger as Log
 from config_manager import ConfigManager
@@ -41,14 +40,11 @@ def save_config():
 
 
 def button_pressed_callback(button):
-    global last_press_time, button_pressed, mode
+    global min_humidity, max_humidity, button_pressed, last_press_time, humidity_changed, mode
 
     now = time.time()
     button_name = 'up' if button.pin.number == up_button_pin else 'dn'
     print("Mode is: ", mode)
-
-    if button_pressed[button_name]:
-        return  # Ignore if button is already pressed
 
     last_press_time[button_name] = now
     button_pressed[button_name] = True
@@ -63,26 +59,6 @@ def button_pressed_callback(button):
             print('DN Button Pressed...')
             display_min_humidity(min_humidity)
             mode = 'min'
-
-
-def button_hold_callback(button):
-    global min_humidity, max_humidity, button_pressed, humidity_changed, mode
-
-    button_name = 'up' if button.pin.number == up_button_pin else 'dn'
-    button_pressed[button_name] = False
-
-    if button_name == 'up':
-        print('Up Button Held...')
-        display_max_humidity(max_humidity)
-        mode = 'max'
-    else:
-        print('DN Button Held...')
-        display_min_humidity(min_humidity)
-        mode = 'min'
-
-
-def button_hold_check():
-    global min_humidity, max_humidity, button_pressed, humidity_changed, mode
 
     while True:
         now = time.time()
@@ -112,8 +88,26 @@ def button_hold_check():
         if humidity_changed and (now - last_press_time['up'] > 3 and now - last_press_time['dn'] > 3):
             save_config()
             humidity_changed = False
+            mode = None
 
         time.sleep(0.1)
+
+
+def button_hold_callback(button):
+    global min_humidity, max_humidity, button_pressed, last_press_time, humidity_changed, mode
+
+    button_name = 'up' if button.pin.number == up_button_pin else 'dn'
+    button_pressed[button_name] = False
+    last_press_time[button_name] = time.time()
+
+    if button_name == 'up':
+        print('Up Button Held...')
+        display_max_humidity(max_humidity)
+        mode = 'max'
+    else:
+        print('DN Button Held...')
+        display_min_humidity(min_humidity)
+        mode = 'min'
 
 
 def cleanup():
