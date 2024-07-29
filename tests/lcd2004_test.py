@@ -17,7 +17,7 @@ def display_text_center_with_border(self, text):
 
 def display_four_rows_center(texts):
     LCD2004.clear()
-    # lines = [""] * 4  # Reset lines
+    lines = [""] * 4  # Reset lines
     for i in range(min(4, len(texts))):
         lines[i] = texts[i]
         centered_text = texts[i].center(20)
