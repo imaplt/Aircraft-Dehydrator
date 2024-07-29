@@ -3,7 +3,7 @@ import LCD2004
 import time
 
 
-lines = []
+lines = [""] * 4  # Reset lines
 
 
 def display_text_center_with_border(self, text):
