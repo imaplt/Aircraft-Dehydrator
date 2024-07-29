@@ -3,6 +3,9 @@ import LCD2004
 import time
 
 
+lines = []
+
+
 def display_text_center_with_border(self, text):
     LCD2004.clear()
     border_line = '*' * self.lcd_columns
@@ -12,25 +15,25 @@ def display_text_center_with_border(self, text):
     LCD2004.write(0, 2, border_line)
 
 
-def display_four_rows_center(self, texts):
+def display_four_rows_center(texts):
     LCD2004.clear()
-    self.lines = [""] * self.lcd_rows  # Reset lines
-    for i in range(min(self.lcd_rows, len(texts))):
-        self.lines[i] = texts[i]
-        centered_text = texts[i].center(self.lcd_columns)
-        self.write(0, i, centered_text)
+    # lines = [""] * 4  # Reset lines
+    for i in range(min(4, len(texts))):
+        lines[i] = texts[i]
+        centered_text = texts[i].center(20)
+        LCD2004.write(0, i, centered_text)
 
 
-def display_default_four_rows(self):
+def display_default_four_rows():
     display_four_rows_center(["Internal:", "reading...", "External:", "reading..."])
 
 
-def update_line(self, line_number, text, justification='center'):
-    if line_number < 0 or line_number >= self.lcd_rows:
+def update_line(line_number, text, justification='center'):
+    if line_number < 0 or line_number >= 3:
         raise ValueError("line_number must be between 0 and 3")
 
-    self.lines[line_number] = text
-    max_chars = self.lcd_columns
+    lines[line_number] = text
+    max_chars = 20
 
     if justification == 'left':
         display_text = text.ljust(max_chars)
@@ -38,7 +41,7 @@ def update_line(self, line_number, text, justification='center'):
         display_text = text.rjust(max_chars)
     else:  # default to center
         display_text = text.center(max_chars)
-    self.write(0, line_number, display_text)
+    LCD2004.write(0, line_number, display_text)
 
 
 def setup():
@@ -55,8 +58,6 @@ def setup():
 
 def destroy():
     LCD2004.clear()
-
-
 
 
 if __name__ == "__main__":
