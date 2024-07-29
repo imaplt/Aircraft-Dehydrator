@@ -96,6 +96,11 @@ def button_hold_callback(button):
     button_name = 'up' if button.pin.number == up_button_pin else 'dn'
     button_pressed[button_name] = False
     last_press_time[button_name] = time.time()
+    print(f"First button: {button_name}")
+    print("Up button held: ", up_button.is_held)
+    print("Dn Button Held: ", dn_button.is_held)
+    print("Up button Is Active: ", up_button.is_active)
+    print("Dn Button IS Active: ", dn_button.is_active)
 
     if button_name == 'up':
         print('Up Button Held...')
