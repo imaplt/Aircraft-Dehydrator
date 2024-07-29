@@ -10,8 +10,6 @@ class Logger:
         self.filename = filename
         self.max_log_size = max_log_size
         self.max_archive_size = max_archive_size
-        self.logger = self.setup_logging()
-
         self.filename = filename
         self.max_log_size = max_log_size
         self.max_archive_size = max_archive_size
