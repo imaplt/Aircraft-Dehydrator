@@ -1,62 +1,23 @@
-# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
-# SPDX-License-Identifier: MIT
-
-"""Simple test for 16x2 character lcd connected to an MCP23008 I2C LCD backpack."""
+#!/usr/bin/env python3
+import LCD2004
 import time
-import board
-import adafruit_character_lcd.character_lcd_i2c as character_lcd
-import busio
 
-# Modify this if you have a different sized Character LCD
-lcd_columns = 20
-lcd_rows = 4
 
-# Initialise I2C bus.
-# i2c = board.I2C()  # uses board.SCL and board.SDA
-i2c = busio.I2C(board.SCL, board.SDA)
-# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+def setup():
+    LCD2004.init(0x27, 1)  # init(slave address, background light)
+    LCD2004.write(0, 0, 'Hello, world')
+    LCD2004.write(0, 1, 'IIC/I2C LCD2004')
+    LCD2004.write(0, 2, '20 cols, 4 rows')
+    LCD2004.write(0, 3, 'www.sunfounder.com')
+    time.sleep(2)
 
-# Initialise the lcd class
-lcd = character_lcd.Character_LCD_I2C(i2c=i2c, columns=lcd_columns, lines=lcd_rows, address=0x27)
 
-# Turn backlight on
-lcd.backlight = True
-# Print a two line message
-lcd.message = "Hello\nCircuitPython"
-# Wait 5s
-time.sleep(5)
-lcd.clear()
-# Print two line message right to left
-lcd.text_direction = lcd.RIGHT_TO_LEFT
-lcd.message = "Hello\nCircuitPython"
-# Wait 5s
-time.sleep(5)
-# Return text direction to left to right
-lcd.text_direction = lcd.LEFT_TO_RIGHT
-# Display cursor
-lcd.clear()
-lcd.cursor = True
-lcd.message = "Cursor! "
-# Wait 5s
-time.sleep(5)
-# Display blinking cursor
-lcd.clear()
-lcd.blink = True
-lcd.message = "Blinky Cursor!"
-# Wait 5s
-time.sleep(5)
-lcd.blink = False
-lcd.clear()
-# Create message to scroll
-scroll_msg = "<-- Scroll"
-lcd.message = scroll_msg
-# Scroll message to the left
-for i in range(len(scroll_msg)):
-    time.sleep(0.5)
-    lcd.move_left()
-lcd.clear()
-lcd.message = "Going to sleep\nCya later!"
-time.sleep(5)
-# Turn backlight off
-lcd.backlight = False
-time.sleep(2)
+def destroy():
+    LCD2004.clear()
+
+
+if __name__ == "__main__":
+    try:
+        setup()
+    except KeyboardInterrupt:
+        destroy()
