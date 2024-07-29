@@ -170,17 +170,17 @@ if __name__ == '__main__':
     time.sleep(3)
     clear()
 
-    set_cursor_position(0, 0)
+    set_cursor_position(10, 2)
     write(0, 0, "Set cursor test")
     time.sleep(3)
 
     clear()
     scroll_text(0, "Scrolling text left to right", direction="left")
-    time.sleep(3)
+    time.sleep(5)
 
     clear()
     scroll_text(0, "Scrolling text right to left", direction="right")
-    time.sleep(3)
+    time.sleep(5)
 
     clear()
     display_text_with_border(["Border test"])
