@@ -5,6 +5,7 @@
 import time
 import board
 import adafruit_character_lcd.character_lcd_i2c as character_lcd
+import busio
 
 # Modify this if you have a different sized Character LCD
 lcd_columns = 20
@@ -12,6 +13,7 @@ lcd_rows = 4
 
 # Initialise I2C bus.
 i2c = board.I2C()  # uses board.SCL and board.SDA
+i2c = busio.I2C(board.SCL, board.SDA)
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 
 # Initialise the lcd class
