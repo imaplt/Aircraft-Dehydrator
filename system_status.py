@@ -71,7 +71,8 @@ def query_i2c_devices(installed_devices):
 
     devices = {
         "SHT30": {"address": 0x44, "status": "Not detected"},
-        "SHT41": {"address": 0x44, "status": "Not detected"},
+        "SHT41_Internal": {"address": 0x44, "status": "Not detected"},
+        "SHT41_External": {"address": 0x44, "status": "Not detected"},
         "LCD2004": {"address": 0x27, "status": "Not detected"},
         "LCD1602": {"address": 0x27, "status": "Not detected"},
         "EMC2101": {"address": 0x4C, "status": "Not detected"},
