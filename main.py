@@ -2,9 +2,7 @@
 
 import time
 from datetime import timedelta
-import threading
 from gpiozero import Button
-
 from LCD2004 import LCD2004Display
 import system_status as SystemStatus
 from humidity_controller import HumidityController
@@ -12,10 +10,10 @@ from logger import Logger as Log
 from display import SSD1306Display, DisplayConfig
 from sensor import Sensor
 from config_manager import ConfigManager
+import sys
 
 
 class MyDehydrator:
-
     def __init__(self, configuration):
         self.config_manager = configuration
         self.logger = Log
@@ -49,82 +47,78 @@ def save_config():
 
 
 def button_pressed_callback(button):
-    global last_press_time, button_pressed, mode
+    global min_humidity, max_humidity, last_press_time, humidity_changed, mode
 
     now = time.time()
     button_name = 'up' if button.pin.number == up_button_pin else 'dn'
+    # last_press_time[button_name] = now
 
-    if button_pressed[button_name]:
-        return  # Ignore if button is already pressed
+    print(f"Button: {button_name} Mode: {mode}")
+    print(f"Up last pressed: {last_press_time['up']} DN last pressed: {last_press_time['dn']}")
+    print("Humidity Changed: ", humidity_changed)
 
-    last_press_time[button_name] = now
-    button_pressed[button_name] = True
+    if humidity_changed and (now - last_press_time['up'] > 3 and now - last_press_time['dn'] > 3):
+        save_config()
+        humidity_changed = False
+        mode = None
 
     # Show the current setting when the button is pressed and released
-    if now - last_press_time[button_name] <= button_hold_time:
+    if mode is None:
         if button_name == 'up':
-            print('Up Button Pressed...')
+            print('Up Button Pressed...', mode)
             display_max_humidity(max_humidity)
-            mode = 'max'
         else:
             print('DN Button Pressed...')
             display_min_humidity(min_humidity)
-            mode = 'min'
-
-
-def button_released_callback(button):
-    global last_press_time, button_pressed, mode
-
-    button_name = 'up' if button.pin.number == up_button_pin else 'dn'
-    button_pressed[button_name] = False
-
-    now = time.time()
-
-    # Check if the button was held for more than the hold time
-    if now - last_press_time[button_name] > button_hold_time:
-        if button_name == 'up':
-            print('Up Button Released...')
-            display_max_humidity(max_humidity)
-            mode = 'max'
-        else:
-            print('DN Button Released...')
-            display_min_humidity(min_humidity)
-            mode = 'min'
-
-
-def button_hold_check():
-    global min_humidity, max_humidity, button_pressed, humidity_changed, mode
-
-    while True:
+    else:
         now = time.time()
         if mode == 'max':
-            if button_pressed['up']:
+            if button_name == 'up':
                 max_humidity += 1
                 display_max_humidity(max_humidity)
                 humidity_changed = True
                 last_press_time['up'] = now
-            elif button_pressed['dn']:
+            elif button_name == 'dn':
                 max_humidity -= 1
                 display_max_humidity(max_humidity)
                 humidity_changed = True
                 last_press_time['dn'] = now
         elif mode == 'min':
-            if button_pressed['up']:
+            if button_name == 'up':
                 min_humidity += 1
                 display_min_humidity(min_humidity)
                 humidity_changed = True
                 last_press_time['up'] = now
-            elif button_pressed['dn']:
+            elif button_name == 'dn':
                 min_humidity -= 1
                 display_min_humidity(min_humidity)
                 humidity_changed = True
                 last_press_time['dn'] = now
 
-        if humidity_changed and (now - last_press_time['up'] > 3 and now - last_press_time['dn'] > 3):
-            save_config()
-            humidity_changed = False
 
-        time.sleep(0.1)
+def button_hold_callback(button):
+    global min_humidity, max_humidity, last_press_time, humidity_changed, mode
+
+    button_name = 'up' if button.pin.number == up_button_pin else 'dn'
+    last_press_time[button_name] = time.time()
+    # print(f"First button: {button_name}")
+    # print("Up button held: ", up_button.is_held)
+    # print("Dn Button Held: ", dn_button.is_held)
+    # print("Up button Is Active: ", up_button.is_active)
+    # print("Dn Button IS Active: ", dn_button.is_active)
+
+    if up_button.is_active and dn_button.is_active:
+        print("Both buttons are being held...")
+        return
+
+    if button_name == 'up':
+        print('Up Button Held...')
+        display_max_humidity(max_humidity)
+        mode = 'max'
+    else:
+        print('DN Button Held...')
+        display_min_humidity(min_humidity)
+        mode = 'min'
 
 
 def cleanup():
@@ -155,6 +149,14 @@ if __name__ == "__main__":
     installed_devices = read_installed_devices(config_manager)
     overall_status, statuses = SystemStatus.query_i2c_devices(installed_devices)
     print(f"Overall status: {overall_status}")
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    for status in statuses:
+        print(status)
+        logger.log(timestamp, 'System', status, statuses[status])
+    if overall_status == 'Bad':
+        logger.log(timestamp, 'System', 'Overall', "Overall Status: Fail")
+        raise ValueError("Overall Status Failed")
+        sys.exit(1)
 
     # Get initial values
     min_humidity = config_manager.get_int_config('min_humidity')
@@ -164,27 +166,21 @@ if __name__ == "__main__":
     dn_button_pin = config_manager.get_int_config('dn_button_pin')
 
     # GPIO setup using gpiozero
-    up_button = Button(up_button_pin, pull_up=True, bounce_time=0.2)
-    dn_button = Button(dn_button_pin, pull_up=True, bounce_time=0.2)
+    up_button = Button(up_button_pin, pull_up=True, bounce_time=0.2, hold_time=3)
+    dn_button = Button(dn_button_pin, pull_up=True, bounce_time=0.2, hold_time=3)
 
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}
     button_hold_time = 2
-    button_pressed = {'up': False, 'dn': False}
     humidity_changed = False
     mode = None
 
     # Attach event handlers
-    up_button.when_pressed = lambda: button_pressed_callback(up_button)
-    up_button.when_released = lambda: button_released_callback(up_button)
-    dn_button.when_pressed = lambda: button_pressed_callback(dn_button)
-    dn_button.when_released = lambda: button_released_callback(dn_button)
+    up_button.when_pressed = button_pressed_callback
+    up_button.when_held = button_hold_callback
 
-    # Start the button hold check thread
-    threading.Thread(target=button_hold_check, daemon=True).start()
-
-    for status in statuses:
-        print(status)
+    dn_button.when_pressed = button_pressed_callback
+    dn_button.when_held = button_hold_callback
 
     # Initialize lines
     lines = [""] * 4  # For four line ssd1306_display...
@@ -233,8 +229,9 @@ if __name__ == "__main__":
                     externalprevious_output['temperature'] = externaloutput['temperature']
                     externalprevious_output['humidity'] = externaloutput['humidity']
                     print("External Sensor Reading:", externaloutput)
-                    ssd1306_display.update_line(3, justification='left',
-                                                text=f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
+                    ssd1306_display.update_line(
+                        3, justification='left',
+                        text=f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
 
                 time.sleep(.1)
                 internaloutput = internalsensor.read_sensor()
@@ -246,8 +243,9 @@ if __name__ == "__main__":
                     internalprevious_output['temperature'] = internaloutput['temperature']
                     internalprevious_output['humidity'] = internaloutput['humidity']
                     print("Internal Sensor Reading:", internaloutput)
-                    ssd1306_display.update_line(1, justification='left',
-                                                text=f"{internaloutput['humidity']}% - {internaloutput['temperature']}°C")
+                    ssd1306_display.update_line(1,
+                                                justification='left', text=f"{internaloutput['humidity']}%"
+                                                                           f" - {internaloutput['temperature']}°C")
                     if internaloutput['humidity'] > max_humidity:
                         started = controller.engage_fan()
                         if started:
