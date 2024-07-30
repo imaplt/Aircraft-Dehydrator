@@ -1,3 +1,5 @@
+import time
+
 import board
 import busio
 import adafruit_sht31d
@@ -6,6 +8,7 @@ import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import adafruit_ssd1306
 from adafruit_bus_device.i2c_device import I2CDevice
 import adafruit_bitbangio
+from fan_controller import EMC2101
 
 
 class SystemStatus:
@@ -76,6 +79,7 @@ def query_i2c_devices(installed_devices):
         "LCD2004": {"address": 0x27, "status": "Not detected"},
         "LCD1602": {"address": 0x27, "status": "Not detected"},
         "EMC2101": {"address": 0x4C, "status": "Not detected"},
+        "FAN": {"address": 0x3C, "status": "Not detected"},
         "SSD1306": {"address": 0x3C, "status": "Not detected"}
     }
     overall_status = "good"
@@ -134,6 +138,19 @@ def query_i2c_devices(installed_devices):
             status = emc2101.read_status()
             config = emc2101.read_config()
             devices["EMC2101"]["status"] = f"Detected, Status: {status}, Config: {config}"
+        except Exception as e:
+            devices["EMC2101"]["status"] = f"Error: {str(e)}"
+            overall_status = "bad"
+
+    if "FAN" in installed_devices:
+        try:
+            fan = EMC2101()
+            fan.set_fan_speed(25)
+            time.sleep(1)
+            rpm = fan.read_fan_speed()
+            temp = fan.read_internal_temp()
+            fan.set_fan_speed(0)
+            devices["FAN"]["status"] = f"Detected, RPM: {rpm}, Internal Temp: {temp}"
         except Exception as e:
             devices["EMC2101"]["status"] = f"Error: {str(e)}"
             overall_status = "bad"
