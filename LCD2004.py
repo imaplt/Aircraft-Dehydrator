@@ -4,7 +4,7 @@ import smbus2 as smbus
 
 
 class LCD2004Display:
-    def __init__(self, configuration, addr=0x27, bl=1):
+    def __init__(self, addr=0x27, bl=1):
         self.BUS = smbus.SMBus(1)
         self.LCD_ADDR = addr
         self.BLEN = bl
@@ -13,7 +13,7 @@ class LCD2004Display:
         self.lines = [""] * 4
 
         # self.i2c_address = i2c_address
-        self.config_manager = configuration
+        # self.config_manager = configuration
         #
         # # Initialize I2C interface based on i2c_type.
         # if i2c_type == 'bitbangio':

@@ -4,10 +4,12 @@ import time
 from datetime import timedelta
 import threading
 from gpiozero import Button
+
+from LCD2004 import LCD2004Display
 import system_status as SystemStatus
 from humidity_controller import HumidityController
 from logger import Logger as Log
-from display import SSD1306Display, DisplayConfig, LCD2004Display
+from display import SSD1306Display, DisplayConfig
 from sensor import Sensor
 from config_manager import ConfigManager
 
@@ -130,12 +132,12 @@ def cleanup():
     # Want to add code here to update display, update log with run time etc
     print('Cleaning Up')
     ssd1306_display.display_text_center_with_border('Shutting down...')
-    lcd2004_display.display_text_center_with_border('Shutting down...')
+    lcd2004_display.display_text_with_border('Shutting down...')
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                'System', '', "Shutting down...")
     time.sleep(3)
     ssd1306_display.clear_screen()
-    lcd2004_display.clear_screen()
+    lcd2004_display.clear()
 
 
 def read_installed_devices(config):
@@ -195,7 +197,7 @@ if __name__ == "__main__":
 
         # Display centered text
         ssd1306_display.display_text_center("Initializing...")
-        lcd2004_display.display_text_center_with_border('Initializing...')
+        lcd2004_display.display_text_with_border('Initializing...')
         time.sleep(3)
 
         internalsensor = Sensor('SHT41_Internal', 0x44)
