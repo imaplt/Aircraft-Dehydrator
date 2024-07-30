@@ -152,7 +152,7 @@ if __name__ == "__main__":
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     for status in statuses:
         print(status)
-        logger.log(timestamp, 'System', status, statuses[status])
+        logger.log(timestamp, 'System', '', statuses[status])
     if overall_status == 'Bad':
         logger.log(timestamp, 'System', 'Overall', "Overall Status: Fail")
         raise ValueError("Overall Status Failed")
