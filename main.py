@@ -155,6 +155,7 @@ if __name__ == "__main__":
         logger.log(timestamp, 'System', '', status)
     if overall_status == 'Bad':
         logger.log(timestamp, 'System', 'Overall', "Overall Status: Fail")
+        cleanup()
         raise ValueError("Overall Status Failed")
         sys.exit(1)
 
