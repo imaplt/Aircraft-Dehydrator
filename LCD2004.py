@@ -2,6 +2,8 @@
 import time
 import smbus2 as smbus
 
+lines = [""] * 4
+
 
 class LCD2004Display:
     def __init__(self, addr=0x27, bl=1):
@@ -90,7 +92,7 @@ class LCD2004Display:
             y = 0
         if y > 3:
             y = 3
-
+        lines[y] = text
         row_offsets = [0x00, 0x40, 0x14, 0x54]
         addr = 0x80 + row_offsets[y] + x
         self._send_command(addr)
@@ -140,6 +142,7 @@ class LCD2004Display:
     def display_default_four_rows(self):
         self.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], justification='left')
 
+
     def display_text_with_border(self, text_lines, full_display_border=False):
         self.clear()
         border_line = '*' * 20
@@ -165,10 +168,10 @@ class LCD2004Display:
         self.clear()
         num_lines = min(4, len(texts))
         max_chars = 20  # Assuming the display has 20 columns
-
         for i in range(num_lines):
             text = texts[i]
-
+            lines[i] = text
+            lines[i] = texts[i]
             if justification == 'left':
                 display_text = text.ljust(max_chars)
             elif justification == 'right':
