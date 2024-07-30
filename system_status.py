@@ -95,7 +95,7 @@ def query_i2c_devices(installed_devices):
         try:
             i2c = busio.I2C(board.SCL, board.SDA)
             sht41 = adafruit_sht4x.SHT4x(i2c)
-            devices["SHT41"]["status"] = ("Detected, temperature: {:.2f} C,"
+            devices["SHT41_Internal"]["status"] = ("Detected, temperature: {:.2f} C,"
                                           " humidity: {:.2f} %").format(sht41.temperature, sht41.relative_humidity)
         except Exception as e:
             devices["SHT41_Internal"]["status"] = f"Error: {str(e)}"
@@ -108,7 +108,7 @@ def query_i2c_devices(installed_devices):
             devices["SHT41_External"]["status"] = ("Detected, temperature: {:.2f} C,"
                                           " humidity: {:.2f} %").format(sht41.temperature, sht41.relative_humidity)
         except Exception as e:
-            devices["SHT41"]["status"] = f"Error: {str(e)}"
+            devices["SHT41_External"]["status"] = f"Error: {str(e)}"
             overall_status = "bad"
 
     if "LCD2004" in installed_devices:
