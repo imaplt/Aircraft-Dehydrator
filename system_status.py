@@ -91,11 +91,21 @@ def query_i2c_devices(installed_devices):
             devices["SHT30"]["status"] = f"Error: {str(e)}"
             overall_status = "bad"
 
-    if "SHT41" in installed_devices:
+    if "SHT41_Internal" in installed_devices:
         try:
             i2c = busio.I2C(board.SCL, board.SDA)
             sht41 = adafruit_sht4x.SHT4x(i2c)
             devices["SHT41"]["status"] = ("Detected, temperature: {:.2f} C,"
+                                          " humidity: {:.2f} %").format(sht41.temperature, sht41.relative_humidity)
+        except Exception as e:
+            devices["SHT41_Internal"]["status"] = f"Error: {str(e)}"
+            overall_status = "bad"
+
+    if "SHT41_External" in installed_devices:
+        try:
+            i2c = busio.I2C(board.D27, board.D22)
+            sht41 = adafruit_sht4x.SHT4x(i2c)
+            devices["SHT41_External"]["status"] = ("Detected, temperature: {:.2f} C,"
                                           " humidity: {:.2f} %").format(sht41.temperature, sht41.relative_humidity)
         except Exception as e:
             devices["SHT41"]["status"] = f"Error: {str(e)}"
