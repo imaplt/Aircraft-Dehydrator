@@ -10,6 +10,8 @@ class LCD2004Display:
         self.LCD_ADDR = addr
         self.BLEN = bl
         self._init_display()
+        # Initialize lines
+        self.lines = [""] * 4
 
     def _write_word(self, addr, data):
         temp = data
@@ -88,6 +90,10 @@ class LCD2004Display:
         for chr in text:
             self._send_data(ord(chr))
 
+    def get_max_characters(self):
+        # Returns the maximum number of characters per line for the display.
+        return 20
+
     def set_cursor_position(self, col, row):
         if col < 0 or col >= 20:
             raise ValueError("col must be between 0 and 19")
@@ -123,6 +129,9 @@ class LCD2004Display:
         self.set_cursor_position(0, line_number)
         self.write(0, line_number, " " * 20)
 
+    def display_default_four_rows(self):
+        self.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], justification='left')
+
     def display_text_with_border(self, text_lines, full_display_border=False):
         self.clear()
         border_line = '*' * 20
@@ -144,6 +153,30 @@ class LCD2004Display:
                     self.write(0, 2, "*" + text.center(18) + "*")
                     self.write(0, 3, border_line)
 
+    def display_four_rows_center(self, texts, justification='center'):
+        self.clear()
+        num_lines = min(4, len(texts))
+        max_chars = 20  # Assuming the display has 20 columns
+
+        for i in range(num_lines):
+            text = texts[i]
+
+            if justification == 'left':
+                display_text = text.ljust(max_chars)
+            elif justification == 'right':
+                display_text = text.rjust(max_chars)
+            else:  # default to center
+                display_text = text.center(max_chars)
+
+            self.write(0, i, display_text)
+
+    def update_line(self, line_number, text, justification='center'):
+        if line_number < 0 or line_number >= 4:
+            raise ValueError("line_number must be between 0 and 3")
+
+        self.lines[line_number] = text
+        self.display_four_rows_center(self.lines, justification)
+
 
 # Example usage
 if __name__ == '__main__':
@@ -154,6 +187,11 @@ if __name__ == '__main__':
     display.write(0, 3, "Line 4")
 
     time.sleep(3)
+    display.update_line(3, "Updated Text")
+    time.sleep(3)
+    display.clear()
+    display.display_default_four_rows()
+    time.sleep(3)
     display.clear()
 
     display.set_cursor_position(10, 2)
@@ -162,11 +200,11 @@ if __name__ == '__main__':
 
     display.clear()
     display.scroll_text(0, "Scrolling text left to right", direction="left")
-    time.sleep(5)
+    time.sleep(3)
 
     display.clear()
     display.scroll_text(0, "Scrolling text right to left", direction="right")
-    time.sleep(5)
+    time.sleep(3)
 
     display.clear()
     display.display_text_with_border(["Border test"])
