@@ -61,7 +61,7 @@ class Sensor:
             self.i2c = busio.I2C(board.SCL, board.SDA)
             self.sensor = adafruit_sht4x.SHT4x(self.i2c, address)
 
-        if sensor_type == 'SHT41_External':
+        elif sensor_type == 'SHT41_External':
             self.i2c = busio.I2C(board.D27, board.D22)
             self.sensor = adafruit_sht4x.SHT4x(self.i2c, address)
 
