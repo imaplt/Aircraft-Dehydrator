@@ -202,7 +202,7 @@ if __name__ == "__main__":
         time.sleep(3)
 
         internalsensor = Sensor('SHT41_Internal', 0x44)
-        externalsensor = Sensor('SHT41_External', 0x44)
+        externalsensor = Sensor('SHT30', 0x44)
 
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}
