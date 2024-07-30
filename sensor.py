@@ -67,10 +67,9 @@ class Sensor:
             self.i2c = adafruit_bitbangio.I2C(board.D27, board.D22)
             self.sensor = adafruit_sht31d.SHT31D(self.i2c, address)
         else:
-            raise ValueError("Invalid sensor type. Supported types: 'SHT41', 'SHT30'")
+            raise ValueError("Invalid sensor type. Supported types: 'SHT41_Internal', 'SHT41_External', 'SHT30'")
 
     def sensor_status(self):
-
         if self.sensor_type == 'SHT30':
             status = self.sensor.status
         else:
