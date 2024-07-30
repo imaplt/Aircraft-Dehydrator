@@ -57,8 +57,8 @@ class Sensor:
 
         if sensor_type == 'SHT41_Internal':
             # self.i2c = busio.I2C(board.D27, board.D22)
-            # self.i2c = busio.I2C(board.SCL, board.SDA)
-            self.i2c = adafruit_bitbangio.I2C(board.D27, board.D22)
+            self.i2c = busio.I2C(board.SCL, board.SDA)
+            # self.i2c = adafruit_bitbangio.I2C(board.D27, board.D22)
             self.sensor = adafruit_sht4x.SHT4x(self.i2c, address)
 
         if sensor_type == 'SHT41_External':
@@ -66,8 +66,8 @@ class Sensor:
             self.sensor = adafruit_sht4x.SHT4x(self.i2c, address)
 
         elif sensor_type == 'SHT30':
-            self.i2c = busio.I2C(board.SCL, board.SDA)
-            # self.i2c = adafruit_bitbangio.I2C(board.D27, board.D22)
+            # self.i2c = busio.I2C(board.SCL, board.SDA)
+            self.i2c = adafruit_bitbangio.I2C(board.D27, board.D22)
             self.sensor = adafruit_sht31d.SHT31D(self.i2c, address)
         else:
             raise ValueError("Invalid sensor type. Supported types: 'SHT41_Internal', 'SHT41_External', 'SHT30'")
