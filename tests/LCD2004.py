@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
-
 import time
 import smbus2 as smbus
 
 
 class LCD2004Display:
-    def __init__(self, addr=0x27, bl=1):
+    def __init__(self, configuration, addr=0x27, bl=1):
         self.BUS = smbus.SMBus(1)
         self.LCD_ADDR = addr
         self.BLEN = bl
         self._init_display()
         # Initialize lines
         self.lines = [""] * 4
+
+        # self.i2c_address = i2c_address
+        self.config_manager = configuration
+        #
+        # # Initialize I2C interface based on i2c_type.
+        # if i2c_type == 'bitbangio':
+        #     self.i2c = bitbangio.I2C(board.D27, board.D22)
+        # else:
+        #     self.i2c = busio.I2C(board.SCL, board.SDA)
 
     def _write_word(self, addr, data):
         temp = data
@@ -187,7 +195,7 @@ if __name__ == '__main__':
     display.write(0, 3, "Line 4")
 
     time.sleep(3)
-    display.update_line(3, "Updated Text")
+    display.update_line(2, "Updated Text")
     time.sleep(3)
     display.clear()
     display.display_default_four_rows()
