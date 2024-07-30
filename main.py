@@ -208,8 +208,6 @@ if __name__ == "__main__":
         internalprevious_output = {'temperature': 0, 'humidity': 0}
         externalprevious_output = {'temperature': 0, 'humidity': 0}
 
-        pass
-
         print("External Mode: ", externalsensor.sensor_mode())
         print("Internal Mode: ", internalsensor.sensor_mode())
 
