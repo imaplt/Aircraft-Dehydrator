@@ -206,13 +206,13 @@ if __name__ == '__main__':
     display.write(0, 0, "Set cursor test")
     time.sleep(3)
 
-    display.clear()
-    display.scroll_text(0, "Scrolling text left to right", direction="left")
-    time.sleep(3)
-
-    display.clear()
-    display.scroll_text(0, "Scrolling text right to left", direction="right")
-    time.sleep(3)
+    # display.clear()
+    # display.scroll_text(0, "Scrolling text left to right", direction="left")
+    # time.sleep(3)
+    #
+    # display.clear()
+    # display.scroll_text(0, "Scrolling text right to left", direction="right")
+    # time.sleep(3)
 
     display.clear()
     display.display_text_with_border(["Border test"])
