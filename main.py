@@ -201,8 +201,8 @@ if __name__ == "__main__":
         lcd2004_display.display_text_center_with_border('Initializing...')
         time.sleep(3)
 
-        internalsensor = Sensor('SHT41', 0x44)
-        externalsensor = Sensor('SHT30', 0x44)
+        internalsensor = Sensor('SHT41_Internal', 0x44)
+        externalsensor = Sensor('SHT41_External', 0x44)
 
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}

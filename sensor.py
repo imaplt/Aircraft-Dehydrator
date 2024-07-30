@@ -55,8 +55,12 @@ class Sensor:
         self.sensor_type = sensor_type
         self.address = address
 
-        if sensor_type == 'SHT41':
+        if sensor_type == 'SHT41_Internal':
             self.i2c = busio.I2C(board.SCL, board.SDA)
+            self.sensor = adafruit_sht4x.SHT4x(self.i2c, address)
+
+        if sensor_type == 'SHT41_External':
+            self.i2c = busio.I2C(board.D27, board.D22)
             self.sensor = adafruit_sht4x.SHT4x(self.i2c, address)
 
         elif sensor_type == 'SHT30':
@@ -80,7 +84,7 @@ class Sensor:
 
     def read_sensor(self):
 
-        if self.sensor_type == 'SHT41':
+        if self.sensor_type[:5] == 'SHT41':
             temperature, humidity = self.sensor.measurements
         elif self.sensor_type == 'SHT30':
             temperature = self.sensor.temperature
@@ -95,13 +99,6 @@ class Sensor:
         return {'temperature': temperature, 'humidity': humidity}
 
     def heat_sensor(self):
-        if self.sensor_type == 'SHT41':
-            self.sensor.heater = True
-            time.sleep(1)
-            self.sensor.heater = False
-        elif self.sensor_type == 'SHT30':
-            self.sensor.heater = True
-            time.sleep(1)
-            self.sensor.heater = False
-        else:
-            raise ValueError("Invalid sensor type. Supported types: 'SHT41', 'SHT30'")
+        self.sensor.heater = True
+        time.sleep(1)
+        self.sensor.heater = False
