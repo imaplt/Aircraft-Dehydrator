@@ -231,6 +231,7 @@ if __name__ == "__main__":
         for status in statuses:
             print(status)
             logger.log(timestamp, 'System', '', status)
+
         # if overall_status == 'bad':
         #     logger.log(timestamp, 'System', 'Overall', "Overall Status: Fail")
         #     print("Overall Status: Fail")
