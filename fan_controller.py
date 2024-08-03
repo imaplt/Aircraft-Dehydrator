@@ -20,7 +20,7 @@ class EMC2101:
         self.STATUS_REG = 0x02
         self.CONFIG_REG = 0x03
         self.RESET_REG = 0x05
-        self.device = I2CDevice(i2c, self.I2C_ADDRESS)
+        self.device = I2CDevice(self.i2c, self.I2C_ADDRESS)
 
     def _read_register(self, register):
         with self.device:
