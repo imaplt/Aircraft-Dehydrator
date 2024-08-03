@@ -1,13 +1,12 @@
-import sys
 
+import sys
 import schedule
 import time
 from config_manager import ConfigManager
 from logger import Logger as Log
 import system_status
-from display import SSD1306Display, DisplayConfig
+from display import SSD1306Display, LCD2004Display, DisplayConfig
 from gpiozero import Button
-from LCD2004 import LCD2004Display
 
 
 def task_internal():
