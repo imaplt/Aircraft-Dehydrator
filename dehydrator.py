@@ -224,18 +224,17 @@ if __name__ == "__main__":
 
     try:
         installed_devices = read_installed_devices(configManager)
-        # overall_status, statuses = system_status.query_i2c_devices(installed_devices)
-        # print(f"Overall status: {overall_status}")
+        overall_status, statuses = system_status.query_i2c_devices(installed_devices)
+        print(f"Overall status: {overall_status}")
 
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        statuses = []
-        # for status in statuses:
-        #     print(status)
-        #     logger.log(timestamp, 'System', '', status)
-        # if overall_status == 'bad':
-        #     logger.log(timestamp, 'System', 'Overall', "Overall Status: Fail")
-        #     print("Overall Status: Fail")
-        #     raise ValueError("Overall Status Failed")
+        for status in statuses:
+            print(status)
+            logger.log(timestamp, 'System', '', status)
+        if overall_status == 'bad':
+            logger.log(timestamp, 'System', 'Overall', "Overall Status: Fail")
+            print("Overall Status: Fail")
+            raise ValueError("Overall Status Failed")
 
         schedule_tasks()
         # run_scheduler()
