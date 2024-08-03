@@ -86,15 +86,6 @@ class EMC2101:
         else:
             raise ValueError("Fan speed must be between 0 and 100")
 
-        #
-        #    # Put code here to stop the fan.
-        #     self.fan_engaged = False
-        #     self.emc2101.set_fan_speed(0)
-        #     last_run_time = time.time() - self.start_time
-        #     return True, last_run_time
-        # else:
-        #     return False, None
-
     def read_status(self):
         status = self.sensor.devstatus
         status_description = []
@@ -110,4 +101,3 @@ class EMC2101:
         if not status_description:
             status_description.append("No faults")
         return ", ".join(status_description)
-
