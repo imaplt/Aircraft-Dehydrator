@@ -4,6 +4,7 @@ import board
 import busio
 import adafruit_sht31d
 import adafruit_sht4x
+import adafruit_shtc3
 import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import adafruit_ssd1306
 from adafruit_bus_device.i2c_device import I2CDevice
@@ -16,6 +17,7 @@ def query_i2c_devices(installed_devices):
 
     devices = {
         "SHT30": {"address": 0x44, "status": "Not detected"},
+        "SHTC3": {"address": 0x70, "status": "Not detected"},
         "SHT41_Internal": {"address": 0x44, "status": "Not detected"},
         "SHT41_External": {"address": 0x44, "status": "Not detected"},
         "LCD2004": {"address": 0x27, "status": "Not detected"},
@@ -36,6 +38,16 @@ def query_i2c_devices(installed_devices):
                                           " humidity: {:.2f} %").format(sensor.temperature, sensor.relative_humidity)
         except Exception as e:
             devices["SHT30"]["status"] = f"Error: {str(e)}"
+            overall_status = "bad"
+
+    if "SHTC3" in installed_devices:
+        try:
+            i2c = busio.I2C(board.SCL, board.SDA)
+            shtc3 = adafruit_shtc3.SHTC3(i2c)
+            devices["SHTC3"]["status"] = ("Detected, temperature: {:.2f} C,"
+                                          " humidity: {:.2f} %").format(shtc3.temperature, shtc3.relative_humidity)
+        except Exception as e:
+            devices["SHT41_Internal"]["status"] = f"Error: {str(e)}"
             overall_status = "bad"
 
     if "SHT41_Internal" in installed_devices:

@@ -49,7 +49,21 @@ def task_internal():
 
 
 def task_external():
-    print("Task running every minute")
+
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    externaloutput = externalsensor.read_sensor()
+    if abs(externaloutput['humidity'] - externalprevious_output['humidity']) > 0.2:
+        logger.log(timestamp, 'External', '01',
+                   f"Temperature: {externaloutput['temperature']}C,"
+                   f" Humidity: {externaloutput['humidity']}%")
+        # Update previous output values
+        externalprevious_output['temperature'] = externaloutput['temperature']
+        externalprevious_output['humidity'] = externaloutput['humidity']
+        print("External Sensor Reading:", externaloutput)
+        ssd1306Display.update_line(3, justification='left',
+                                   text=f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
+
+    time.sleep(.1)
 
 
 def schedule_tasks(int_interval=1, ext_interval=15):
@@ -61,6 +75,17 @@ def run_scheduler():
     while True:
         schedule.run_pending()
         time.sleep(1)
+
+
+def heat_sensor():
+    # TODO: Add code to heat sensors when the humidity gets high.
+    print("Heating External sensor...")
+    externalsensor.heat_sensor()
+    logger.log(timestamp, 'External', '01', "Heating External sensor...")
+
+    print("Heating Internal sensor...")
+    internalsensor.heat_sensor()
+    logger.log(timestamp, 'Internal', '02', "Heating Internal sensor...")
 
 
 def read_installed_devices(config):
