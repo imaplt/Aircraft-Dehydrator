@@ -204,6 +204,7 @@ def isDeviceDetected(statuses, device):
             return True
     return False
 
+
 if __name__ == "__main__":
     # Get configuration items
     configManager = ConfigManager('config.ini')
@@ -275,8 +276,8 @@ if __name__ == "__main__":
         time.sleep(3)
         internalsensor = Sensor('SHT41_Internal', 0x44)
 
-        if isDeviceDetected(statuses, 'SHT30'):
-            externalsensor = Sensor('SHT30', 0x44)
+        if isDeviceDetected(statuses, 'SHTC3'):
+            externalsensor = Sensor('SHTC3', 0x70)
             externalprevious_output = {'temperature': 0, 'humidity': 0}
             print("External Mode: ", externalsensor.sensor_mode())
 
