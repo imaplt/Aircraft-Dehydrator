@@ -10,17 +10,14 @@ class Logger:
         self.filename = filename
         self.max_log_size = max_log_size
         self.max_archive_size = max_archive_size
-        self.filename = filename
-        self.max_log_size = max_log_size
-        self.max_archive_size = max_archive_size
 
         # Initialize the file before setting up logging
-        self.initialize_file()
+        self.__initialize_file()
 
         # Setup logging after the file has been initialized
-        self.logger = self.setup_logging()
+        self.logger = self.__setup_logging()
 
-    def initialize_file(self):
+    def __initialize_file(self):
         print('Initializing log file....')
         try:
             # Ensure the file is initialized with headers if it doesn't exist
@@ -33,7 +30,7 @@ class Logger:
         except IOError as e:
             print(f"Error initializing log file: {e}")
 
-    def setup_logging(self):
+    def __setup_logging(self):
         print('Setting up log file....')
         logger = logging.getLogger('CustomLogger')
         logger.handlers.clear()  # Clear existing handlers
@@ -44,7 +41,7 @@ class Logger:
         logger.addHandler(handler)
         return logger
 
-    def manage_archives(self):
+    def __manage_archives(self):
         # Archive files are named filename.log.1, filename.log.2, etc.
         archive_files = [
             f for f in os.listdir('.') if f.startswith(self.filename) and f != self.filename
@@ -61,6 +58,6 @@ class Logger:
         log_entry = f'{timestamp},{name},{id},{message}'
         try:
             self.logger.info(log_entry)
-            self.manage_archives()
+            self.__manage_archives()
         except IOError as e:
             print(f"Error writing to log file: {e}")
