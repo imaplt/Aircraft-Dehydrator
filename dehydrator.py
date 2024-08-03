@@ -7,6 +7,7 @@ from logger import Logger as Log
 import system_status
 from display import SSD1306Display, LCD2004Display, DisplayConfig
 from gpiozero import Button
+from sensor import Sensor
 
 
 def task_internal():
@@ -202,8 +203,22 @@ if __name__ == "__main__":
 
         # Display centered text
         ssd1306Display.display_text_center("Initializing...")
-        lcd2004Display.display_text_with_border('Initializing...')
+        lcd2004Display.display_text_with_border(['Initializing...'])
         time.sleep(3)
+        internalsensor = Sensor('SHT41_Internal', 0x44)
+        externalsensor = Sensor('SHT30', 0x44)
+
+        # Initialize previous output values to None
+        internalprevious_output = {'temperature': 0, 'humidity': 0}
+        externalprevious_output = {'temperature': 0, 'humidity': 0}
+
+        print("External Mode: ", externalsensor.sensor_mode())
+        print("Internal Mode: ", internalsensor.sensor_mode())
+
+        ssd1306Display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."],
+                                                 justification='left')
+        ssd1306Display.display_default_four_rows()
+        time.sleep(2)
 
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected!")
