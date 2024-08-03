@@ -8,64 +8,7 @@ import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import adafruit_ssd1306
 from adafruit_bus_device.i2c_device import I2CDevice
 import adafruit_bitbangio
-
-
-class SystemStatus:
-    I2C_ADDRESS = 0x4C
-    INTERNAL_TEMP_REG = 0x00
-    EXTERNAL_TEMP_REG = 0x01
-    FAN_SPEED_REG = 0x10
-    FAN_SPEED_SET_REG = 0x11
-    STATUS_REG = 0x02
-    CONFIG_REG = 0x03
-    RESET_REG = 0x05
-
-    def __init__(self, i2c):
-        self.device = I2CDevice(i2c, self.I2C_ADDRESS)
-
-    def read_register(self, register):
-        with self.device:
-            self.device.write(bytes([register]))
-            result = bytearray(1)
-            self.device.readinto(result)
-        return result[0]
-
-    def read_status(self):
-        status = self.read_register(self.STATUS_REG)
-        status_description = []
-
-        if status & 0x01:
-            status_description.append("Internal temperature sensor fault")
-        if status & 0x02:
-            status_description.append("External temperature sensor fault")
-        if status & 0x04:
-            status_description.append("Fan speed fault")
-        if status & 0x08:
-            status_description.append("Device reset")
-
-        if not status_description:
-            status_description.append("No faults")
-
-        return ", ".join(status_description)
-
-    def read_config(self):
-        config = self.read_register(self.CONFIG_REG)
-        config_description = []
-
-        if config & 0x01:
-            config_description.append("Device enabled")
-        else:
-            config_description.append("Device disabled")
-        if config & 0x02:
-            config_description.append("Fan control enabled")
-        else:
-            config_description.append("Fan control disabled")
-        if config & 0x04:
-            config_description.append("Temperature monitoring enabled")
-        else:
-            config_description.append("Temperature monitoring disabled")
-
-        return ", ".join(config_description)
+from fan_controller import EMC2101
 
 
 def query_i2c_devices(installed_devices):
@@ -133,7 +76,7 @@ def query_i2c_devices(installed_devices):
 
     if "EMC2101" in installed_devices:
         try:
-            emc2101 = SystemStatus(i2c)
+            emc2101 = EMC2101()
             status = emc2101.read_status()
             devices["EMC2101"]["status"] = f"Detected, Status: {status}"
         except Exception as e:
@@ -142,12 +85,12 @@ def query_i2c_devices(installed_devices):
 
     if "FAN" in installed_devices:
         try:
-            emc2101 = SystemStatus(i2c)
-            emc2101.set_fan_speed(100)
+            fan = EMC2101()
+            fan. set_fan_speed(100)
             time.sleep(1)
-            rpm = emc2101.read_fan_speed()
-            temp = emc2101.read_internal_temp()
-            emc2101.set_fan_speed(0)
+            rpm = fan.read_fan_speed()
+            temp = fan.read_internal_temp()
+            fan.set_fan_speed(0)
             if rpm >= 4000:
                 devices["FAN"]["status"] = f"Detected, RPM: {rpm}, Internal Temp: {temp}"
                 overall_status = "good"

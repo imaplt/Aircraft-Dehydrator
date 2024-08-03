@@ -1,6 +1,7 @@
 import board
 import adafruit_emc2101
 import time
+from adafruit_bus_device.i2c_device import I2CDevice
 
 
 class EMC2101:
@@ -11,6 +12,41 @@ class EMC2101:
         self.fan_engaged_time = 0
         self.start_time = time.time()
         self.fan_engage_start_time = None
+        self.I2C_ADDRESS = 0x4C
+        self.INTERNAL_TEMP_REG = 0x00
+        self.EXTERNAL_TEMP_REG = 0x01
+        self.FAN_SPEED_REG = 0x10
+        self.FAN_SPEED_SET_REG = 0x11
+        self.STATUS_REG = 0x02
+        self.CONFIG_REG = 0x03
+        self.RESET_REG = 0x05
+        self.device = I2CDevice(i2c, self.I2C_ADDRESS)
+
+    def _read_register(self, register):
+        with self.device:
+            self.device.write(bytes([register]))
+            result = bytearray(1)
+            self.device.readinto(result)
+        return result[0]
+
+    def read_config(self):
+        config = self._read_register(self.CONFIG_REG)
+        config_description = []
+
+        if config & 0x01:
+            config_description.append("Device enabled")
+        else:
+            config_description.append("Device disabled")
+        if config & 0x02:
+            config_description.append("Fan control enabled")
+        else:
+            config_description.append("Fan control disabled")
+        if config & 0x04:
+            config_description.append("Temperature monitoring enabled")
+        else:
+            config_description.append("Temperature monitoring disabled")
+
+        return ", ".join(config_description)
 
     def read_internal_temp(self):
         temp = self.sensor.internal_temperature
@@ -75,6 +111,3 @@ class EMC2101:
             status_description.append("No faults")
         return ", ".join(status_description)
 
-    def read_config(self):
-        config = self.sensor.devconfig
-        return config
