@@ -157,7 +157,7 @@ def query_i2c_devices(installed_devices):
                 devices["FAN"]["status"] = f"Not Detected, RPM: {rpm}; Should be > 4000"
                 overall_status = "bad"
         except Exception as e:
-            devices["EMC2101"]["status"] = f"Error: {str(e)}"
+            devices["FAN"]["status"] = f"Error: {str(e)}"
             overall_status = "bad"
 
     if "SSD1306" in installed_devices:
