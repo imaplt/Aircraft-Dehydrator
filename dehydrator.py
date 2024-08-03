@@ -2,16 +2,50 @@
 import sys
 import schedule
 import time
+from datetime import timedelta
 from config_manager import ConfigManager
 from logger import Logger as Log
 import system_status
 from display import SSD1306Display, LCD2004Display, DisplayConfig
 from gpiozero import Button
 from sensor import Sensor
+from fan_controller import EMC2101
 
 
 def task_internal():
-    print("Task running every second")
+    internaloutput = internalsensor.read_sensor()
+    if abs(internaloutput['humidity'] - internalprevious_output['humidity']) > 0.2:
+        logger.log(timestamp, 'Internal', '02',
+                   f"Temperature: {internaloutput['temperature']}C,"
+                   f" Humidity: {internaloutput['humidity']}%")
+        # Update previous output values
+        internalprevious_output['temperature'] = internaloutput['temperature']
+        internalprevious_output['humidity'] = internaloutput['humidity']
+        print("Internal Sensor Reading:", internaloutput)
+        ssd1306Display.update_line(1,
+                                    justification='left', text=f"{internaloutput['humidity']}%"
+                                                               f" - {internaloutput['temperature']}°C")
+        if internaloutput['humidity'] > MAX_HUMIDITY:
+            started = fanController.set_fan_speed(50)
+            if started:
+                logger.log(timestamp, 'Fan', '',
+                           f"Fan started, exceeded MAX humidity of: {MAX_HUMIDITY}%")
+                print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
+                ssd1306Display.display_text_center_with_border('Fan Started...')
+                time.sleep(1)
+                ssd1306Display.display_default_four_rows()
+        elif internaloutput['humidity'] < MIN_HUMIDITY:
+            stopped, run_time = fanController.set_fan_speed(0)
+            if stopped:
+                print("Fan stopped...")
+                logger.log(timestamp, 'Fan', '',
+                           f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY }%")
+                logger.log(timestamp, 'Fan', '', f"Fan run time: {str(timedelta(seconds=run_time))}")
+                ssd1306Display.display_text_center_with_border('Fan Stopped...')
+                time.sleep(1)
+                ssd1306Display.display_default_four_rows()
+
+    time.sleep(.1)  # Adjust as needed
 
 
 def task_external():
@@ -139,6 +173,12 @@ def cleanup():
     # lcd2004_display.clear()
 
 
+def isDeviceDetected(statuses, device):
+    for status in statuses:
+        if device in status and 'Detected' in status:
+            return True
+    return False
+
 if __name__ == "__main__":
     # Get configuration items
     configManager = ConfigManager('config.ini')
@@ -160,7 +200,7 @@ if __name__ == "__main__":
     # Initialise the logging
     logger = Log(LOGFILE, MAX_LOG_SIZE, MAX_ARCHIVE_SIZE)
 
-    # GPIO setup using gpiozero
+    # GPIO setup using gpiozero for input buttons
     up_button = Button(UP_BUTTON_PIN, pull_up=True, bounce_time=0.2, hold_time=3)
     dn_button = Button(DN_BUTTON_PIN, pull_up=True, bounce_time=0.2, hold_time=3)
 
@@ -177,6 +217,8 @@ if __name__ == "__main__":
     dn_button.when_pressed = button_pressed_callback
     dn_button.when_held = button_hold_callback
 
+    # Initialize fan controller
+    fanController = EMC2101()
     # Initialize lines
     lines = [""] * 4  # For four line ssd1306_display...
 
@@ -206,19 +248,23 @@ if __name__ == "__main__":
         lcd2004Display.display_text_with_border(['Initializing...'])
         time.sleep(3)
         internalsensor = Sensor('SHT41_Internal', 0x44)
-        externalsensor = Sensor('SHT30', 0x44)
+
+        if isDeviceDetected(statuses, 'SHT30'):
+            externalsensor = Sensor('SHT30', 0x44)
+            externalprevious_output = {'temperature': 0, 'humidity': 0}
+            print("External Mode: ", externalsensor.sensor_mode())
 
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}
-        externalprevious_output = {'temperature': 0, 'humidity': 0}
 
-        print("External Mode: ", externalsensor.sensor_mode())
         print("Internal Mode: ", internalsensor.sensor_mode())
 
         ssd1306Display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."],
                                                  justification='left')
         ssd1306Display.display_default_four_rows()
         time.sleep(2)
+        schedule_tasks()
+        run_scheduler()
 
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected!")
