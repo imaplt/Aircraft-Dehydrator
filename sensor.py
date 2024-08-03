@@ -98,8 +98,11 @@ class Sensor:
         elif self.sensor_type == 'SHT30':
             temperature = self.sensor.temperature
             humidity = self.sensor.relative_humidity
+        elif self.sensor_type == 'SHTC3':
+            temperature = self.sensor.temperature
+            humidity = self.sensor.relative_humidity
         else:
-            raise ValueError("Invalid sensor type. Supported types: 'SHT41', 'SHT30'")
+            raise ValueError("Invalid sensor type. Supported types: 'SHT41', 'SHTC3', 'SHT30'")
 
         # Format the sensor output to one decimal place
         temperature = round(temperature, 1)
