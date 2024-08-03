@@ -1,3 +1,5 @@
+import sys
+
 import schedule
 import time
 from config_manager import ConfigManager
@@ -5,6 +7,7 @@ from logger import Logger as Log
 import system_status
 from display import SSD1306Display, DisplayConfig
 from gpiozero import Button
+from LCD2004 import LCD2004Display
 
 
 def task_internal():
@@ -188,19 +191,19 @@ if __name__ == "__main__":
             logger.log(timestamp, 'System', '', status)
         if overall_status == 'bad':
             logger.log(timestamp, 'System', 'Overall', "Overall Status: Fail")
+            print("Overall Status: Fail")
             raise ValueError("Overall Status Failed")
 
         schedule_tasks()
         # run_scheduler()
 
-        ssd1306_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE,
-                                               border_size=BORDER)
-        ssd1306_display = SSD1306Display(ssd1306_display_config)
-        # lcd2004_display = LCD2004Display()
+        ssd1306_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
+        ssd1306Display = SSD1306Display(ssd1306_display_config)
+        lcd2004Display = LCD2004Display()
 
         # Display centered text
-        ssd1306_display.display_text_center("Initializing...")
-        # lcd2004_display.display_text_with_border('Initializing...')
+        ssd1306Display.display_text_center("Initializing...")
+        lcd2004Display.display_text_with_border('Initializing...')
         time.sleep(3)
 
     except KeyboardInterrupt:
