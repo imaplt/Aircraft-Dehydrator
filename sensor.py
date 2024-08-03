@@ -5,7 +5,6 @@ import board
 import busio
 import adafruit_sht4x
 import adafruit_sht31d
-import adafruit_sht31d
 import adafruit_bitbangio
 from enum import Enum
 
@@ -58,13 +57,11 @@ class Sensor:
         self.sensor_type = sensor_type
         self.address = address
 
-        print(sensor_type)
-
         if sensor_type == 'SHT41_Internal':
             self.i2c = busio.I2C(board.SCL, board.SDA)
             self.sensor = adafruit_sht4x.SHT4x(self.i2c, address)
 
-        if sensor_type == 'SHTC3':
+        elif sensor_type == 'SHTC3':
             self.i2c = busio.I2C(board.SCL, board.SDA)
             self.sensor = adafruit_shtc3.SHTC3(self.i2c)
 
