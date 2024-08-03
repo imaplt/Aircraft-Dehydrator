@@ -189,13 +189,13 @@ def button_hold_callback(button):
 def cleanup():
     # Want to add code here to update display, update log with run time etc
     print('Cleaning Up')
-    # ssd1306Display.display_text_center_with_border('Shutting down...')
-    # lcd2004Display.display_text_with_border('Shutting down...')
+    ssd1306Display.display_text_center_with_border('Shutting down...')
+    lcd2004Display.display_text_with_border('Shutting down...')
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                'System', '', "Shutting down...")
     time.sleep(3)
-    # ssd1306Display.clear_screen()
-    # lcd2004Display.clear()
+    ssd1306Display.clear_screen()
+    lcd2004Display.clear()
 
 
 def isDeviceDetected(statuses, device):
@@ -262,9 +262,6 @@ if __name__ == "__main__":
             logger.log(timestamp, 'System', 'Overall', "Overall Status: Fail")
             print("Overall Status: Fail")
             raise ValueError("Overall Status Failed")
-
-        schedule_tasks()
-        # run_scheduler()
 
         ssd1306_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
         ssd1306Display = SSD1306Display(ssd1306_display_config)
