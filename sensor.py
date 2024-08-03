@@ -1,7 +1,10 @@
 import time
+
+import adafruit_shtc3
 import board
 import busio
 import adafruit_sht4x
+import adafruit_sht31d
 import adafruit_sht31d
 import adafruit_bitbangio
 from enum import Enum
@@ -61,6 +64,10 @@ class Sensor:
             self.i2c = busio.I2C(board.SCL, board.SDA)
             self.sensor = adafruit_sht4x.SHT4x(self.i2c, address)
 
+        if sensor_type == 'SHTC3':
+            self.i2c = busio.I2C(board.SCL, board.SDA)
+            self.sensor = adafruit_shtc3.SHTC3(self.i2c)
+
         elif sensor_type == 'SHT41_External':
             self.i2c = busio.I2C(board.D27, board.D22)
             self.sensor = adafruit_sht4x.SHT4x(self.i2c, address)
@@ -69,7 +76,8 @@ class Sensor:
             self.i2c = adafruit_bitbangio.I2C(board.D27, board.D22)
             self.sensor = adafruit_sht31d.SHT31D(self.i2c, address)
         else:
-            raise ValueError("Invalid sensor type. Supported types: 'SHT41_Internal', 'SHT41_External', 'SHT30'")
+            raise ValueError("Invalid sensor type. Supported types: 'SHT41_Internal', "
+                             "'SHT41_External', 'SHTC3' ,'SHT30'")
 
     def sensor_status(self):
         if self.sensor_type == 'SHT30':

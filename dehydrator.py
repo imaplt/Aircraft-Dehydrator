@@ -66,7 +66,7 @@ def task_external():
     time.sleep(.1)
 
 
-def schedule_tasks(int_interval=1, ext_interval=15):
+def schedule_tasks(int_interval=1, ext_interval=1):
     schedule.every(int_interval).seconds.do(task_internal)
     schedule.every(ext_interval).minutes.do(task_external)
 
