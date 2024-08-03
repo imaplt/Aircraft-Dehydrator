@@ -64,7 +64,6 @@ class EMC2101:
         if 0 <= speed <= 100:
             # Disengage code
             if speed == 0:
-                self.sensor.manual_fan_speed = speed
                 # Disengaged fan code
                 if self.fan_engaged and speed == 0:
                     # Put code here to stop the fan.

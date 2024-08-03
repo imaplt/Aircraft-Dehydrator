@@ -88,15 +88,15 @@ def query_i2c_devices(installed_devices):
             fan = EMC2101()
             fan.set_fan_speed(100)
             time.sleep(1)
-            # rpm = fan.read_fan_speed()
-            # temp = fan.read_internal_temp()
-            # fan.set_fan_speed(0)
-            # if rpm >= 4000:
-            #     devices["FAN"]["status"] = f"Detected, RPM: {rpm}, Internal Temp: {temp}"
-            #     overall_status = "good"
-            # else:
-            #     devices["FAN"]["status"] = f"Not Detected, RPM: {rpm}; Should be > 4000"
-            #     overall_status = "bad"
+            rpm = fan.read_fan_speed()
+            temp = fan.read_internal_temp()
+            fan.set_fan_speed(0)
+            if rpm >= 4000:
+                devices["FAN"]["status"] = f"Detected, RPM: {rpm}, Internal Temp: {temp}"
+                overall_status = "good"
+            else:
+                devices["FAN"]["status"] = f"Not Detected, RPM: {rpm}; Should be > 4000"
+                overall_status = "bad"
         except Exception as e:
             devices["FAN"]["status"] = f"Error: {str(e)}"
             overall_status = "bad"
