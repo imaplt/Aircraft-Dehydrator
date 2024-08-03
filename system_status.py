@@ -134,8 +134,9 @@ def query_i2c_devices(installed_devices):
 
     if "EMC2101" in installed_devices:
         try:
-            status = EMC2101.read_status(self=EMC2101())
+            # status = EMC2101.read_status(self=EMC2101())
             # config = emc2101.read_config()
+            status = 'Detected'
             devices["EMC2101"]["status"] = f"Detected, Status: {status}"
         except Exception as e:
             devices["EMC2101"]["status"] = f"Error: {str(e)}"
