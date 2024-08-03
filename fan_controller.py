@@ -1,11 +1,16 @@
 import board
 import adafruit_emc2101
+import time
 
 
 class EMC2101:
     def __init__(self, i2c_address=0x4C):
         self.i2c = board.I2C()
         self.sensor = adafruit_emc2101.EMC2101(self.i2c)
+        self.fan_engaged = False
+        self.fan_engaged_time = 0
+        self.start_time = time.time()
+        self.fan_engage_start_time = None
 
     def read_internal_temp(self):
         temp = self.sensor.internal_temperature
@@ -21,9 +26,38 @@ class EMC2101:
 
     def set_fan_speed(self, speed):
         if 0 <= speed <= 100:
-            self.sensor.manual_fan_speed = speed
+            # Disengage code
+            if speed == 0:
+                self.sensor.manual_fan_speed = speed
+                # Disengaged fan code
+                if self.fan_engaged and speed == 0:
+                    # Put code here to stop the fan.
+                    self.fan_engaged = False
+                    self.set_fan_speed(0)
+                    last_run_time = time.time() - self.start_time
+                    return True, last_run_time
+                else:
+                    return False, None
+            # Engage code (speed greater than 0)
+            else:
+                if not self.fan_engaged:
+                    # Put code here to start fan...
+                    self.set_fan_speed(100)
+                    self.fan_engaged = True
+                    return True
+                else:
+                    return False
         else:
             raise ValueError("Fan speed must be between 0 and 100")
+
+        #
+        #    # Put code here to stop the fan.
+        #     self.fan_engaged = False
+        #     self.emc2101.set_fan_speed(0)
+        #     last_run_time = time.time() - self.start_time
+        #     return True, last_run_time
+        # else:
+        #     return False, None
 
     def read_status(self):
         status = self.sensor.devstatus
