@@ -96,6 +96,7 @@ class Sensor:
             temperature = self.sensor.temperature
             humidity = self.sensor.relative_humidity
         elif self.sensor_type == 'SHTC3':
+            self.sensor.low_power = False
             temperature = self.sensor.temperature
             humidity = self.sensor.relative_humidity
         else:
