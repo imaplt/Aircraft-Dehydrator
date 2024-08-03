@@ -8,7 +8,6 @@ import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import adafruit_ssd1306
 from adafruit_bus_device.i2c_device import I2CDevice
 import adafruit_bitbangio
-from fan_controller import EMC2101
 
 
 class SystemStatus:
@@ -143,12 +142,12 @@ def query_i2c_devices(installed_devices):
 
     if "FAN" in installed_devices:
         try:
-            fan = EMC2101()
-            fan.set_fan_speed(100)
+            emc2101 = SystemStatus(i2c)
+            emc2101.set_fan_speed(100)
             time.sleep(1)
-            rpm = fan.read_fan_speed()
-            temp = fan.read_internal_temp()
-            fan.set_fan_speed(0)
+            rpm = emc2101.read_fan_speed()
+            temp = emc2101.read_internal_temp()
+            emc2101.set_fan_speed(0)
             if rpm >= 4000:
                 devices["FAN"]["status"] = f"Detected, RPM: {rpm}, Internal Temp: {temp}"
                 overall_status = "good"
