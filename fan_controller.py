@@ -77,7 +77,7 @@ class EMC2101:
             else:
                 if not self.fan_engaged:
                     # Put code here to start fan...
-                    self.sensor.manual_fan_speed(100)
+                    self.sensor.manual_fan_speed(speed)
                     self.fan_engaged = True
                     return True
                 else:

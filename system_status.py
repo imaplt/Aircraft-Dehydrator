@@ -87,7 +87,6 @@ def query_i2c_devices(installed_devices):
         try:
             fan = EMC2101()
             fan.set_fan_speed(100)
-            time.sleep(1)
             rpm = fan.read_fan_speed()
             temp = fan.read_internal_temp()
             fan.set_fan_speed(0)
