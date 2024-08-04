@@ -123,10 +123,10 @@ def task_fan():
 
 
 def task_display():
-    lines[0] = f"Internal - Max Temp: {INTERNAL_HIGH_TEMP} Max Humidity: {INTERNAL_HIGH_HUMIDITY}"
-    lines[1] = f"Internal - Min Temp: {INTERNAL_LOW_TEMP} Min Humidity: {INTERNAL_LOW_HUMIDITY}"
-    lines[2] = f"External - Max Temp: {EXTERNAL_HIGH_TEMP} Max Humidity: {EXTERNAL_HIGH_HUMIDITY}"
-    lines[3] = f"External - Min Temp: {EXTERNAL_LOW_TEMP} Min Humidity: {EXTERNAL_LOW_HUMIDITY}"
+    lines[0] = f"Max Temp:{INTERNAL_HIGH_TEMP} Humidity:{INTERNAL_HIGH_HUMIDITY}"
+    lines[1] = f"Min Temp:{INTERNAL_LOW_TEMP} Min Humidity:{INTERNAL_LOW_HUMIDITY}"
+    lines[2] = f"Max Temp:{EXTERNAL_HIGH_TEMP} Max Humidity:{EXTERNAL_HIGH_HUMIDITY}"
+    lines[3] = f"Min Temp:{EXTERNAL_LOW_TEMP} Min Humidity:{EXTERNAL_LOW_HUMIDITY}"
     lcd2004Display.display_four_rows_center(lines, justification='left')
 
 
@@ -403,6 +403,7 @@ if __name__ == "__main__":
         # Need to run the External once to update the values
         task_external()
         if DISPLAY_ENABLED:
+            time.sleep(3)
             task_display()
         run_scheduler()
 
