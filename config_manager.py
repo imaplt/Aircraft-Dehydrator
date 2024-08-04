@@ -32,9 +32,9 @@ class ConfigManager:
     def get_boolean_config(self, key, section='DEFAULT'):
         return self.config.getboolean(section, key)
 
-    def get_duration_config(self, section, key):  # TODO: Add default section?
+    def get_duration_config(self, section, key):
         # Retrieve the total cycle duration in seconds
-        total_cycle_duration_seconds = float(self.config[section][key])
+        total_cycle_duration_seconds = self.config.getfloat(section, key)
         # Convert the total seconds back to a timedelta object
         return timedelta(seconds=total_cycle_duration_seconds)
 
