@@ -20,8 +20,10 @@ class ConfigManager:
             return int(self.config["CUSTOM"][key])
         elif "DEFAULT" in self.config and key in self.config["DEFAULT"]:
             return int(self.config["DEFAULT"][key])
+        elif "LOG" in self.config and key in self.config["LOG"]:
+            return int(self.config["LOG"][key])
         else:
-            raise KeyError(f"Config for DEFAULT/{key} not found.")
+            raise KeyError(f"Config for {key} not found.")
 
     def get_float_config(self, section, key):  # TODO: Add default section?
         return float(self.config[section][key])
