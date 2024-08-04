@@ -38,7 +38,7 @@ class ConfigManager:
         # Convert the total seconds back to a timedelta object
         return timedelta(seconds=total_cycle_duration_seconds)
 
-    def set_duration_config(self, key, value, section='Log'):  # TODO: Add default section?
+    def set_duration_config(self, key, value, section='LOG'):  # TODO: Add default section?
         self.config.set(section, key, str(value.total_seconds()))
         self.save_config()
 

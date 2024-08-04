@@ -124,9 +124,9 @@ def task_fan():
 
 def task_display():
     lines[0] = f"Max T:{INTERNAL_HIGH_TEMP} H:{INTERNAL_HIGH_HUMIDITY}"
-    lines[1] = f"Min T:{INTERNAL_LOW_TEMP} Min H:{INTERNAL_LOW_HUMIDITY}"
-    lines[2] = f"Max T:{EXTERNAL_HIGH_TEMP} Max H:{EXTERNAL_HIGH_HUMIDITY}"
-    lines[3] = f"Min T:{EXTERNAL_LOW_TEMP} Min H:{EXTERNAL_LOW_HUMIDITY}"
+    lines[1] = f"Min T:{INTERNAL_LOW_TEMP} H:{INTERNAL_LOW_HUMIDITY}"
+    lines[2] = f"Max T:{EXTERNAL_HIGH_TEMP} H:{EXTERNAL_HIGH_HUMIDITY}"
+    lines[3] = f"Min T:{EXTERNAL_LOW_TEMP} H:{EXTERNAL_LOW_HUMIDITY}"
     lcd2004Display.display_four_rows_center(lines)
 
 
