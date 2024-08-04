@@ -319,7 +319,7 @@ if __name__ == "__main__":
     EXTERNAL_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'external_high_humidity')
     EXTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'external_low_humidity')
     CYCLE_COUNT = configManager.get_int_config('cycle_count')
-    TOTAL_CYCLE_DURATION = configManager.get_float_config('LOG', 'total_cycle_duration')
+    TOTAL_CYCLE_DURATION = configManager.get_duration_config('LOG', 'total_cycle_duration')
 
     # GPIO setup using gpiozero for input buttons
     up_button = Button(UP_BUTTON_PIN, pull_up=True, bounce_time=0.2, hold_time=3)

@@ -1,5 +1,5 @@
 import configparser
-
+from datetime import timedelta
 
 class ConfigManager:
     def __init__(self, config_file):
@@ -27,6 +27,9 @@ class ConfigManager:
 
     def get_float_config(self, section, key):  # TODO: Add default section?
         return float(self.config[section][key])
+
+    def get_duration_config(self, section, key):  # TODO: Add default section?
+        return timedelta(self.config[section][key])
 
     def display_config(self):
         for section in self.config.sections():
