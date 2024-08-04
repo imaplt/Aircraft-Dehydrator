@@ -26,7 +26,7 @@ class Logger:
                     writer = csv.writer(file)
                     writer.writerow(['Timestamp', 'Name', 'ID', 'Message'])
                     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                    writer.writerow([timestamp, '', '', 'Initial Log File Creation...'])
+                    writer.writerow([timestamp, 'System', 'Log', 'Initial Log File Creation...'])
         except IOError as e:
             print(f"Error initializing log file: {e}")
 

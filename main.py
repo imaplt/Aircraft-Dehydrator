@@ -1,6 +1,7 @@
 # main.py
 
 import time
+import schedule
 from datetime import timedelta
 from gpiozero import Button
 from LCD2004 import LCD2004Display
@@ -213,8 +214,8 @@ if __name__ == "__main__":
         time.sleep(2)
         start_time = time.time()
         controller = HumidityController()
-        fan_status = controller.fan_status()
-        print(fan_status)
+        # fan_status = controller.fan_status()
+        # print(fan_status)
         while True:
             current_time = time.time()
             # Read and print sensor data every 2 seconds
