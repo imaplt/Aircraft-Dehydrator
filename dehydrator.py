@@ -12,8 +12,31 @@ from fan_controller import EMC2101
 
 
 def task_internal():
+    global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
+
+    # Update the config file with stats..
+    log_changed = False
+    # Update high and low humidity
+    if internaloutput['humidity'] > INTERNAL_HIGH_HUMIDITY:
+        INTERNAL_HIGH_HUMIDITY = internaloutput['humidity']
+        log_changed = True
+    elif internaloutput['humidity'] < INTERNAL_LOW_HUMIDITY:
+        INTERNAL_LOW_HUMIDITY = internaloutput['humidity']
+        log_changed = True
+
+    # Update high and low temperature
+    if internaloutput['temperature'] > INTERNAL_HIGH_TEMP:
+        INTERNAL_HIGH_TEMP = internaloutput['temperature']
+        log_changed = True
+    elif internaloutput['temperature'] < INTERNAL_LOW_TEMP:
+        INTERNAL_LOW_TEMP = internaloutput['temperature']
+        log_changed = True
+
+    if log_changed:
+        save_config()
+
     if abs(internaloutput['humidity'] - internalprevious_output['humidity']) > 0.2:
         logger.log(timestamp, 'Sensors', 'Internal',
                    f"Temperature: {internaloutput['temperature']}C,"
@@ -47,9 +70,31 @@ def task_internal():
 
 
 def task_external():
+    global EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     externaloutput = externalsensor.read_sensor()
+    # Update the config file with stats..
+    log_changed = False
+
+    if externaloutput['humidity'] > EXTERNAL_HIGH_HUMIDITY:
+        EXTERNAL_HIGH_HUMIDITY = externaloutput['humidity']
+        external_humidity_changed = True
+    elif externaloutput['humidity'] < EXTERNAL_LOW_HUMIDITY:
+        EXTERNAL_LOW_HUMIDITY = externaloutput['humidity']
+        external_humidity_changed = True
+
+    # Update high and low temperature for external values
+    if externaloutput['temperature'] > EXTERNAL_HIGH_TEMP:
+        EXTERNAL_HIGH_TEMP = externaloutput['temperature']
+        external_temperature_changed = True
+    elif externaloutput['temperature'] < EXTERNAL_LOW_TEMP:
+        EXTERNAL_LOW_TEMP = externaloutput['temperature']
+        external_temperature_changed = True
+
+    if log_changed:
+        save_config()
+
     if abs(externaloutput['humidity'] - externalprevious_output['humidity']) > 0.2:
         logger.log(timestamp, 'Sensors', 'External',
                    f"Temperature: {externaloutput['temperature']}C,"
@@ -111,13 +156,36 @@ def display_max_humidity(value):
 
 
 def save_config():
-    global MIN_HUMIDITY, MAX_HUMIDITY
+    global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
+    global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
+    global EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
+    global CYCLE_COUNT, TOTAL_CYCLE_DURATION
     print("Saving config...")
     print("Min Humidity: ", MIN_HUMIDITY)
     print("Max Humidity: ", MAX_HUMIDITY)
+    print('CYCLE_COUNT: ', CYCLE_COUNT)
+    print('TOTAL_CYCLE_DURATION: ', TOTAL_CYCLE_DURATION)
+    print('Internal High Temperature: ', INTERNAL_HIGH_TEMP)
+    print('External High Temperature: ', EXTERNAL_HIGH_TEMP)
+    print('Internal Low Temperature: ', INTERNAL_LOW_TEMP)
+    print('External Low Temperature: ', EXTERNAL_LOW_TEMP)
+    print('Internal Low Humidity: ', INTERNAL_LOW_HUMIDITY)
+    print('Internal High Humidity: ', INTERNAL_HIGH_HUMIDITY)
+    print('External Low Humidity: ', EXTERNAL_LOW_HUMIDITY)
+    print('External High Humidity: ', EXTERNAL_HIGH_HUMIDITY)
+
     configManager.update_config('min_humidity', MIN_HUMIDITY)
     configManager.update_config('max_humidity', MAX_HUMIDITY)
-
+    configManager.update_config('internal_high_temp', INTERNAL_HIGH_TEMP, 'LOG')
+    configManager.update_config('internal_low_temp', INTERNAL_LOW_TEMP, 'LOG')
+    configManager.update_config('internal_high_humidity', INTERNAL_HIGH_HUMIDITY, 'LOG')
+    configManager.update_config('internal_low_humidity', INTERNAL_LOW_HUMIDITY, 'LOG')
+    configManager.update_config('external_high_temp', EXTERNAL_HIGH_TEMP, 'LOG')
+    configManager.update_config('external_low_temp', EXTERNAL_LOW_TEMP, 'LOG')
+    configManager.update_config('external_high_humidity', EXTERNAL_HIGH_HUMIDITY, 'LOG')
+    configManager.update_config('external_low_humidity', EXTERNAL_LOW_HUMIDITY, 'LOG')
+    configManager.update_config('cycle_count', CYCLE_COUNT, 'LOG')
+    configManager.update_config('total_cycle_duration', TOTAL_CYCLE_DURATION, 'LOG')
 
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
@@ -236,8 +304,18 @@ if __name__ == "__main__":
     FONTSIZE = configManager.get_int_config('fontsize')
     BORDER = configManager.get_int_config('border')
 
-    # Initialise the logging
+    # Initialise the logging and pull numbers from the config.
     logger = Log(LOGFILE, MAX_LOG_SIZE, MAX_ARCHIVE_SIZE)
+    INTERNAL_HIGH_TEMP = configManager.get_float_config('LOG', 'internal_high_temp')
+    INTERNAL_LOW_TEMP = configManager.get_float_config('LOG', 'internal_low_temp')
+    INTERNAL_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'internal_high_humidity')
+    INTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'internal_low_humidity')
+    EXTERNAL_HIGH_TEMP = configManager.get_float_config('LOG', 'external_high_temp')
+    EXTERNAL_LOW_TEMP = configManager.get_float_config('LOG', 'external_low_temp')
+    EXTERNAL_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'external_high_humidity')
+    EXTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'external_low_humidity')
+    CYCLE_COUNT = configManager.get_int_config('cycle_count')
+    TOTAL_CYCLE_DURATION = configManager.get_float_config('LOG', 'cycle_duration')
 
     # GPIO setup using gpiozero for input buttons
     up_button = Button(UP_BUTTON_PIN, pull_up=True, bounce_time=0.2, hold_time=3)

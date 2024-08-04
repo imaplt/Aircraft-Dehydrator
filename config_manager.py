@@ -16,14 +16,16 @@ class ConfigManager:
             raise KeyError(f"Config for DEFAULT/{key} not found.")
 
     def get_int_config(self, key):
-
         if "CUSTOM" in self.config and key in self.config["CUSTOM"]:
             return int(self.config["CUSTOM"][key])
         elif "DEFAULT" in self.config and key in self.config["DEFAULT"]:
             return int(self.config["DEFAULT"][key])
         else:
             raise KeyError(f"Config for DEFAULT/{key} not found.")
-    
+
+    def get_float_config(self, section, key):  # TODO: Add default section?
+        return float(self.config[section][key])
+
     def display_config(self):
         for section in self.config.sections():
             print(f"[{section}]")
@@ -34,10 +36,10 @@ class ConfigManager:
             for key in self.config['DEFAULT']:
                 print(f"{key} = {self.config['DEFAULT'][key]}")
     
-    def update_config(self, key, value):
-        if not self.config.has_section("CUSTOM"):
-            self.config.add_section("CUSTOM")
-        self.config.set("CUSTOM", key, str(value))
+    def update_config(self, key, value, section='CUSTOM'):
+        if not self.config.has_section(section):
+            self.config.add_section(section)
+        self.config.set(section, key, str(value))
         self.save_config()
 
     def save_config(self):
