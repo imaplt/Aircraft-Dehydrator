@@ -122,10 +122,20 @@ def task_fan():
     fanController.set_fan_speed(0)
 
 
-def schedule_tasks(int_interval=1, ext_interval=1, fan_interval=1):
+def task_display():
+    lines[0] = f"Internal - Max Temp: {INTERNAL_HIGH_TEMP} Max Humidity: {INTERNAL_HIGH_HUMIDITY}"
+    lines[1] = f"Internal - Min Temp: {INTERNAL_LOW_TEMP} Min Humidity: {INTERNAL_LOW_HUMIDITY}"
+    lines[3] = f"External - Max Temp: {EXTERNAL_HIGH_TEMP} Max Humidity: {EXTERNAL_HIGH_HUMIDITY}"
+    lines[4] = f"External - Min Temp: {EXTERNAL_LOW_TEMP} Min Humidity: {EXTERNAL_LOW_HUMIDITY}"
+    lcd2004Display.display_four_rows_center(lines, justification='left')
+
+
+def schedule_tasks(int_interval=1, ext_interval=1, fan_interval=1, display_interval=30):
     schedule.every(int_interval).seconds.do(task_internal)
     schedule.every(ext_interval).minutes.do(task_external)
     schedule.every(fan_interval).minutes.do(task_fan)
+    if DISPLAY_ENABLED:
+        schedule.every(display_interval).seconds.do(task_display)
 
 
 def run_scheduler():
@@ -190,6 +200,7 @@ def save_config():
     configManager.update_config('external_low_humidity', EXTERNAL_LOW_HUMIDITY, 'LOG')
     configManager.update_config('cycle_count', CYCLE_COUNT, 'LOG')
     configManager.update_config('total_cycle_duration', TOTAL_CYCLE_DURATION, 'LOG')
+
 
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
@@ -298,6 +309,7 @@ if __name__ == "__main__":
     TASK_FAN = configManager.get_int_config('task_fan')
     TASK_INTERNAL = configManager.get_int_config('task_internal')
     TASK_EXTERNAL = configManager.get_int_config('task_external')
+    TASK_DISPLAY = configManager.get_int_config('task_display')
 
     # Get button pin info
     UP_BUTTON_PIN = configManager.get_int_config('up_button_pin')
@@ -321,6 +333,9 @@ if __name__ == "__main__":
     CYCLE_COUNT = configManager.get_int_config('cycle_count')
     TOTAL_CYCLE_DURATION = configManager.get_duration_config('LOG', 'total_cycle_duration')
 
+    # Display configuration
+    DISPLAY_ENABLED = configManager.get_boolean_config('DISPLAY_ENABLED')
+
     # GPIO setup using gpiozero for input buttons
     up_button = Button(UP_BUTTON_PIN, pull_up=True, bounce_time=0.2, hold_time=3)
     dn_button = Button(DN_BUTTON_PIN, pull_up=True, bounce_time=0.2, hold_time=3)
@@ -340,6 +355,12 @@ if __name__ == "__main__":
 
     # Initialize fan controller
     fanController = EMC2101()
+
+    # Initialize displays...
+    ssd1306_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
+    ssd1306Display = SSD1306Display(ssd1306_display_config)
+    lcd2004Display = LCD2004Display()
+
     # Initialize lines
     lines = [""] * 4  # For four line ssd1306_display...
 
@@ -357,10 +378,6 @@ if __name__ == "__main__":
             logger.log(timestamp, 'System', 'Overall', "Overall Status: Fail")
             print("Overall Status: Fail")
             raise ValueError("Overall Status Failed")
-
-        ssd1306_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
-        ssd1306Display = SSD1306Display(ssd1306_display_config)
-        lcd2004Display = LCD2004Display()
 
         # Display centered text
         ssd1306Display.display_text_center("Initializing...")
@@ -385,6 +402,8 @@ if __name__ == "__main__":
 
         # Need to run the External once to update the values
         task_external()
+        if DISPLAY_ENABLED:
+            task_display()
         run_scheduler()
 
     except KeyboardInterrupt:
@@ -392,4 +411,3 @@ if __name__ == "__main__":
 
     finally:
         cleanup()
-

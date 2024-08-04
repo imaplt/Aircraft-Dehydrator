@@ -29,6 +29,9 @@ class ConfigManager:
     def get_float_config(self, section, key):  # TODO: Add default section?
         return float(self.config[section][key])
 
+    def get_boolean_config(self, key, section='DEFAULT'):
+        return self.config.getboolean(section, key)
+
     def get_duration_config(self, section, key):  # TODO: Add default section?
         # Retrieve the total cycle duration in seconds
         total_cycle_duration_seconds = float(self.config[section][key])
