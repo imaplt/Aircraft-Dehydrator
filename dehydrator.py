@@ -123,11 +123,11 @@ def task_fan():
 
 
 def task_display():
-    lines[0] = f"Max Temp:{INTERNAL_HIGH_TEMP} Humidity:{INTERNAL_HIGH_HUMIDITY}"
-    lines[1] = f"Min Temp:{INTERNAL_LOW_TEMP} Min Humidity:{INTERNAL_LOW_HUMIDITY}"
-    lines[2] = f"Max Temp:{EXTERNAL_HIGH_TEMP} Max Humidity:{EXTERNAL_HIGH_HUMIDITY}"
-    lines[3] = f"Min Temp:{EXTERNAL_LOW_TEMP} Min Humidity:{EXTERNAL_LOW_HUMIDITY}"
-    lcd2004Display.display_four_rows_center(lines, justification='left')
+    lines[0] = f"Max T:{INTERNAL_HIGH_TEMP} H:{INTERNAL_HIGH_HUMIDITY}"
+    lines[1] = f"Min T:{INTERNAL_LOW_TEMP} Min H:{INTERNAL_LOW_HUMIDITY}"
+    lines[2] = f"Max T:{EXTERNAL_HIGH_TEMP} Max H:{EXTERNAL_HIGH_HUMIDITY}"
+    lines[3] = f"Min T:{EXTERNAL_LOW_TEMP} Min H:{EXTERNAL_LOW_HUMIDITY}"
+    lcd2004Display.display_four_rows_center(lines)
 
 
 def schedule_tasks(int_interval=1, ext_interval=1, fan_interval=1, display_interval=30):
@@ -360,6 +360,7 @@ if __name__ == "__main__":
     ssd1306_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
     ssd1306Display = SSD1306Display(ssd1306_display_config)
     lcd2004Display = LCD2004Display()
+    lcd2004Display.clear()
 
     # Initialize lines
     lines = [""] * 4  # For four line ssd1306_display...
@@ -403,7 +404,6 @@ if __name__ == "__main__":
         # Need to run the External once to update the values
         task_external()
         if DISPLAY_ENABLED:
-            time.sleep(3)
             task_display()
         run_scheduler()
 
