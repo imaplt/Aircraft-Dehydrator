@@ -31,6 +31,10 @@ class ConfigManager:
     def get_duration_config(self, section, key):  # TODO: Add default section?
         return timedelta(self.config[section][key])
 
+    def set_duration_config(self, key, value, section='Log'):  # TODO: Add default section?
+        self.config.set(section, key, str(value.total_seconds()))
+        self.save_config()
+
     def display_config(self):
         for section in self.config.sections():
             print(f"[{section}]")
