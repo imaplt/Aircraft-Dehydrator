@@ -1,4 +1,3 @@
-import time
 
 import board
 import busio
@@ -7,7 +6,6 @@ import adafruit_sht4x
 import adafruit_shtc3
 import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import adafruit_ssd1306
-from adafruit_bus_device.i2c_device import I2CDevice
 import adafruit_bitbangio
 from fan_controller import EMC2101
 

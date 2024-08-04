@@ -73,10 +73,10 @@ def task_fan():
     fanController.set_fan_speed(0)
 
 
-def schedule_tasks(int_interval=1, ext_interval=1):
+def schedule_tasks(int_interval=1, ext_interval=1, fan_interval=1):
     schedule.every(int_interval).seconds.do(task_internal)
     schedule.every(ext_interval).minutes.do(task_external)
-    schedule.every(int_interval).minutes.do(task_fan)
+    schedule.every(fan_interval).minutes.do(task_fan)
 
 
 def run_scheduler():
@@ -221,8 +221,11 @@ if __name__ == "__main__":
     MAX_ARCHIVE_SIZE = configManager.get_int_config('max_archive_size')
     MIN_HUMIDITY = configManager.get_int_config('min_humidity')
     MAX_HUMIDITY = configManager.get_int_config('max_humidity')
-    FAN_CYCLE = configManager.get_int_config('fan_cycle')
     FAN_DURATION = configManager.get_int_config('fan_duration')
+    # Set task intervals
+    TASK_FAN = configManager.get_int_config('task_fan')
+    TASK_INTERNAL = configManager.get_int_config('task_internal')
+    TASK_EXTERNAL = configManager.get_int_config('task_external')
 
     # Get button pin info
     UP_BUTTON_PIN = configManager.get_int_config('up_button_pin')
@@ -296,7 +299,7 @@ if __name__ == "__main__":
                                                 justification='left')
         ssd1306Display.display_default_four_rows()
         time.sleep(2)
-        schedule_tasks()
+        schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL, fan_interval=TASK_FAN)
         run_scheduler()
 
     except KeyboardInterrupt:
