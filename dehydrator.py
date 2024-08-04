@@ -12,7 +12,8 @@ from fan_controller import EMC2101
 
 
 def task_internal():
-    global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY
+    global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
+        CYCLE_COUNT, TOTAL_CYCLE_DURATION
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
 
@@ -63,6 +64,9 @@ def task_internal():
                 logger.log(timestamp, 'Fan', '',
                            f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY }%")
                 logger.log(timestamp, 'Fan', '', f"Fan run time: {str(timedelta(seconds=run_time))}")
+                TOTAL_CYCLE_DURATION += timedelta(seconds=run_time)
+                CYCLE_COUNT += 1
+                save_config()
                 ssd1306Display.display_text_center_with_border('Fan Stopped...')
                 time.sleep(1)
                 ssd1306Display.display_default_four_rows()
@@ -378,6 +382,9 @@ if __name__ == "__main__":
         ssd1306Display.display_default_four_rows()
         time.sleep(2)
         schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL, fan_interval=TASK_FAN)
+
+        # Need to run the External once to update the values
+        task_external()
         run_scheduler()
 
     except KeyboardInterrupt:
