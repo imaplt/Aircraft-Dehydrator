@@ -71,6 +71,8 @@ def task_internal():
                 time.sleep(1)
                 ssd1306Display.display_default_four_rows()
     time.sleep(.1)  # Adjust as needed
+    if internalprevious_output['temperature'] is None and internalprevious_output['humidity'] is None:
+        print("Both are non...")
 
 
 def task_external():
@@ -393,13 +395,14 @@ if __name__ == "__main__":
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}
 
-        print("Internal Mode: ", internalsensor.sensor_mode())
+        print("Internal Mode: ", internalsensor.sensor_mode()) # TODO: Figure out what mode is...
 
         ssd1306Display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."],
                                                 justification='left')
         ssd1306Display.display_default_four_rows()
         time.sleep(2)
-        schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL, fan_interval=TASK_FAN)
+        schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL,
+                       fan_interval=TASK_FAN, display_interval=TASK_DISPLAY)
 
         # Need to run the External once to update the values
         task_external()
