@@ -287,6 +287,8 @@ def cleanup():
     time.sleep(3)
     ssd1306Display.clear_screen()
     lcd2004Display.clear()
+    # make sure fan is off
+    fanController.set_fan_speed(0)
 
 
 def isDeviceDetected(statuses, device):
