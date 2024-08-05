@@ -17,7 +17,7 @@ def task_internal():
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
 
-    # Update the config file with stats..
+    # Update the config file with stats
     log_changed = False
     # Update high and low humidity
     if internaloutput['humidity'] > INTERNAL_HIGH_HUMIDITY:
@@ -38,11 +38,6 @@ def task_internal():
     if log_changed:
         save_config()
 
-        texts = ssd1306Display.lines
-        num_lines = min(4, len(texts))
-        for i in range(num_lines):
-            print(texts[i])
-
     if abs(internaloutput['humidity'] - internalprevious_output['humidity']) > 0.2:
         logger.log(timestamp, 'Sensors', 'Internal',
                    f"Temperature: {internaloutput['temperature']}C,"
@@ -59,11 +54,10 @@ def task_internal():
                 logger.log(timestamp, 'Fan', '',
                            f"Fan started, exceeded MAX humidity of: {MAX_HUMIDITY}%")
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
-                print(lines)
                 ssd1306Display.display_text_center_with_border('Fan Started...')
                 time.sleep(1)
+                ssd1306Display.display_four_rows_center(lines)  # Reset display back to previous lines
 
-                ssd1306Display.display_default_four_rows()
         elif internaloutput['humidity'] < MIN_HUMIDITY:
             stopped, run_time = fanController.set_fan_speed(0)
             if stopped:
@@ -76,7 +70,7 @@ def task_internal():
                 save_config()
                 ssd1306Display.display_text_center_with_border('Fan Stopped...')
                 time.sleep(1)
-                ssd1306Display.display_default_four_rows()
+                ssd1306Display.display_four_rows_center(lines)  # Reset display back to previous lines
     time.sleep(.1)  # Adjust as needed
 
 
@@ -85,7 +79,7 @@ def task_external():
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     externaloutput = externalsensor.read_sensor()
-    # Update the config file with stats..
+    # Update the config file with stats
     log_changed = False
 
     if externaloutput['humidity'] > EXTERNAL_HIGH_HUMIDITY:
@@ -134,7 +128,7 @@ def task_display():
     lines[1] = f"Int Min:{INTERNAL_LOW_TEMP}C {INTERNAL_LOW_HUMIDITY}%"
     lines[2] = f"Ext Max:{EXTERNAL_HIGH_TEMP}C {EXTERNAL_HIGH_HUMIDITY}%"
     lines[3] = f"Ext Min:{EXTERNAL_LOW_TEMP}C {EXTERNAL_LOW_HUMIDITY}%"
-    lcd2004Display.display_four_rows_center(lines,justification='left')
+    lcd2004Display.display_four_rows_center(lines, justification='left')
 
 
 def schedule_tasks(int_interval=1, ext_interval=1, fan_interval=1, display_interval=30):
@@ -181,19 +175,6 @@ def save_config():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
     global EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
     global CYCLE_COUNT, TOTAL_CYCLE_DURATION
-    print("Saving config...")
-    print("Min Humidity: ", MIN_HUMIDITY)
-    print("Max Humidity: ", MAX_HUMIDITY)
-    print('CYCLE_COUNT: ', CYCLE_COUNT)
-    print('TOTAL_CYCLE_DURATION: ', TOTAL_CYCLE_DURATION)
-    print('Internal High Temperature: ', INTERNAL_HIGH_TEMP)
-    print('External High Temperature: ', EXTERNAL_HIGH_TEMP)
-    print('Internal Low Temperature: ', INTERNAL_LOW_TEMP)
-    print('External Low Temperature: ', EXTERNAL_LOW_TEMP)
-    print('Internal Low Humidity: ', INTERNAL_LOW_HUMIDITY)
-    print('Internal High Humidity: ', INTERNAL_HIGH_HUMIDITY)
-    print('External Low Humidity: ', EXTERNAL_LOW_HUMIDITY)
-    print('External High Humidity: ', EXTERNAL_HIGH_HUMIDITY)
 
     configManager.update_config('min_humidity', MIN_HUMIDITY)
     configManager.update_config('max_humidity', MAX_HUMIDITY)
@@ -291,11 +272,12 @@ def cleanup():
     lcd2004Display.display_text_with_border(['Shutting down...'])
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                'System', 'System', "Shutting down...")
+    # make sure fan is off
+    fanController.set_fan_speed(0)
     time.sleep(3)
     ssd1306Display.clear_screen()
     lcd2004Display.clear()
-    # make sure fan is off
-    fanController.set_fan_speed(0)
+
 
 
 def isDeviceDetected(statuses, device):
@@ -365,7 +347,7 @@ if __name__ == "__main__":
     # Initialize fan controller
     fanController = EMC2101()
 
-      # Initialize lines
+    # Initialize lines
     lines = [""] * 4  # For four line ssd1306_display...
 
     try:
@@ -402,10 +384,8 @@ if __name__ == "__main__":
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}
 
-        print("Internal Mode: ", internalsensor.sensor_mode()) # TODO: Figure out what mode is...
+        print("Internal Mode: ", internalsensor.sensor_mode())  # TODO: Figure out what mode is...
 
-        # ssd1306Display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."],
-        #                                         justification='left')
         ssd1306Display.display_default_four_rows()
         time.sleep(2)
         schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL,
