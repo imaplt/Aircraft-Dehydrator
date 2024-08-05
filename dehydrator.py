@@ -133,7 +133,7 @@ def task_display():
 def schedule_tasks(int_interval=1, ext_interval=1, fan_interval=1, display_interval=30):
     schedule.every(int_interval).seconds.do(task_internal)
     schedule.every(ext_interval).minutes.do(task_external)
-    schedule.every(fan_interval).minutes.do(task_fan)
+    # schedule.every(fan_interval).minutes.do(task_fan)
     if DISPLAY_ENABLED:
         schedule.every(display_interval).seconds.do(task_display)
 
