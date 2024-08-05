@@ -374,7 +374,7 @@ if __name__ == "__main__":
         time.sleep(3)
         internalsensor = Sensor('SHT41_Internal', 0x44)
 
-        sht30_sensor = Sensor('SHT30_Internal', 0x44)
+        sht30_sensor = Sensor('SHT30', 0x44)
         print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
 
         if isDeviceDetected(statuses, 'SHTC3'):
