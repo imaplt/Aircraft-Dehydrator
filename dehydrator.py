@@ -17,8 +17,6 @@ def task_internal():
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
 
-    # TODO: Remove this entry...
-    print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
 
     # Update the config file with stats
     log_changed = False
@@ -49,6 +47,8 @@ def task_internal():
         internalprevious_output['temperature'] = internaloutput['temperature']
         internalprevious_output['humidity'] = internaloutput['humidity']
         print("Internal Sensor Reading:", internaloutput)
+        # TODO: Remove this entry...
+        print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
         ssd1306Display.update_line(1, justification='left',
                                    text=f"{internaloutput['humidity']}%" f" - {internaloutput['temperature']}°C")
         if internaloutput['humidity'] > MAX_HUMIDITY:
@@ -136,7 +136,7 @@ def task_display():
     lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
 
 
-def schedule_tasks(int_interval=1, ext_interval=1, fan_interval=1, display_interval=30):
+def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1, display_interval=30):
     schedule.every(int_interval).seconds.do(task_internal)
     schedule.every(ext_interval).minutes.do(task_external)
     # schedule.every(fan_interval).minutes.do(task_fan)
@@ -296,10 +296,10 @@ if __name__ == "__main__":
     MAX_HUMIDITY = configManager.get_int_config('max_humidity')
     FAN_DURATION = configManager.get_int_config('fan_duration')
     # Set task intervals
-    TASK_FAN = configManager.get_int_config('task_fan')
-    TASK_INTERNAL = configManager.get_int_config('task_internal')
-    TASK_EXTERNAL = configManager.get_int_config('task_external')
-    TASK_DISPLAY = configManager.get_int_config('task_display')
+    TASK_FAN = configManager.get_int_config('TASK_FAN')
+    TASK_INTERNAL = configManager.get_int_config('TASK_INTERNAL')
+    TASK_EXTERNAL = configManager.get_int_config('TASK_EXTERNAL')
+    TASK_DISPLAY = configManager.get_int_config('TASK_DISPLAY')
 
     # Get button pin info
     UP_BUTTON_PIN = configManager.get_int_config('up_button_pin')
