@@ -100,7 +100,6 @@ class SSD1306Display:
     def display_four_rows_center(self, texts, justification='center'):
         self.clear_screen()
         num_lines = min(4, len(texts))
-        self.oled_lines = [""] * 4  # Reset lines
         line_height = self.height // num_lines
         for i in range(num_lines):
             text = texts[i]

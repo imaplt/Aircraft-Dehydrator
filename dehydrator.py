@@ -54,7 +54,6 @@ def task_internal():
                 logger.log(timestamp, 'Fan', '',
                            f"Fan started, exceeded MAX humidity of: {MAX_HUMIDITY}%")
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
-                print(oled_lines)
                 ssd1306Display.display_text_center_with_border('Fan Started...')
                 time.sleep(1)
                 ssd1306Display.display_four_rows_center(oled_lines)  # Reset display back to previous lines
@@ -246,11 +245,6 @@ def button_hold_callback(button):
 
     button_name = 'up' if button.pin.number == UP_BUTTON_PIN else 'dn'
     last_press_time[button_name] = time.time()
-    # print(f"First button: {button_name}")
-    # print("Up button held: ", up_button.is_held)
-    # print("Dn Button Held: ", dn_button.is_held)
-    # print("Up button Is Active: ", up_button.is_active)
-    # print("Dn Button IS Active: ", dn_button.is_active)
 
     if up_button.is_active and dn_button.is_active:
         print("Both buttons are being held...")
