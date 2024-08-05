@@ -199,7 +199,7 @@ def save_config():
     configManager.update_config('external_high_humidity', EXTERNAL_HIGH_HUMIDITY, 'LOG')
     configManager.update_config('external_low_humidity', EXTERNAL_LOW_HUMIDITY, 'LOG')
     configManager.update_config('cycle_count', CYCLE_COUNT, 'LOG')
-    configManager.update_config('total_cycle_duration', TOTAL_CYCLE_DURATION, 'LOG')
+    configManager.set_duration_config('total_cycle_duration', TOTAL_CYCLE_DURATION, 'LOG')
 
 
 def button_pressed_callback(button):
