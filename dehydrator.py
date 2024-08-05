@@ -56,8 +56,8 @@ def task_internal():
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
                 ssd1306Display.display_text_center_with_border('Fan Started...')
                 time.sleep(1)
-                ssd1306Display.display_four_rows_center(oled_lines)  # Reset display back to previous lines
-
+                # Reset display back to previous lines
+                ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines)
         elif internaloutput['humidity'] < MIN_HUMIDITY:
             stopped, run_time = fanController.set_fan_speed(0)
             if stopped:
@@ -273,7 +273,6 @@ def cleanup():
     time.sleep(3)
     ssd1306Display.clear_screen()
     lcd2004Display.clear()
-
 
 
 def isDeviceDetected(statuses, device):
