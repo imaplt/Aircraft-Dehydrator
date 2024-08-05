@@ -43,6 +43,7 @@ class SSD1306Display:
 
         # Initialize lines
         self.oled_lines = [""] * 4
+        self.lcd_lines = [""] * 4
 
     def reset_screen(self):
         self.disp.fill(0)
@@ -329,7 +330,6 @@ class LCD2004Display:
         for i in range(num_lines):
             text = texts[i]
             self.lcd_lines[i] = text
-            self.lcd_lines[i] = texts[i]
             if justification == 'left':
                 display_text = text.ljust(max_chars)
             elif justification == 'right':
