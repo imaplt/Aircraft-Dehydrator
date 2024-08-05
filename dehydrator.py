@@ -38,6 +38,11 @@ def task_internal():
     if log_changed:
         save_config()
 
+        texts = ssd1306Display.lines
+        num_lines = min(4, len(texts))
+        for i in range(num_lines):
+            print(texts[i])
+
     if abs(internaloutput['humidity'] - internalprevious_output['humidity']) > 0.2:
         logger.log(timestamp, 'Sensors', 'Internal',
                    f"Temperature: {internaloutput['temperature']}C,"
@@ -399,8 +404,8 @@ if __name__ == "__main__":
 
         print("Internal Mode: ", internalsensor.sensor_mode()) # TODO: Figure out what mode is...
 
-        ssd1306Display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."],
-                                                justification='left')
+        # ssd1306Display.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."],
+        #                                         justification='left')
         ssd1306Display.display_default_four_rows()
         time.sleep(2)
         schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL,
