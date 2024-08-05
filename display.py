@@ -34,7 +34,6 @@ class SSD1306Display:
 
         # Initialize display.
         self.disp = adafruit_ssd1306.SSD1306_I2C(self.width, self.height, self.i2c, addr=self.i2c_address)
-
         # Create blank image for drawing.
         self.image = Image.new('1', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)

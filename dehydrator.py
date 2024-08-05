@@ -54,8 +54,10 @@ def task_internal():
                 logger.log(timestamp, 'Fan', '',
                            f"Fan started, exceeded MAX humidity of: {MAX_HUMIDITY}%")
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
+                print(lines)
                 ssd1306Display.display_text_center_with_border('Fan Started...')
                 time.sleep(1)
+
                 ssd1306Display.display_default_four_rows()
         elif internaloutput['humidity'] < MIN_HUMIDITY:
             stopped, run_time = fanController.set_fan_speed(0)
