@@ -43,7 +43,6 @@ class SSD1306Display:
 
         # Initialize lines
         self.oled_lines = [""] * 4
-        self.lcd_lines = [""] * 4
 
     def reset_screen(self):
         self.disp.fill(0)
@@ -94,6 +93,8 @@ class SSD1306Display:
         self.disp.show()
 
     def display_default_four_rows(self):
+        # Yeah, I know. I could make this prettier
+        self.oled_lines = ["Internal:", "reading...", "External:", "reading..."]
         self.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], justification='left')
 
     def display_four_rows_center(self, texts, justification='center'):
@@ -170,17 +171,8 @@ class LCD2004Display:
         self.LCD_ADDR = addr
         self.BLEN = bl
         self._init_display()
-        # Initialize lines
         self.lcd_lines = [""] * 4
 
-        # self.i2c_address = i2c_address
-        # self.config_manager = configuration
-        #
-        # # Initialize I2C interface based on i2c_type.
-        # if i2c_type == 'bitbangio':
-        #     self.i2c = bitbangio.I2C(board.D27, board.D22)
-        # else:
-        #     self.i2c = busio.I2C(board.SCL, board.SDA)
 
     def _write_word(self, addr, data):
         temp = data
@@ -301,19 +293,18 @@ class LCD2004Display:
     def display_default_four_rows(self):
         self.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], justification='left')
 
-
-    def display_text_with_border(self, text_lines, full_display_border=False):
+    def display_text_with_border(self, texts, full_display_border=False):
         self.clear()
         border_line = '*' * 20
 
         if full_display_border:
             self.write(0, 0, border_line)
             for i in range(1, 4):
-                line_text = text_lines[i - 1] if i - 1 < len(text_lines) else ""
+                line_text = texts[i - 1] if i - 1 < len(texts) else ""
                 self.write(0, i, "*" + line_text.center(18) + "*")
             self.write(0, 3, border_line)
         else:
-            for i, text in enumerate(text_lines):
+            for i, text in enumerate(texts):
                 if i == 0:
                     self.write(0, 0, border_line)
                     self.write(0, 1, "*" + text.center(18) + "*")

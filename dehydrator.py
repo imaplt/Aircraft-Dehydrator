@@ -69,7 +69,7 @@ def task_internal():
                 CYCLE_COUNT += 1
                 save_config()
                 ssd1306Display.display_text_center_with_border('Fan Stopped...')
-                time.sleep(1)
+                time.sleep(3)
                 ssd1306Display.display_four_rows_center(oled_lines)  # Reset display back to previous lines
     time.sleep(.1)  # Adjust as needed
 
