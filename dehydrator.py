@@ -17,6 +17,9 @@ def task_internal():
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
 
+    # TODO: Remove this entry...
+    print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
+
     # Update the config file with stats
     log_changed = False
     # Update high and low humidity
@@ -85,18 +88,18 @@ def task_external():
 
     if externaloutput['humidity'] > EXTERNAL_HIGH_HUMIDITY:
         EXTERNAL_HIGH_HUMIDITY = externaloutput['humidity']
-        external_humidity_changed = True
+        log_changed = True
     elif externaloutput['humidity'] < EXTERNAL_LOW_HUMIDITY:
         EXTERNAL_LOW_HUMIDITY = externaloutput['humidity']
-        external_humidity_changed = True
+        log_changed = True
 
     # Update high and low temperature for external values
     if externaloutput['temperature'] > EXTERNAL_HIGH_TEMP:
         EXTERNAL_HIGH_TEMP = externaloutput['temperature']
-        external_temperature_changed = True
+        log_changed = True
     elif externaloutput['temperature'] < EXTERNAL_LOW_TEMP:
         EXTERNAL_LOW_TEMP = externaloutput['temperature']
-        external_temperature_changed = True
+        log_changed = True
 
     if log_changed:
         save_config()
