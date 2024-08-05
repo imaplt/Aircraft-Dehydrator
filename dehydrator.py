@@ -123,11 +123,11 @@ def task_fan():
 
 
 def task_display():
-    lines[0] = f"Max T:{INTERNAL_HIGH_TEMP} H:{INTERNAL_HIGH_HUMIDITY}"
-    lines[1] = f"Min T:{INTERNAL_LOW_TEMP} H:{INTERNAL_LOW_HUMIDITY}"
-    lines[2] = f"Max T:{EXTERNAL_HIGH_TEMP} H:{EXTERNAL_HIGH_HUMIDITY}"
-    lines[3] = f"Min T:{EXTERNAL_LOW_TEMP} H:{EXTERNAL_LOW_HUMIDITY}"
-    lcd2004Display.display_four_rows_center(lines)
+    lines[0] = f"Int Max:{INTERNAL_HIGH_TEMP}C {INTERNAL_HIGH_HUMIDITY}%"
+    lines[1] = f"Int Min:{INTERNAL_LOW_TEMP}C {INTERNAL_LOW_HUMIDITY}%"
+    lines[2] = f"Ext Max:{EXTERNAL_HIGH_TEMP}C {EXTERNAL_HIGH_HUMIDITY}%"
+    lines[3] = f"Ext Min:{EXTERNAL_LOW_TEMP}C {EXTERNAL_LOW_HUMIDITY}%"
+    lcd2004Display.display_four_rows_center(lines,justification='left')
 
 
 def schedule_tasks(int_interval=1, ext_interval=1, fan_interval=1, display_interval=30):
