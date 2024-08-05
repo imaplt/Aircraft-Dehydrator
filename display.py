@@ -42,7 +42,7 @@ class SSD1306Display:
         self.set_font(self.config_manager.get_font_path(), self.config_manager.get_font_size())
 
         # Initialize lines
-        self.lines = [""] * 4
+        self.oled_lines = [""] * 4
 
     def reset_screen(self):
         self.disp.fill(0)
@@ -98,11 +98,11 @@ class SSD1306Display:
     def display_four_rows_center(self, texts, justification='center'):
         self.clear_screen()
         num_lines = min(4, len(texts))
-        self.lines = [""] * 4  # Reset lines
+        self.oled_lines = [""] * 4  # Reset lines
         line_height = self.height // num_lines
         for i in range(num_lines):
             text = texts[i]
-            self.lines[i] = text
+            self.oled_lines[i] = text
             bbox = self.draw.textbbox((0, 0), text, font=self.font)
             text_width = bbox[2] - bbox[0]
             text_height = bbox[3] - bbox[1]
@@ -124,7 +124,7 @@ class SSD1306Display:
         if line_number < 0 or line_number >= 4:
             raise ValueError("line_number must be between 0 and 3")
 
-        self.lines[line_number] = text
+        self.oled_lines[line_number] = text
 
         # Clear the specific line area
         line_height = self.height // 4
@@ -170,7 +170,7 @@ class LCD2004Display:
         self.BLEN = bl
         self._init_display()
         # Initialize lines
-        self.lines = [""] * 4
+        self.lcd_lines = [""] * 4
 
         # self.i2c_address = i2c_address
         # self.config_manager = configuration
@@ -250,7 +250,7 @@ class LCD2004Display:
             y = 0
         if y > 3:
             y = 3
-        self.lines[y] = text
+        self.lcd_lines[y] = text
         row_offsets = [0x00, 0x40, 0x14, 0x54]
         addr = 0x80 + row_offsets[y] + x
         self._send_command(addr)
@@ -328,8 +328,8 @@ class LCD2004Display:
         max_chars = 20  # Assuming the display has 20 columns
         for i in range(num_lines):
             text = texts[i]
-            self.lines[i] = text
-            self.lines[i] = texts[i]
+            self.lcd_lines[i] = text
+            self.lcd_lines[i] = texts[i]
             if justification == 'left':
                 display_text = text.ljust(max_chars)
             elif justification == 'right':
@@ -343,5 +343,5 @@ class LCD2004Display:
         if line_number < 0 or line_number >= 4:
             raise ValueError("line_number must be between 0 and 3")
 
-        self.lines[line_number] = text
-        self.display_four_rows_center(self.lines, justification)
+        self.lcd_lines[line_number] = text
+        self.display_four_rows_center(self.lcd_lines, justification)

@@ -56,7 +56,7 @@ def task_internal():
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
                 ssd1306Display.display_text_center_with_border('Fan Started...')
                 time.sleep(1)
-                ssd1306Display.display_four_rows_center(lines)  # Reset display back to previous lines
+                ssd1306Display.display_four_rows_center(oled_lines)  # Reset display back to previous lines
 
         elif internaloutput['humidity'] < MIN_HUMIDITY:
             stopped, run_time = fanController.set_fan_speed(0)
@@ -70,7 +70,7 @@ def task_internal():
                 save_config()
                 ssd1306Display.display_text_center_with_border('Fan Stopped...')
                 time.sleep(1)
-                ssd1306Display.display_four_rows_center(lines)  # Reset display back to previous lines
+                ssd1306Display.display_four_rows_center(oled_lines)  # Reset display back to previous lines
     time.sleep(.1)  # Adjust as needed
 
 
@@ -124,11 +124,11 @@ def task_fan():
 
 
 def task_display():
-    lines[0] = f"Int Max:{INTERNAL_HIGH_TEMP}C {INTERNAL_HIGH_HUMIDITY}%"
-    lines[1] = f"Int Min:{INTERNAL_LOW_TEMP}C {INTERNAL_LOW_HUMIDITY}%"
-    lines[2] = f"Ext Max:{EXTERNAL_HIGH_TEMP}C {EXTERNAL_HIGH_HUMIDITY}%"
-    lines[3] = f"Ext Min:{EXTERNAL_LOW_TEMP}C {EXTERNAL_LOW_HUMIDITY}%"
-    lcd2004Display.display_four_rows_center(lines, justification='left')
+    lcd_lines[0] = f"Int Max:{INTERNAL_HIGH_TEMP}C {INTERNAL_HIGH_HUMIDITY}%"
+    lcd_lines[1] = f"Int Min:{INTERNAL_LOW_TEMP}C {INTERNAL_LOW_HUMIDITY}%"
+    lcd_lines[2] = f"Ext Max:{EXTERNAL_HIGH_TEMP}C {EXTERNAL_HIGH_HUMIDITY}%"
+    lcd_lines[3] = f"Ext Min:{EXTERNAL_LOW_TEMP}C {EXTERNAL_LOW_HUMIDITY}%"
+    lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
 
 
 def schedule_tasks(int_interval=1, ext_interval=1, fan_interval=1, display_interval=30):
@@ -348,7 +348,8 @@ if __name__ == "__main__":
     fanController = EMC2101()
 
     # Initialize lines
-    lines = [""] * 4  # For four line ssd1306_display...
+    oled_lines = [""] * 4  # For four line ssd1306_display...
+    lcd_lines = [""] * 4  # For four line ssd1306_display...
 
     try:
         installed_devices = read_installed_devices(configManager)
