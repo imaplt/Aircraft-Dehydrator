@@ -57,7 +57,7 @@ def task_internal():
                 ssd1306Display.display_text_center_with_border('Fan Started...')
                 time.sleep(1)
                 # Reset display back to previous lines
-                ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines)
+                ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines, justification='left')
         elif internaloutput['humidity'] < MIN_HUMIDITY:
             stopped, run_time = fanController.set_fan_speed(0)
             if stopped:
@@ -70,7 +70,8 @@ def task_internal():
                 save_config()
                 ssd1306Display.display_text_center_with_border('Fan Stopped...')
                 time.sleep(3)
-                ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines)  # Reset display back to prev lines
+                # Reset display back to prev lines
+                ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines, justification='left')
     time.sleep(.1)  # Adjust as needed
 
 
@@ -100,16 +101,16 @@ def task_external():
     if log_changed:
         save_config()
 
-    if abs(externaloutput['humidity'] - externalprevious_output['humidity']) > 0.2:
-        logger.log(timestamp, 'Sensors', 'External',
-                   f"Temperature: {externaloutput['temperature']}C,"
-                   f" Humidity: {externaloutput['humidity']}%")
-        # Update previous output values
-        externalprevious_output['temperature'] = externaloutput['temperature']
-        externalprevious_output['humidity'] = externaloutput['humidity']
-        print("External Sensor Reading:", externaloutput)
-        ssd1306Display.update_line(3, justification='left',
-                                   text=f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
+    # No need to check differences as this will be logged every x seconds unlike the internal one
+    logger.log(timestamp, 'Sensors', 'External',
+               f"Temperature: {externaloutput['temperature']}C,"
+               f" Humidity: {externaloutput['humidity']}%")
+    # Update previous output values
+    externalprevious_output['temperature'] = externaloutput['temperature']
+    externalprevious_output['humidity'] = externaloutput['humidity']
+    print("External Sensor Reading:", externaloutput)
+    ssd1306Display.update_line(3, justification='left',
+                               text=f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
     time.sleep(.1)
 
 
@@ -372,6 +373,9 @@ if __name__ == "__main__":
         lcd2004Display.display_text_with_border(['Initializing...'])
         time.sleep(3)
         internalsensor = Sensor('SHT41_Internal', 0x44)
+
+        sht30_sensor = Sensor('SHT30_Internal', 0x44)
+        print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
 
         if isDeviceDetected(statuses, 'SHTC3'):
             externalsensor = Sensor('SHTC3', 0x70)
