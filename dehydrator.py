@@ -71,9 +71,6 @@ def task_internal():
                 time.sleep(1)
                 ssd1306Display.display_default_four_rows()
     time.sleep(.1)  # Adjust as needed
-    print(internaloutput['temperature'], internalprevious_output['humidity'])
-    if internalprevious_output['temperature'] is None and internalprevious_output['humidity'] is None:
-        print("Both are non...")
 
 
 def task_external():
