@@ -70,7 +70,7 @@ def task_internal():
                 save_config()
                 ssd1306Display.display_text_center_with_border('Fan Stopped...')
                 time.sleep(3)
-                ssd1306Display.display_four_rows_center(oled_lines)  # Reset display back to previous lines
+                ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines)  # Reset display back to prev lines
     time.sleep(.1)  # Adjust as needed
 
 
@@ -124,6 +124,7 @@ def task_fan():
 
 
 def task_display():
+    global lcd_lines
     lcd_lines[0] = f"Int Max:{INTERNAL_HIGH_TEMP}C {INTERNAL_HIGH_HUMIDITY}%"
     lcd_lines[1] = f"Int Min:{INTERNAL_LOW_TEMP}C {INTERNAL_LOW_HUMIDITY}%"
     lcd_lines[2] = f"Ext Max:{EXTERNAL_HIGH_TEMP}C {EXTERNAL_HIGH_HUMIDITY}%"
