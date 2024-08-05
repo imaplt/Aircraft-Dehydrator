@@ -54,6 +54,7 @@ def task_internal():
                 logger.log(timestamp, 'Fan', '',
                            f"Fan started, exceeded MAX humidity of: {MAX_HUMIDITY}%")
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
+                print(oled_lines)
                 ssd1306Display.display_text_center_with_border('Fan Started...')
                 time.sleep(1)
                 ssd1306Display.display_four_rows_center(oled_lines)  # Reset display back to previous lines
