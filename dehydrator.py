@@ -348,6 +348,14 @@ if __name__ == "__main__":
     lcd_lines = [""] * 4  # For four line ssd1306_display...
 
     try:
+
+        # Initialize displays...
+        # Need to do this forst so if there is an error cleanup can still work...
+        ssd1306_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
+        ssd1306Display = SSD1306Display(ssd1306_display_config)
+        lcd2004Display = LCD2004Display()
+        lcd2004Display.clear()
+
         # Initialize fan controller
         fanController = EMC2101()
 
@@ -365,11 +373,6 @@ if __name__ == "__main__":
             print("Overall Status: Fail")
             raise ValueError("Overall Status Failed")
 
-            # Initialize displays...
-        ssd1306_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
-        ssd1306Display = SSD1306Display(ssd1306_display_config)
-        lcd2004Display = LCD2004Display()
-        lcd2004Display.clear()
 
         # Display centered text
         ssd1306Display.display_text_center("Initializing...")
