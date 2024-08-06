@@ -48,7 +48,7 @@ def task_internal():
         internalprevious_output['humidity'] = internaloutput['humidity']
         print("Internal Sensor Reading:", internaloutput)
         # TODO: Remove this entry...
-        print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
+        # print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
         ssd1306Display.update_line(1, justification='left',
                                    text=f"{internaloutput['humidity']}%" f" - {internaloutput['temperature']}°C")
         if internaloutput['humidity'] > MAX_HUMIDITY:
@@ -379,8 +379,8 @@ if __name__ == "__main__":
         time.sleep(3)
         internalsensor = Sensor('SHT41_Internal', 0x44)
 
-        sht30_sensor = Sensor('SHT30', 0x44)
-        print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
+        # sht30_sensor = Sensor('SHT30', 0x44)
+        # print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
 
         if isDeviceDetected(statuses, 'SHTC3'):
             externalsensor = Sensor('SHTC3', 0x70)
@@ -390,7 +390,6 @@ if __name__ == "__main__":
         internalprevious_output = {'temperature': 0, 'humidity': 0}
 
         print("Internal Mode: ", internalsensor.sensor_mode())  # TODO: Figure out what mode is...
-
         ssd1306Display.display_default_four_rows()
         time.sleep(2)
         schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL,

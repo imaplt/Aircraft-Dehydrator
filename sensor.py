@@ -23,8 +23,22 @@ SHT4X_LOWHEAT_100MS = 0x15  # High precision measurement, low heat for 0.1 sec
 SHT4X_READSERIAL = 0x89  # Read Out of Serial Register
 SHT4X_SOFTRESET = 0x94  # Soft Reset
 
+# Create a dictionary mapping hex values to string descriptions
+hex_to_description = {
+    SHT4X_NOHEAT_HIGHPRECISION: "High precision measurement, no heater",
+    SHT4X_NOHEAT_MEDPRECISION: "Medium precision measurement, no heater",
+    SHT4X_NOHEAT_LOWPRECISION: "Low precision measurement, no heater",
+    SHT4X_HIGHHEAT_1S: "High precision measurement, high heat for 1 sec",
+    SHT4X_HIGHHEAT_100MS: "High precision measurement, high heat for 0.1 sec",
+    SHT4X_MEDHEAT_1S: "High precision measurement, med heat for 1 sec",
+    SHT4X_MEDHEAT_100MS: "High precision measurement, med heat for 0.1 sec",
+    SHT4X_LOWHEAT_1S: "High precision measurement, low heat for 1 sec",
+    SHT4X_LOWHEAT_100MS: "High precision measurement, low heat for 0.1 sec",
+    SHT4X_READSERIAL: "Read Out of Serial Register",
+    SHT4X_SOFTRESET: "Soft Reset"
+}
 
-# Define enums
+
 class SHT4XPrecision(Enum):
     HIGH_PRECISION = "High Precision"
     MED_PRECISION = "Medium Precision"
@@ -39,17 +53,6 @@ class SHT4XHeater(Enum):
     MED_HEATER_100MS = "Med Heater 100ms"
     LOW_HEATER_1S = "Low Heater 1s"
     LOW_HEATER_100MS = "Low Heater 100ms"
-
-# # Example usage
-# print(f"High precision no heater code: {SHT4X_NOHEAT_HIGHPRECISION}")
-# print(f"Soft reset code: {SHT4X_SOFTRESET}")
-#
-# # Using enums
-# precision = SHT4XPrecision.HIGH_PRECISION
-# heater_setting = SHT4XHeater.HIGH_HEATER_1S
-#
-# print(f"Selected precision: {precision}")
-# print(f"Selected heater setting: {heater_setting}")
 
 
 class Sensor:
@@ -85,8 +88,7 @@ class Sensor:
 
     def sensor_mode(self):
         mode = self.sensor.mode
-        # return hex(mode).upper()
-        return mode
+        return hex_to_description.get(mode, "Unknown mode")
 
     def read_sensor(self):
 
