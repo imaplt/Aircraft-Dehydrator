@@ -343,14 +343,14 @@ if __name__ == "__main__":
     dn_button.when_pressed = button_pressed_callback
     dn_button.when_held = button_hold_callback
 
-    # Initialize fan controller
-    fanController = EMC2101()
-
     # Initialize lines
     oled_lines = [""] * 4  # For four line ssd1306_display...
     lcd_lines = [""] * 4  # For four line ssd1306_display...
 
     try:
+        # Initialize fan controller
+        fanController = EMC2101()
+
         installed_devices = read_installed_devices(configManager)
         overall_status, statuses = system_status.query_i2c_devices(installed_devices)
         print(f"Overall status: {overall_status}")
