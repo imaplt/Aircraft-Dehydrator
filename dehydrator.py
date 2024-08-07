@@ -26,7 +26,7 @@ def print_elapsed_time(func):
     return wrapper
 
 
-@print_elapsed_time
+# @print_elapsed_time
 def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
         CYCLE_COUNT, TOTAL_CYCLE_DURATION
@@ -93,7 +93,7 @@ def task_internal():
     time.sleep(.1)  # Adjust as needed
 
 
-@print_elapsed_time
+# @print_elapsed_time
 def task_external():
     global EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY
 
@@ -153,10 +153,10 @@ def lcd_display(screen_no):
         lcd_lines[3] = f"Ext Min:{EXTERNAL_LOW_TEMP}C {EXTERNAL_LOW_HUMIDITY}%"
         lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
     else:
-        lcd_lines[0] = "Fan Cycles/Duration:"
-        lcd_lines[1] = f" {CYCLE_COUNT}"
-        lcd_lines[2] = "Duration:"
-        lcd_lines[3] = f" {TOTAL_CYCLE_DURATION}"
+        lcd_lines[0] = "Fan Cycles/Duration"
+        lcd_lines[1] = f"Count: {CYCLE_COUNT}"
+        lcd_lines[2] = f"Duration  {TOTAL_CYCLE_DURATION}"
+        lcd_lines[3] = ""
         lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
 
 
