@@ -58,6 +58,9 @@ class EMC2101:
 
     def read_fan_speed(self):
         fan_speed = self.sensor.fan_speed
+        # Speed might read greater than zero even when stopped.
+        if fan_speed < 200:
+            fan_speed = 0
         return fan_speed
 
     def set_fan_speed(self, speed):
@@ -69,7 +72,7 @@ class EMC2101:
                     # Put code here to stop the fan.
                     self.fan_engaged = False
                     self.sensor.manual_fan_speed = speed
-                    time.sleep(1)
+                    time.sleep(1)  # Allow for it to slow down
                     last_run_time = time.time() - self.start_time
                     return True, last_run_time
                 else:
@@ -79,6 +82,7 @@ class EMC2101:
                 if not self.fan_engaged:
                     # Put code here to start fan...
                     self.sensor.manual_fan_speed = speed
+                    #  Allow for it to stabilize
                     time.sleep(1)
                     self.fan_engaged = True
                     return True

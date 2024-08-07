@@ -13,13 +13,15 @@ from fan_controller import EMC2101
 
 
 # This decorator can be applied to any job function to log the elapsed time of each job
+# Use this to account for jobs taking longer than expected...
 def print_elapsed_time(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         start_timestamp = time.time()
-        print('LOG: Running job "%s"' % func.__name__)
         result = func(*args, **kwargs)
-        print('LOG: Job "%s" completed in %d seconds' % (func.__name__, time.time() - start_timestamp))
+        if time.time() - start_timestamp > 0:
+            print('LOG: Running job "%s"' % func.__name__)
+            print('LOG: Job "%s" completed in %d seconds' % (func.__name__, time.time() - start_timestamp))
         return result
     return wrapper
 
@@ -86,7 +88,7 @@ def task_internal():
                 CYCLE_COUNT += 1
                 save_config()
                 ssd1306Display.display_text_center_with_border('Fan Stopped...')
-                time.sleep(3)
+                time.sleep(1)
                 # Reset display back to prev lines
                 ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines, justification='left')
     time.sleep(.1)  # Adjust as needed
@@ -143,8 +145,23 @@ def task_fan():
     fanController.set_fan_speed(0)
 
 
-@print_elapsed_time
-def task_display():
+def lcd_display(screen_no):
+    global lcd_lines
+    if screen_no == 1:
+        lcd_lines[0] = f"Int Max:{INTERNAL_HIGH_TEMP}C {INTERNAL_HIGH_HUMIDITY}%"
+        lcd_lines[1] = f"Int Min:{INTERNAL_LOW_TEMP}C {INTERNAL_LOW_HUMIDITY}%"
+        lcd_lines[2] = f"Ext Max:{EXTERNAL_HIGH_TEMP}C {EXTERNAL_HIGH_HUMIDITY}%"
+        lcd_lines[3] = f"Ext Min:{EXTERNAL_LOW_TEMP}C {EXTERNAL_LOW_HUMIDITY}%"
+        lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
+    else:
+        lcd_lines[0] = f"Cycle Count: {CYCLE_COUNT}"
+        lcd_lines[1] = f"Total Cycle Duration: {TOTAL_CYCLE_DURATION}"
+        lcd_lines[2] = ""
+        lcd_lines[3] = ""
+        lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
+
+
+def oled_display():
     global lcd_lines
     lcd_lines[0] = f"Int Max:{INTERNAL_HIGH_TEMP}C {INTERNAL_HIGH_HUMIDITY}%"
     lcd_lines[1] = f"Int Min:{INTERNAL_LOW_TEMP}C {INTERNAL_LOW_HUMIDITY}%"
@@ -153,12 +170,22 @@ def task_display():
     lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
 
 
+# Task to alternate screens
+def task_alternate_screens():
+    if task_alternate_screens.current_screen == 1:
+        lcd_display(1)
+        task_alternate_screens.current_screen = 2
+    else:
+        lcd_display(2)
+        task_alternate_screens.current_screen = 1
+
+
 def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1, display_interval=30):
     schedule.every(int_interval).seconds.do(task_internal)
     schedule.every(ext_interval).minutes.do(task_external)
     # schedule.every(fan_interval).minutes.do(task_fan)
     if DISPLAY_ENABLED:
-        schedule.every(display_interval).seconds.do(task_display)
+        schedule.every(display_interval).seconds.do(task_alternate_screens)
 
 
 def run_scheduler():
@@ -316,7 +343,9 @@ if __name__ == "__main__":
     TASK_FAN = configManager.get_int_config('TASK_FAN')
     TASK_INTERNAL = configManager.get_int_config('TASK_INTERNAL')
     TASK_EXTERNAL = configManager.get_int_config('TASK_EXTERNAL')
-    TASK_DISPLAY = configManager.get_int_config('TASK_DISPLAY')
+    TASK_DISPLAY_ROTATION = configManager.get_int_config('TASK_DISPLAY_ROTATION')
+    LCD_ROTATION = configManager.get_int_config('LCD_ROTATION')
+    OLED_ROTATION = configManager.get_int_config('OLED_ROTATION')
 
     # Get button pin info
     UP_BUTTON_PIN = configManager.get_int_config('up_button_pin')
@@ -342,6 +371,9 @@ if __name__ == "__main__":
 
     # Display configuration
     DISPLAY_ENABLED = configManager.get_boolean_config('DISPLAY_ENABLED')
+
+    # Initialize current screen
+    task_alternate_screens.current_screen = 1
 
     # GPIO setup using gpiozero for input buttons
     up_button = Button(UP_BUTTON_PIN, pull_up=True, bounce_time=0.2, hold_time=3)
@@ -410,12 +442,12 @@ if __name__ == "__main__":
         ssd1306Display.display_default_four_rows()
         time.sleep(2)
         schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL,
-                       fan_interval=TASK_FAN, display_interval=TASK_DISPLAY)
+                       fan_interval=TASK_FAN, display_interval=TASK_DISPLAY_ROTATION)
 
         # Need to run the External once to update the values
         task_external()
         if DISPLAY_ENABLED:
-            task_display()
+            lcd_display()
         run_scheduler()
 
     except KeyboardInterrupt:
