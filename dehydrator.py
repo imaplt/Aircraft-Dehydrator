@@ -33,7 +33,6 @@ def task_internal():
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
 
-
     # Update the config file with stats
     log_changed = False
     # Update high and low humidity
@@ -447,7 +446,7 @@ if __name__ == "__main__":
         # Need to run the External once to update the values
         task_external()
         if DISPLAY_ENABLED:
-            lcd_display()
+            lcd_display(1)
         run_scheduler()
 
     except KeyboardInterrupt:
