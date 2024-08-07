@@ -153,8 +153,8 @@ def lcd_display(screen_no):
         lcd_lines[3] = f"Ext Min:{EXTERNAL_LOW_TEMP}C {EXTERNAL_LOW_HUMIDITY}%"
         lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
     else:
-        lcd_lines[0] = f"Cycle Count: {CYCLE_COUNT}"
-        lcd_lines[1] = f"Total Cycle Duration: {TOTAL_CYCLE_DURATION}"
+        lcd_lines[0] = f"Fan Count: {CYCLE_COUNT}"
+        lcd_lines[1] = f"Fan Duration: {timedelta(seconds=TOTAL_CYCLE_DURATION)}"
         lcd_lines[2] = ""
         lcd_lines[3] = ""
         lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
