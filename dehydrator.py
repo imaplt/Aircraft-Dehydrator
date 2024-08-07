@@ -1,6 +1,7 @@
 
 import schedule
 import time
+import functools
 from datetime import timedelta
 from config_manager import ConfigManager
 from logger import Logger as Log
@@ -11,6 +12,19 @@ from sensor import Sensor
 from fan_controller import EMC2101
 
 
+# This decorator can be applied to any job function to log the elapsed time of each job
+def print_elapsed_time(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start_timestamp = time.time()
+        print('LOG: Running job "%s"' % func.__name__)
+        result = func(*args, **kwargs)
+        print('LOG: Job "%s" completed in %d seconds' % (func.__name__, time.time() - start_timestamp))
+        return result
+    return wrapper
+
+
+@print_elapsed_time
 def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
         CYCLE_COUNT, TOTAL_CYCLE_DURATION
@@ -78,6 +92,7 @@ def task_internal():
     time.sleep(.1)  # Adjust as needed
 
 
+@print_elapsed_time
 def task_external():
     global EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY
 
@@ -117,6 +132,7 @@ def task_external():
     time.sleep(.1)
 
 
+@print_elapsed_time
 def task_fan():
     # TODO: A better way to cycle the fan
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -127,6 +143,7 @@ def task_fan():
     fanController.set_fan_speed(0)
 
 
+@print_elapsed_time
 def task_display():
     global lcd_lines
     lcd_lines[0] = f"Int Max:{INTERNAL_HIGH_TEMP}C {INTERNAL_HIGH_HUMIDITY}%"
