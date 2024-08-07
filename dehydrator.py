@@ -154,7 +154,7 @@ def lcd_display(screen_no):
         lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
     else:
         lcd_lines[0] = f"Fan Count: {CYCLE_COUNT}"
-        lcd_lines[1] = f"Fan Duration: {timedelta(seconds=TOTAL_CYCLE_DURATION)}"
+        lcd_lines[1] = f"Fan Duration: {TOTAL_CYCLE_DURATION}"
         lcd_lines[2] = ""
         lcd_lines[3] = ""
         lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
