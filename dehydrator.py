@@ -81,6 +81,9 @@ def task_internal():
             else:
                 # This should cover when it has aleady started
                 RUNNING_TIME = run_time
+            print(type(RUNNING_TIME))
+            print(type(MAX_FAN_RUNTIME))
+            print(type(FAN_LIMIT))
             if RUNNING_TIME > timedelta(seconds=MAX_FAN_RUNTIME):
                 MAX_FAN_RUNTIME = RUNNING_TIME
             if RUNNING_TIME > timedelta(seconds=FAN_LIMIT):
