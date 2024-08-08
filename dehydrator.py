@@ -381,7 +381,7 @@ if __name__ == "__main__":
     CYCLE_COUNT = configManager.get_int_config('cycle_count')
     TOTAL_CYCLE_DURATION = configManager.get_duration_config('LOG', 'total_cycle_duration')
     MAX_FAN_RUNTIME = configManager.get_duration_config('MAX_FAN_RUNTIME')
-    FAN_LIMIT = configManager.get_int_config('FAN_LIMIT')
+    FAN_LIMIT = configManager.get_duration_config('FAN_LIMIT')
 
     # Display configuration
     DISPLAY_ENABLED = configManager.get_boolean_config('DISPLAY_ENABLED')
