@@ -29,7 +29,7 @@ def print_elapsed_time(func):
 # @print_elapsed_time
 def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
-        CYCLE_COUNT, TOTAL_CYCLE_DURATION, STARTED, STOPPED
+        CYCLE_COUNT, TOTAL_CYCLE_DURATION, FAN_RUNNING
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
 
@@ -67,24 +67,26 @@ def task_internal():
         ssd1306Display.update_line(1, justification='left',
                                    text=f"{internaloutput['humidity']}%" f" - {internaloutput['temperature']}°C")
         if internaloutput['humidity'] > MAX_HUMIDITY:
-            STARTED = fanController.set_fan_speed(100)
-            if STARTED:
+            started = fanController.set_fan_speed(100)
+            if started:
                 logger.log(timestamp, 'Fan', '',
                            f"Fan started, exceeded MAX humidity of: {MAX_HUMIDITY}%")
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
                 ssd1306Display.display_text_center_with_border('Fan Started...')
+                FAN_RUNNING = True
                 time.sleep(1)
                 # Reset display back to previous lines
                 ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines, justification='left')
         elif internaloutput['humidity'] < MIN_HUMIDITY:
-            STOPPED, run_time = fanController.set_fan_speed(0)
-            if STOPPED:
+            stopped, run_time = fanController.set_fan_speed(0)
+            if stopped:
                 print(f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY }%")
                 logger.log(timestamp, 'Fan', '',
                            f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY }%")
                 logger.log(timestamp, 'Fan', '', f"Fan run time: {str(timedelta(seconds=run_time))}")
                 TOTAL_CYCLE_DURATION += timedelta(seconds=run_time)
                 CYCLE_COUNT += 1
+                FAN_RUNNING = False
                 save_config()
                 ssd1306Display.display_text_center_with_border('Fan Stopped...')
                 time.sleep(1)
@@ -397,8 +399,7 @@ if __name__ == "__main__":
 
     # Initialize fan controller
     fanController = EMC2101()
-    STOPPED = True
-    STARTED = False
+    FAN_RUNNING = False
 
     try:
 
