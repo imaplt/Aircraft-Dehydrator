@@ -155,7 +155,7 @@ def lcd_display(screen_no):
     else:
         lcd_lines[0] = "Fan Stats:"
         lcd_lines[1] = f"Cycles: {CYCLE_COUNT}"
-        lcd_lines[2] = f"Tot Duration: {TOTAL_CYCLE_DURATION}"
+        lcd_lines[2] = f"Duration: {TOTAL_CYCLE_DURATION}"
         lcd_lines[3] = ""
         lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
 
