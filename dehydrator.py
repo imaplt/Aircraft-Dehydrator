@@ -81,9 +81,9 @@ def task_internal():
             else:
                 # This should cover when it has aleady started
                 RUNNING_TIME = run_time
-            if RUNNING_TIME > MAX_FAN_RUNTIME:
+            if RUNNING_TIME > timedelta(seconds=MAX_FAN_RUNTIME):
                 MAX_FAN_RUNTIME = RUNNING_TIME
-            if RUNNING_TIME > FAN_LIMIT:
+            if RUNNING_TIME > timedelta(seconds=FAN_LIMIT):
                 # TODO: Add FAN_LIMIT logic, maybe a method or function?
                 print("Fan limit exceeded")
                 logger.log(timestamp, 'System', 'Fan',
