@@ -29,7 +29,7 @@ def print_elapsed_time(func):
 # @print_elapsed_time
 def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
-        CYCLE_COUNT, TOTAL_CYCLE_DURATION
+        CYCLE_COUNT, TOTAL_CYCLE_DURATION, STARTED, STOPPED
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
 
@@ -67,8 +67,8 @@ def task_internal():
         ssd1306Display.update_line(1, justification='left',
                                    text=f"{internaloutput['humidity']}%" f" - {internaloutput['temperature']}°C")
         if internaloutput['humidity'] > MAX_HUMIDITY:
-            started = fanController.set_fan_speed(100)
-            if started:
+            STARTED = fanController.set_fan_speed(100)
+            if STARTED:
                 logger.log(timestamp, 'Fan', '',
                            f"Fan started, exceeded MAX humidity of: {MAX_HUMIDITY}%")
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
@@ -77,8 +77,8 @@ def task_internal():
                 # Reset display back to previous lines
                 ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines, justification='left')
         elif internaloutput['humidity'] < MIN_HUMIDITY:
-            stopped, run_time = fanController.set_fan_speed(0)
-            if stopped:
+            STOPPED, run_time = fanController.set_fan_speed(0)
+            if STOPPED:
                 print(f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY }%")
                 logger.log(timestamp, 'Fan', '',
                            f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY }%")
@@ -153,10 +153,10 @@ def lcd_display(screen_no):
         lcd_lines[3] = f"Ext Min:{EXTERNAL_LOW_TEMP}C {EXTERNAL_LOW_HUMIDITY}%"
         lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
     else:
-        lcd_lines[0] = "Fan Stats:"
+        lcd_lines[0] = "Fan Stats..."
         lcd_lines[1] = f"Cycles: {CYCLE_COUNT}"
         lcd_lines[2] = f"Duration: {TOTAL_CYCLE_DURATION}"
-        lcd_lines[3] = ""
+        lcd_lines[3] = f"Running - {str(STARTED)}"
         lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
 
 
@@ -397,6 +397,8 @@ if __name__ == "__main__":
 
     # Initialize fan controller
     fanController = EMC2101()
+    STOPPED = True
+    STARTED = False
 
     try:
 
