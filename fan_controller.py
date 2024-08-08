@@ -85,7 +85,7 @@ class EMC2101:
                     #  Allow for it to stabilize
                     time.sleep(1)
                     self.fan_engaged = True
-                    return True
+                    return True, 0
                 else:
                     current_run_time = time.time() - self.start_time
                     return False, current_run_time
