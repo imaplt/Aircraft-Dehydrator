@@ -81,6 +81,13 @@ def task_internal():
             else:
                 # This should cover when it has aleady started
                 RUNNING_TIME = run_time
+            if RUNNING_TIME > MAX_FAN_RUNTIME:
+                MAX_FAN_RUNTIME = RUNNING_TIME
+            if RUNNING_TIME > FAN_LIMIT:
+                # TODO: Add FAN_LIMIT logic, maybe a method or function?
+                print("Fan limit exceeded")
+                logger.log(timestamp, 'System', 'Fan',
+                           f"Fan time limit exceeded: {FAN_LIMIT}%")
         elif internaloutput['humidity'] < MIN_HUMIDITY:
             stopped, run_time = fanController.set_fan_speed(0)
             if stopped:
@@ -96,8 +103,8 @@ def task_internal():
                 elif RUNNING_TIME > FAN_LIMIT:
                     # TODO: Add FAN_LIMIT logic, maybe a method or function?
                     print("Fan limit exceeded")
-                logger.log(timestamp, 'System', 'Fan',
-                           f"Fan limit exceeded: {FAN_LIMIT}%")
+                    logger.log(timestamp, 'System', 'Fan',
+                               f"Fan time limit exceeded: {FAN_LIMIT}%")
                 RUNNING_TIME = 0
                 save_config()
                 ssd1306Display.display_text_center_with_border('Fan Stopped...')
