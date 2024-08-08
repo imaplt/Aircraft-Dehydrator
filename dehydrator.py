@@ -29,7 +29,7 @@ def print_elapsed_time(func):
 # @print_elapsed_time
 def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
-        CYCLE_COUNT, TOTAL_CYCLE_DURATION, FAN_RUNNING
+        CYCLE_COUNT, TOTAL_CYCLE_DURATION, FAN_RUNNING, RUNNING_TIME, MAX_FAN_RUNTIME
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
 
@@ -67,7 +67,7 @@ def task_internal():
         ssd1306Display.update_line(1, justification='left',
                                    text=f"{internaloutput['humidity']}%" f" - {internaloutput['temperature']}°C")
         if internaloutput['humidity'] > MAX_HUMIDITY:
-            started = fanController.set_fan_speed(100)
+            started, run_time = fanController.set_fan_speed(100)
             if started:
                 logger.log(timestamp, 'Fan', '',
                            f"Fan started, exceeded MAX humidity of: {MAX_HUMIDITY}%")
@@ -77,6 +77,9 @@ def task_internal():
                 time.sleep(1)
                 # Reset display back to previous lines
                 ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines, justification='left')
+            else:
+                # This should cover when it has aleady started
+                RUNNING_TIME = run_time
         elif internaloutput['humidity'] < MIN_HUMIDITY:
             stopped, run_time = fanController.set_fan_speed(0)
             if stopped:
@@ -87,6 +90,14 @@ def task_internal():
                 TOTAL_CYCLE_DURATION += timedelta(seconds=run_time)
                 CYCLE_COUNT += 1
                 FAN_RUNNING = False
+                if RUNNING_TIME > MAX_FAN_RUNTIME:
+                    MAX_FAN_RUNTIME = RUNNING_TIME
+                elif RUNNING_TIME > FAN_LIMIT:
+                    # TODO: Add FAN_LIMIT logic, maybe a method or function?
+                    print("Fan limit exceeded")
+                logger.log(timestamp, 'System', 'Fan',
+                           f"Fan limit exceeded: {FAN_LIMIT}%")
+                RUNNING_TIME = 0
                 save_config()
                 ssd1306Display.display_text_center_with_border('Fan Stopped...')
                 time.sleep(1)
@@ -158,7 +169,7 @@ def lcd_display(screen_no):
         lcd_lines[0] = "Fan Stats..."
         lcd_lines[1] = f"Cycles: {CYCLE_COUNT}"
         lcd_lines[2] = f"Duration: {TOTAL_CYCLE_DURATION}"
-        lcd_lines[3] = f"Running - {str(STARTED)}"
+        lcd_lines[3] = f"Running - {str(FAN_RUNNING)}"
         lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
 
 
@@ -224,7 +235,7 @@ def save_config():
     global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
     global EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
-    global CYCLE_COUNT, TOTAL_CYCLE_DURATION
+    global CYCLE_COUNT, TOTAL_CYCLE_DURATION, MAX_FAN_RUNTIME
 
     configManager.update_config('min_humidity', MIN_HUMIDITY)
     configManager.update_config('max_humidity', MAX_HUMIDITY)
@@ -238,7 +249,7 @@ def save_config():
     configManager.update_config('external_low_humidity', EXTERNAL_LOW_HUMIDITY, 'LOG')
     configManager.update_config('cycle_count', CYCLE_COUNT, 'LOG')
     configManager.set_duration_config('total_cycle_duration', TOTAL_CYCLE_DURATION, 'LOG')
-
+    configManager.set_duration_config('MAX_FAN_RUNTIME', MAX_FAN_RUNTIME, 'LOG')
 
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
@@ -369,6 +380,8 @@ if __name__ == "__main__":
     EXTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'external_low_humidity')
     CYCLE_COUNT = configManager.get_int_config('cycle_count')
     TOTAL_CYCLE_DURATION = configManager.get_duration_config('LOG', 'total_cycle_duration')
+    MAX_FAN_RUNTIME = configManager.get_int_config('MAX_FAN_RUNTIME')
+    FAN_LIMIT = configManager.get_int_config('FAN_LIMIT')
 
     # Display configuration
     DISPLAY_ENABLED = configManager.get_boolean_config('DISPLAY_ENABLED')
@@ -400,7 +413,7 @@ if __name__ == "__main__":
     # Initialize fan controller
     fanController = EMC2101()
     FAN_RUNNING = False
-
+    RUNNING_TIME = 0
     try:
 
         installed_devices = read_installed_devices(configManager)

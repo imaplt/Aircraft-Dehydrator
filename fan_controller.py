@@ -87,7 +87,8 @@ class EMC2101:
                     self.fan_engaged = True
                     return True
                 else:
-                    return False
+                    current_run_time = time.time() - self.start_time
+                    return False, current_run_time
         else:
             raise ValueError("Fan speed must be between 0 and 100")
 
