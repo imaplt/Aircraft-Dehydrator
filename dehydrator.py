@@ -74,19 +74,12 @@ def task_internal():
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
                 ssd1306Display.display_text_center_with_border('Fan Started...')
                 FAN_RUNNING = True
-                RUNNING_TIME = run_time
                 time.sleep(1)
                 # Reset display back to previous lines
                 ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines, justification='left')
-            else:
-                # This should cover when it has aleady started
-                RUNNING_TIME = run_time
-            print(type(RUNNING_TIME))
-            print(type(MAX_FAN_RUNTIME))
-            print(type(FAN_LIMIT))
-            if RUNNING_TIME > timedelta(seconds=MAX_FAN_RUNTIME):
-                MAX_FAN_RUNTIME = RUNNING_TIME
-            if RUNNING_TIME > timedelta(seconds=FAN_LIMIT):
+            if timedelta(seconds= run_time) > MAX_FAN_RUNTIME:
+                MAX_FAN_RUNTIME = timedelta(seconds= run_time)
+            if timedelta(seconds= run_time) > FAN_LIMIT:
                 # TODO: Add FAN_LIMIT logic, maybe a method or function?
                 print("Fan limit exceeded")
                 logger.log(timestamp, 'System', 'Fan',
