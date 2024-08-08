@@ -380,8 +380,8 @@ if __name__ == "__main__":
     EXTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'external_low_humidity')
     CYCLE_COUNT = configManager.get_int_config('cycle_count')
     TOTAL_CYCLE_DURATION = configManager.get_duration_config('LOG', 'total_cycle_duration')
-    MAX_FAN_RUNTIME = configManager.get_duration_config('MAX_FAN_RUNTIME')
-    FAN_LIMIT = configManager.get_duration_config('FAN_LIMIT')
+    MAX_FAN_RUNTIME = configManager.get_duration_config('LOG', 'MAX_FAN_RUNTIME')
+    FAN_LIMIT = configManager.get_duration_config('LOG', 'FAN_LIMIT')
 
     # Display configuration
     DISPLAY_ENABLED = configManager.get_boolean_config('DISPLAY_ENABLED')
