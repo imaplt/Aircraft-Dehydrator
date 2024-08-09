@@ -62,8 +62,6 @@ def task_internal():
         internalprevious_output['temperature'] = internaloutput['temperature']
         internalprevious_output['humidity'] = internaloutput['humidity']
         print("Internal Sensor Reading:", internaloutput)
-        # TODO: Remove this entry...
-        # print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
         ssd1306Display.update_line(1, justification='left',
                                    text=f"{internaloutput['humidity']}%" f" - {internaloutput['temperature']}°C")
         if internaloutput['humidity'] > MAX_HUMIDITY:
@@ -83,7 +81,8 @@ def task_internal():
                 # TODO: Add FAN_LIMIT logic, maybe a method or function?
                 print("Fan limit exceeded")
                 logger.log(timestamp, 'WARN', 'SYSTEM', 'FAN',
-                           f"Fan time limit exceeded: {FAN_LIMIT}%")
+                           f"Fan time limit exceeded: {FAN_LIMIT}")
+                _fan_limit_exceeded()
         elif internaloutput['humidity'] < MIN_HUMIDITY:
             stopped, run_time = fanController.set_fan_speed(0)
             if stopped:
@@ -96,11 +95,12 @@ def task_internal():
                 FAN_RUNNING = False
                 if RUNNING_TIME > MAX_FAN_RUNTIME:
                     MAX_FAN_RUNTIME = RUNNING_TIME
-                elif RUNNING_TIME > FAN_LIMIT:
+                if RUNNING_TIME > FAN_LIMIT:
                     # TODO: Add FAN_LIMIT logic, maybe a method or function?
                     print("Fan limit exceeded")
                     logger.log(timestamp, 'WARN', 'SYSTEM', 'FAN',
                                f"Fan time limit exceeded: {FAN_LIMIT}%")
+                    _fan_limit_exceeded()
                 RUNNING_TIME = 0
                 save_config()
                 ssd1306Display.display_text_center_with_border('Fan Stopped...')
@@ -326,6 +326,17 @@ def button_hold_callback(button):
         mode = 'min'
 
 
+def _fan_limit_exceeded():
+    # Cancel all teh jobs
+    schedule.clear()
+    ssd1306Display.display_text_center_with_border('FAN LIMIT EXCEEDED...')
+    lcd2004Display.display_text_with_border(['FAN LIMIT EXCEEDED'])
+    fanController.set_fan_speed(0)
+    save_config()
+    while True:
+        time.sleap()
+
+
 def cleanup():
     # Want to add code here to update display, update log with run time etc
     print('Cleaning Up')
@@ -386,7 +397,7 @@ if __name__ == "__main__":
     CYCLE_COUNT = configManager.get_int_config('cycle_count')
     TOTAL_CYCLE_DURATION = configManager.get_duration_config('LOG', 'total_cycle_duration')
     MAX_FAN_RUNTIME = configManager.get_duration_config('LOG', 'MAX_FAN_RUNTIME')
-    FAN_LIMIT = configManager.get_duration_config('LOG', 'FAN_LIMIT')
+    FAN_LIMIT = configManager.get_duration_config('DEFAULT', 'FAN_LIMIT')
 
     # Display configuration
     DISPLAY_ENABLED = configManager.get_boolean_config('DISPLAY_ENABLED')
