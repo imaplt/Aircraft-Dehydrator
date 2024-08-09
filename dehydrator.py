@@ -326,7 +326,6 @@ def button_hold_callback(button):
             lcd2004Display.display_text_with_border(['Configuration Mode'])
             time.sleep(10)
             mode = 'config'
-            run_scheduler()
             return
 
     if button_name == 'up':
