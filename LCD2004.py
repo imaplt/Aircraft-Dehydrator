@@ -74,7 +74,7 @@ class LCD2004Display:
             time.sleep(0.005)
             self._send_command(0x01)
             self.BUS.write_byte(self.LCD_ADDR, 0x08)
-        except:
+        except Exception:
             raise Exception("Failed to initialize display")
 
     def clear(self):
@@ -142,7 +142,6 @@ class LCD2004Display:
 
     def display_default_four_rows(self):
         self.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], justification='left')
-
 
     def display_text_with_border(self, text_lines, full_display_border=False):
         self.clear()

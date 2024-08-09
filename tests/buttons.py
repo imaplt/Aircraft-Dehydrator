@@ -119,7 +119,7 @@ def cleanup():
     # Want to add code here to update display, update log with run time etc
     print('Cleaning Up')
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
-               'System', '', "Shutting down...")
+               'LEVEL', 'SYSTEM', 'SYSTEM', "Shutting down...")
     time.sleep(3)
 
 
@@ -178,10 +178,10 @@ if __name__ == "__main__":
             if int(current_time - start_time) % 30 == 0:
                 timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 print("Heating External sensor...")
-                logger.log(timestamp, 'External', '01', "Heating External sensor...")
+                logger.log(timestamp, 'INFO', 'SENSOR', 'EXTERNAL', "Heating External sensor...")
 
                 print("Heating Internal sensor...")
-                logger.log(timestamp, 'Internal', '02', "Heating Internal sensor...")
+                logger.log(timestamp, 'INFO', 'SENSOR', 'INTERNAL', "Heating Internal sensor...")
 
             # Sleep for a short duration to avoid multiple reads/heats within the same second
             time.sleep(0.3)

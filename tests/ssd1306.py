@@ -5,7 +5,7 @@ import adafruit_ssd1306
 
 oled_reset = digitalio.DigitalInOut(board.D4)
 WIDTH = 128
-HEIGHT = 64 # Change to 64 if needed
+HEIGHT = 64  # Change to 64 if needed
 BORDER = 5
 
 i2c = board.I2C()

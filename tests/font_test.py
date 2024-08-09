@@ -4,6 +4,7 @@ import adafruit_ssd1306
 from PIL import Image, ImageDraw, ImageFont
 import time
 
+
 def main():
     # Initialize I2C interface
     i2c = busio.I2C(board.SCL, board.SDA)

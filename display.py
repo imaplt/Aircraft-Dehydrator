@@ -172,7 +172,6 @@ class LCD2004Display:
         self._init_display()
         self.lcd_lines = [""] * 4
 
-
     def _write_word(self, addr, data):
         temp = data
         if self.BLEN == 1:
@@ -223,7 +222,7 @@ class LCD2004Display:
             time.sleep(0.005)
             self._send_command(0x01)
             self.BUS.write_byte(self.LCD_ADDR, 0x08)
-        except:
+        except Exception:
             raise Exception("Failed to initialize display")
 
     def clear(self):

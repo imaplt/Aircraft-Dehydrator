@@ -12,7 +12,7 @@ class EMC2101:
         self.fan_engaged_time = 0
         self.start_time = time.time()
         self.fan_engage_start_time = None
-        self.I2C_ADDRESS = 0x4C
+        self.I2C_ADDRESS = i2c_address
         self.INTERNAL_TEMP_REG = 0x00
         self.EXTERNAL_TEMP_REG = 0x01
         self.FAN_SPEED_REG = 0x10

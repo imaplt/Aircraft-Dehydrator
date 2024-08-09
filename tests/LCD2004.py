@@ -66,7 +66,7 @@ def init(addr, bl):
         time.sleep(0.005)
         send_command(0x01)
         BUS.write_byte(LCD_ADDR, 0x08)
-    except:
+    except Exception:
         return False
     else:
         return True

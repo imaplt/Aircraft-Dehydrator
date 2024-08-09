@@ -55,7 +55,7 @@ def task_internal():
         save_config()
 
     if abs(internaloutput['humidity'] - internalprevious_output['humidity']) > 0.2:
-        logger.log(timestamp, 'Sensors', 'Internal',
+        logger.log(timestamp, 'INFO', 'SENSORS', 'INTERNAL',
                    f"Temperature: {internaloutput['temperature']}C,"
                    f" Humidity: {internaloutput['humidity']}%")
         # Update previous output values
@@ -69,7 +69,7 @@ def task_internal():
         if internaloutput['humidity'] > MAX_HUMIDITY:
             started, run_time = fanController.set_fan_speed(100)
             if started:
-                logger.log(timestamp, 'Fan', '',
+                logger.log(timestamp, 'LEVEL', 'SYSTEM', 'FAN',
                            f"Fan started, exceeded MAX humidity of: {MAX_HUMIDITY}%")
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
                 ssd1306Display.display_text_center_with_border('Fan Started...')
@@ -77,20 +77,20 @@ def task_internal():
                 time.sleep(1)
                 # Reset display back to previous lines
                 ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines, justification='left')
-            if timedelta(seconds= run_time) > MAX_FAN_RUNTIME:
-                MAX_FAN_RUNTIME = timedelta(seconds= run_time)
-            if timedelta(seconds= run_time) > FAN_LIMIT:
+            if timedelta(seconds=run_time) > MAX_FAN_RUNTIME:
+                MAX_FAN_RUNTIME = timedelta(seconds=run_time)
+            if timedelta(seconds=run_time) > FAN_LIMIT:
                 # TODO: Add FAN_LIMIT logic, maybe a method or function?
                 print("Fan limit exceeded")
-                logger.log(timestamp, 'System', 'Fan',
+                logger.log(timestamp, 'WARN', 'SYSTEM', 'FAN',
                            f"Fan time limit exceeded: {FAN_LIMIT}%")
         elif internaloutput['humidity'] < MIN_HUMIDITY:
             stopped, run_time = fanController.set_fan_speed(0)
             if stopped:
                 print(f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY }%")
-                logger.log(timestamp, 'Fan', '',
+                logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN',
                            f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY }%")
-                logger.log(timestamp, 'Fan', '', f"Fan run time: {str(timedelta(seconds=run_time))}")
+                logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan run time: {str(timedelta(seconds=run_time))}")
                 TOTAL_CYCLE_DURATION += timedelta(seconds=run_time)
                 CYCLE_COUNT += 1
                 FAN_RUNNING = False
@@ -99,7 +99,7 @@ def task_internal():
                 elif RUNNING_TIME > FAN_LIMIT:
                     # TODO: Add FAN_LIMIT logic, maybe a method or function?
                     print("Fan limit exceeded")
-                    logger.log(timestamp, 'System', 'Fan',
+                    logger.log(timestamp, 'WARN', 'SYSTEM', 'FAN',
                                f"Fan time limit exceeded: {FAN_LIMIT}%")
                 RUNNING_TIME = 0
                 save_config()
@@ -138,7 +138,7 @@ def task_external():
         save_config()
 
     # No need to check differences as this will be logged every x seconds unlike the internal one
-    logger.log(timestamp, 'Sensors', 'External',
+    logger.log(timestamp, 'INFO', 'SENSORS', 'EXTERNAL',
                f"Temperature: {externaloutput['temperature']}C,"
                f" Humidity: {externaloutput['humidity']}%")
     # Update previous output values
@@ -154,7 +154,7 @@ def task_external():
 def task_fan():
     # TODO: A better way to cycle the fan
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    logger.log(timestamp, 'System', 'Fan', "Fan Cycle Started...")
+    logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', "Fan Cycle Started...")
     print("Fan Cycle Started...")
     fanController.set_fan_speed(50)
     time.sleep(FAN_DURATION)
@@ -214,11 +214,11 @@ def heat_sensor():
     # TODO: Add code to heat sensors when the humidity gets high.
     print("Heating External sensor...")
     externalsensor.heat_sensor()
-    logger.log(timestamp, 'External', '01', "Heating External sensor...")
+    logger.log(timestamp, 'INFO', 'SYSTEM', 'EXTERNAL', "Heating External sensor...")
 
     print("Heating Internal sensor...")
     internalsensor.heat_sensor()
-    logger.log(timestamp, 'Internal', '02', "Heating Internal sensor...")
+    logger.log(timestamp, 'INFO', 'SYSTEM', 'INTERNAL', "Heating Internal sensor...")
 
 
 def read_installed_devices(config):
@@ -254,6 +254,7 @@ def save_config():
     configManager.update_config('cycle_count', CYCLE_COUNT, 'LOG')
     configManager.set_duration_config('total_cycle_duration', TOTAL_CYCLE_DURATION, 'LOG')
     configManager.set_duration_config('MAX_FAN_RUNTIME', MAX_FAN_RUNTIME, 'LOG')
+
 
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
@@ -330,7 +331,7 @@ def cleanup():
     print('Cleaning Up')
     ssd1306Display.display_text_center_with_border('Shutting down...')
     lcd2004Display.display_text_with_border(['Shutting down...'])
-    logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+    logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
                'System', 'System', "Shutting down...")
     # make sure fan is off
     fanController.set_fan_speed(0)
@@ -427,10 +428,10 @@ if __name__ == "__main__":
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         for status in statuses:
             print(status)
-            logger.log(timestamp, 'System', '', status)
+            logger.log(timestamp, 'INFO', 'SYSTEM', 'STATUS', status)
 
         if overall_status == 'bad':
-            logger.log(timestamp, 'System', 'Overall', "Overall Status: Fail")
+            logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
             print("Overall Status: Fail")
             raise ValueError("Overall Status Failed")
 
