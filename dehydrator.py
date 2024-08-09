@@ -67,8 +67,8 @@ def task_internal():
         if internaloutput['humidity'] > MAX_HUMIDITY:
             started, run_time = fanController.set_fan_speed(100)
             if started:
-                logger.log(timestamp, 'LEVEL', 'SYSTEM', 'FAN',
-                           f"Fan started, exceeded MAX humidity of: {MAX_HUMIDITY}%")
+                logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN',
+                           f"Fan started, exceeded MAX humidity of {MAX_HUMIDITY}%")
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
                 ssd1306Display.display_text_center_with_border('Fan Started...')
                 FAN_RUNNING = True
@@ -150,11 +150,11 @@ def task_external():
     time.sleep(.1)
 
 
-@print_elapsed_time
-def task_fan():
-    # TODO: A better way to cycle the fan
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', "Fan Cycle Started...")
+#  @print_elapsed_time
+def _cycle_fan():
+    # TODO: How do we want to engage this?
+    logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+               'INFO', 'SYSTEM', 'FAN', "Fan Cycle Started...")
     print("Fan Cycle Started...")
     fanController.set_fan_speed(50)
     time.sleep(FAN_DURATION)
@@ -206,12 +206,12 @@ def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1, display_inter
 
 def run_scheduler():
     while True:
-        schedule.run_pending()
+        # schedule.run_pending()
         time.sleep(1)
 
 
 def heat_sensor():
-    # TODO: Add code to heat sensors when the humidity gets high.
+    # TODO: Add code to heat sensors when the humidity gets high. Only applies to SHT4X series sensors
     print("Heating External sensor...")
     externalsensor.heat_sensor()
     logger.log(timestamp, 'INFO', 'SYSTEM', 'EXTERNAL', "Heating External sensor...")
@@ -327,9 +327,10 @@ def button_hold_callback(button):
 
 
 def _fan_limit_exceeded():
+    # TODO: Should this be a hard limit? Some way to change this maybe?
     # Cancel all teh jobs
     schedule.clear()
-    ssd1306Display.display_text_center_with_border('FAN LIMIT EXCEEDED...')
+    ssd1306Display.display_text_center_with_border('FAN LIMIT EXCEEDED')
     lcd2004Display.display_text_with_border(['FAN LIMIT EXCEEDED'])
     fanController.set_fan_speed(0)
     save_config()
