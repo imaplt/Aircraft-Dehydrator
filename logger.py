@@ -56,6 +56,7 @@ class Logger:
 
     def log(self, timestamp, level, name, identifier, message):
         log_entry = f'{timestamp}, {level.upper()} {name.upper()},{identifier.upper()},{message}'
+        # Added a level like WARN, INFO etc...
         try:
             self.logger.info(log_entry)
             self.__manage_archives()
