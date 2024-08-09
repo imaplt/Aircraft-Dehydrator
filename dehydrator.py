@@ -280,6 +280,11 @@ def button_pressed_callback(button):
         else:
             print('DN Button Pressed...')
             display_min_humidity(MIN_HUMIDITY)
+    elif mode == 'config':
+        if button_name == 'up':
+            print('Up Config Button Pressed...', mode)
+        else:
+            print('DN Config Button Pressed...')
     else:
         now = time.time()
         if mode == 'max':
