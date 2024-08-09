@@ -334,7 +334,7 @@ def _fan_limit_exceeded():
     fanController.set_fan_speed(0)
     save_config()
     while True:
-        time.sleap()
+        time.sleep(1)
 
 
 def cleanup():
