@@ -206,7 +206,7 @@ def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1, display_inter
 
 def run_scheduler():
     while True:
-        # schedule.run_pending()
+        schedule.run_pending()
         time.sleep(1)
 
 
@@ -313,8 +313,16 @@ def button_hold_callback(button):
     last_press_time[button_name] = time.time()
 
     if up_button.is_active and dn_button.is_active:
-        print("Both buttons are being held...")
-        return
+        if mode != 'config':
+            print("Both buttons are being held...")
+            schedule.clear()
+            time.sleep(.2)
+            print('Starting schedular again...')
+            lcd2004Display.display_text_with_border(['Configuration Mode'])
+            time.sleep(10)
+            mode = 'config'
+            run_scheduler()
+            return
 
     if button_name == 'up':
         print('Up Button Held...')
@@ -324,6 +332,7 @@ def button_hold_callback(button):
         print('DN Button Held...')
         display_min_humidity(MIN_HUMIDITY)
         mode = 'min'
+    time.sleep(.2)
 
 
 def _fan_limit_exceeded():
