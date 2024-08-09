@@ -24,9 +24,9 @@ class Logger:
             if not os.path.isfile(self.filename):
                 with open(self.filename, mode='w', newline='') as file:
                     writer = csv.writer(file)
-                    writer.writerow(['Timestamp', 'Name', 'ID', 'Message'])
+                    writer.writerow(['Timestamp', 'Level', 'Name', 'ID', 'Message'])
                     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                    writer.writerow([timestamp, 'System', 'Log', 'Initial Log File Creation...'])
+                    writer.writerow([timestamp, 'INFO' 'SYSTEM', 'LOG', 'Initial Log File Creation...'])
         except IOError as e:
             print(f"Error initializing log file: {e}")
 
@@ -54,8 +54,8 @@ class Logger:
             os.remove(oldest_file)
             archive_files.remove(oldest_file)
 
-    def log(self, timestamp, name, id, message):
-        log_entry = f'{timestamp},{name},{id},{message}'
+    def log(self, timestamp, level, name, identifier, message):
+        log_entry = f'{timestamp}, {level.upper()} {name.upper()},{identifier.upper()},{message}'
         try:
             self.logger.info(log_entry)
             self.__manage_archives()
