@@ -440,11 +440,11 @@ if __name__ == "__main__":
     oled_lines = [""] * 4  # For four line ssd1306_display...
     lcd_lines = [""] * 4  # For four line ssd1306_display...
 
-    # Initialize fan controller
-    fanController = EMC2101()
     FAN_RUNNING = False
     RUNNING_TIME = 0
     try:
+        # Initialize fan controller
+        fanController = EMC2101()
 
         installed_devices = read_installed_devices(configManager)
         overall_status, statuses = system_status.query_i2c_devices(installed_devices)
