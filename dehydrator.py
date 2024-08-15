@@ -354,15 +354,18 @@ def _fan_limit_exceeded():
 def cleanup():
     # Want to add code here to update display, update log with run time etc
     print('Cleaning Up')
-    ssd1306Display.display_text_center_with_border('Shutting down...')
-    lcd2004Display.display_text_with_border(['Shutting down...'])
-    logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
-               'System', 'System', "Shutting down...")
-    # make sure fan is off
-    fanController.set_fan_speed(0)
-    time.sleep(3)
-    ssd1306Display.clear_screen()
-    lcd2004Display.clear()
+    try:
+        ssd1306Display.display_text_center_with_border('Shutting down...')
+        lcd2004Display.display_text_with_border(['Shutting down...'])
+        logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
+                   'System', 'System', "Shutting down...")
+        # make sure fan is off
+        fanController.set_fan_speed(0)
+        time.sleep(3)
+        ssd1306Display.clear_screen()
+        lcd2004Display.clear()
+    except NameError:
+        print('LCD Not Defined')
 
 
 def isDeviceDetected(statuses, device):
@@ -497,6 +500,15 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected!")
+
+    except ValueError:
+        print("\nValue Error!")
+
+    except OSError:
+        print("\nOS Error!")
+
+    except NameError:
+        print("\nName Error!")
 
     finally:
         cleanup()
