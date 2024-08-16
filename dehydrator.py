@@ -366,6 +366,11 @@ def cleanup():
         lcd2004Display.clear()
     except NameError:
         print('LCD Not Defined')
+        logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'FATAL',
+                   'System', 'System', "No display available...")
+    finally:
+        logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'FATAL',
+                   'System', 'System', "System Shutting down..")
 
 
 def isDeviceDetected(statuses, device):
@@ -446,12 +451,12 @@ if __name__ == "__main__":
     FAN_RUNNING = False
     RUNNING_TIME = 0
     try:
-        # Initialize fan controller
-        fanController = EMC2101()
-
         installed_devices = read_installed_devices(configManager)
         overall_status, statuses = system_status.query_i2c_devices(installed_devices)
         print(f"Overall status: {overall_status}")
+
+        # Initialize fan controller
+        fanController = EMC2101()
 
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         for status in statuses:
