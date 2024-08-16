@@ -455,9 +455,6 @@ if __name__ == "__main__":
         overall_status, statuses = system_status.query_i2c_devices(installed_devices)
         print(f"Overall status: {overall_status}")
 
-        # Initialize fan controller
-        fanController = EMC2101()
-
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         for status in statuses:
             print(status)
@@ -467,6 +464,9 @@ if __name__ == "__main__":
             logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
             print("Overall Status: Fail")
             raise ValueError("Overall Status Failed")
+
+        # Initialize fan controller
+        fanController = EMC2101()
 
         # Initialize displays...
         # Need to do this first so if there is an error cleanup can still work...
