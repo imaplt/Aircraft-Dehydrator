@@ -501,13 +501,14 @@ if __name__ == "__main__":
         task_external()
         if DISPLAY_ENABLED:
             lcd_display(1)
+
         run_scheduler()
 
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected!")
 
-    except ValueError:
-        print("\nValue Error!")
+    except ValueError as e:
+        print("\nValue Error!",e)
 
     except OSError:
         print("\nOS Error!")
