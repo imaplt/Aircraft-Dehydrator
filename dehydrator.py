@@ -513,11 +513,11 @@ if __name__ == "__main__":
         #  TODO: Systems has failed, what to do next?
         print("\nValue Error!",e)
 
-    except OSError:
-        print("\nOS Error!")
+    except OSError as e:
+        print("\nOS Error!", e)
 
-    except NameError:
-        print("\nName Error!")
+    except NameError as e:
+        print("\nName Error!",e)
 
     finally:
         cleanup()
