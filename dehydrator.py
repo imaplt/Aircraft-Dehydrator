@@ -472,12 +472,14 @@ if __name__ == "__main__":
         # Need to do this first so if there is an error cleanup can still work...
         ssd1306_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
         ssd1306Display = SSD1306Display(ssd1306_display_config)
-        lcd2004Display = LCD2004Display()
-        lcd2004Display.clear()
+        if isDeviceDetected(statuses, 'LCD2004'):
+            lcd2004Display = LCD2004Display()
+            lcd2004Display.clear()
+            lcd2004Display.display_text_with_border(['Initializing...'])
 
         # Display centered text
         ssd1306Display.display_text_center("Initializing...")
-        lcd2004Display.display_text_with_border(['Initializing...'])
+
         time.sleep(3)
         internalsensor = Sensor('SHT41_Internal', 0x44)
 
@@ -508,6 +510,7 @@ if __name__ == "__main__":
         print("\nKeyboardInterrupt detected!")
 
     except ValueError as e:
+        #  TODO: Systems has failed, what to do next?
         print("\nValue Error!",e)
 
     except OSError:
