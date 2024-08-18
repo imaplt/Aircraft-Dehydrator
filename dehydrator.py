@@ -466,16 +466,20 @@ if __name__ == "__main__":
             raise ValueError("Overall Status Failed")
 
         # Initialize fan controller
+        print('Initializing fan controller...')
         fanController = EMC2101()
 
-        # Initialize displays...
-        # Need to do this first so if there is an error cleanup can still work...
-        ssd1306_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
-        ssd1306Display = SSD1306Display(ssd1306_display_config)
+        print ('Initializing LCD Display...')
         if isDeviceDetected(statuses, 'LCD2004'):
             lcd2004Display = LCD2004Display()
             lcd2004Display.clear()
             lcd2004Display.display_text_with_border(['Initializing...'])
+
+        # Initialize displays...
+        # Need to do this first so if there is an error cleanup can still work...
+        print('Initializing SSD Display...')
+        ssd1306_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
+        ssd1306Display = SSD1306Display(ssd1306_display_config)
 
         # Display centered text
         ssd1306Display.display_text_center("Initializing...")
