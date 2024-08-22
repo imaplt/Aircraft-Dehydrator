@@ -284,7 +284,7 @@ def button_pressed_callback(button):
         if button_name == 'up':
             print('Up Config Button Pressed...', mode)
         else:
-            print('DN Config Button Pressed...')
+            print('DN Config Button Pressed...', mode)
     else:
         now = time.time()
         if mode == 'max':
