@@ -93,6 +93,7 @@ def task_internal():
                 TOTAL_CYCLE_DURATION += timedelta(seconds=run_time)
                 CYCLE_COUNT += 1
                 FAN_RUNNING = False
+                RUNNING_TIME = timedelta(seconds=run_time)
                 if RUNNING_TIME > MAX_FAN_RUNTIME:
                     MAX_FAN_RUNTIME = RUNNING_TIME
                 if RUNNING_TIME > FAN_LIMIT:
@@ -324,7 +325,7 @@ def button_hold_callback(button):
             time.sleep(.2)
             print('Starting schedular again...')
             lcd2004Display.display_text_with_border(['Configuration Mode'])
-            time.sleep(10)
+            ssd1306Display.display_text_center_with_border('Configuration Mode')
             mode = 'config'
             return
 
