@@ -72,7 +72,7 @@ class EMC2101:
                     # Put code here to stop the fan.
                     self.fan_engaged = False
                     self.sensor.manual_fan_speed = speed
-                    time.sleep(1)  # Allow for it to slow down
+                    time.sleep(.5)  # Allow for it to slow down
                     last_run_time = time.time() - self.start_time
                     return True, last_run_time
                 else:
@@ -83,7 +83,7 @@ class EMC2101:
                     # Put code here to start fan...
                     self.sensor.manual_fan_speed = speed
                     #  Allow for it to stabilize
-                    time.sleep(1)
+                    time.sleep(.5)
                     self.fan_engaged = True
                     return True, 0
                 else:

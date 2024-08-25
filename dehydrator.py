@@ -25,6 +25,9 @@ def print_elapsed_time(func):
         return result
     return wrapper
 
+def celsius_to_fahrenheit(celsius):
+    fahrenheit = (celsius * 9/5) + 32
+    return round(fahrenheit, 1)
 
 # @print_elapsed_time
 def task_internal():
@@ -66,6 +69,8 @@ def task_internal():
                                    text=f"{internaloutput['humidity']}%" f" - {internaloutput['temperature']}°C")
         if internaloutput['humidity'] > MAX_HUMIDITY:
             started, run_time = fanController.set_fan_speed(100)
+            # Set start time here.
+            fanController.start_time = time.time()
             if started:
                 logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN',
                            f"Fan started, exceeded MAX humidity of {MAX_HUMIDITY}%")
@@ -75,6 +80,7 @@ def task_internal():
                 time.sleep(1)
                 # Reset display back to previous lines
                 ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines, justification='left')
+                print(run_time, MAX_FAN_RUNTIME, FAN_LIMIT)
             if timedelta(seconds=run_time) > MAX_FAN_RUNTIME:
                 MAX_FAN_RUNTIME = timedelta(seconds=run_time)
             if timedelta(seconds=run_time) > FAN_LIMIT:
@@ -94,6 +100,7 @@ def task_internal():
                 CYCLE_COUNT += 1
                 FAN_RUNNING = False
                 RUNNING_TIME = timedelta(seconds=run_time)
+                #  TODO: Saving limit multiple times
                 if RUNNING_TIME > MAX_FAN_RUNTIME:
                     MAX_FAN_RUNTIME = RUNNING_TIME
                 if RUNNING_TIME > FAN_LIMIT:
@@ -342,7 +349,7 @@ def button_hold_callback(button):
 
 def _fan_limit_exceeded():
     # TODO: Should this be a hard limit? Some way to change this maybe?
-    # Cancel all teh jobs
+    # Cancel all the jobs
     schedule.clear()
     ssd1306Display.display_text_center_with_border('FAN LIMIT EXCEEDED')
     lcd2004Display.display_text_with_border(['FAN LIMIT EXCEEDED'])
@@ -428,15 +435,16 @@ if __name__ == "__main__":
     # Initialize current screen
     task_alternate_screens.current_screen = 1
 
-    # GPIO setup using gpiozero for input buttons
-    up_button = Button(UP_BUTTON_PIN, pull_up=True, bounce_time=0.2, hold_time=3)
-    dn_button = Button(DN_BUTTON_PIN, pull_up=True, bounce_time=0.2, hold_time=3)
-
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}
-    button_hold_time = 2
+    BUTTON_HOLD_TIME = 3
     humidity_changed = False
     mode = None
+
+    # GPIO setup using gpiozero for input buttons
+    up_button = Button(UP_BUTTON_PIN, pull_up=True, bounce_time=0.2, hold_time=BUTTON_HOLD_TIME)
+    dn_button = Button(DN_BUTTON_PIN, pull_up=True, bounce_time=0.2, hold_time=BUTTON_HOLD_TIME)
+
 
     # Attach event handlers
     up_button.when_pressed = button_pressed_callback
