@@ -177,7 +177,7 @@ def lcd_display(screen_no):
         lcd_lines[3] = f"Ext Min:{EXTERNAL_LOW_TEMP}C {EXTERNAL_LOW_HUMIDITY}%"
         lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
     else:
-        duration = timedelta(seconds=int(TOTAL_CYCLE_DURATION))
+        duration = timedelta(seconds=TOTAL_CYCLE_DURATION)
         lcd_lines[0] = "Fan Stats..."
         lcd_lines[1] = f"Cycles: {CYCLE_COUNT}"
         lcd_lines[2] = f"Duration: {duration}s"
