@@ -69,9 +69,9 @@ def task_internal():
                                    text=f"{internaloutput['humidity']}%" f" - {internaloutput['temperature']}°C")
         if internaloutput['humidity'] > MAX_HUMIDITY:
             started, run_time = fanController.set_fan_speed(100)
-            # Set start time here.
-            fanController.start_time = time.time()
             if started:
+                # Set start time here.
+                fanController.start_time = time.time()
                 logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN',
                            f"Fan started, exceeded MAX humidity of {MAX_HUMIDITY}%")
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
