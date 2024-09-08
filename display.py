@@ -132,6 +132,59 @@ class BONNETDisplay:
         color = COLORS[color_name]
         return tuple(int(c * brightness_factor) for c in color)
 
+    def blink_text(self, text, color_name="white", brightness_factor=1.0, blink_speed=0.5, blink_times=5):
+        color = self.set_brightness(color_name, brightness_factor)
+        bbox = self.draw.textbbox((0, 0), text, font=self.font)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+
+        # Center the text on the screen
+        x_position = (self.width - text_width) // 2
+        y_position = (self.height - text_height) // 2
+
+        # Blink the text
+        for _ in range(blink_times):
+            self.clear_screen()
+            # Show text
+            self.draw.text((x_position, y_position), text, font=self.font, fill=color)
+            self.disp.image(self.image)
+            time.sleep(blink_speed)
+
+            # Clear text (make it disappear)
+            self.clear_screen()
+            self.disp.image(self.image)
+            time.sleep(blink_speed)
+
+    def fade_text(self, text, color_name="white", fade_in_time=2.0, fade_out_time=2.0, steps=10):
+        bbox = self.draw.textbbox((0, 0), text, font=self.font)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+
+        # Center the text on the screen
+        x_position = (self.width - text_width) // 2
+        y_position = (self.height - text_height) // 2
+
+        # Fade in
+        for i in range(steps + 1):
+            brightness_factor = i / steps
+            color = self.set_brightness(color_name, brightness_factor)
+            self.clear_screen()
+            self.draw.text((x_position, y_position), text, font=self.font, fill=color)
+            self.disp.image(self.image)
+            time.sleep(fade_in_time / steps)
+
+        # Pause before fade-out
+        time.sleep(0.5)
+
+        # Fade out
+        for i in range(steps + 1):
+            brightness_factor = 1.0 - (i / steps)
+            color = self.set_brightness(color_name, brightness_factor)
+            self.clear_screen()
+            self.draw.text((x_position, y_position), text, font=self.font, fill=color)
+            self.disp.image(self.image)
+            time.sleep(fade_out_time / steps)
+
     def display_text_center(self, text, color_name="white", brightness_factor=1.0, justification='center'):
         self.clear_screen()
 

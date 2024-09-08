@@ -267,83 +267,34 @@ def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
 
     now = time.time()
-    button_name = 'up' if button.pin.number == UP_BUTTON_PIN else 'dn'
-    # last_press_time[button_name] = now
 
-    print(f"Button: {button_name} Mode: {mode}")
+    if button.pin.number == BTN_L_PIN:
+        print("Left button pressed")
+    elif button.pin.number == BTN_R_PIN:
+        print("Right button pressed")
+    elif button.pin.number == BTN_U_PIN:
+        print("Up button pressed")
+    elif button.pin.number == BTN_D_PIN:
+        print("Down button pressed")
+    elif button.pin.number == BTN_C_PIN:
+        print("Center button pressed")
+    elif button.pin.number == BTN_A_PIN:
+        print("A button pressed")
+    elif button.pin.number == BTN_B_PIN:
+        print("B button pressed")
+    else:
+        print("Unknown button")
+
     print(f"Up last pressed: {last_press_time['up']} DN last pressed: {last_press_time['dn']}")
     print("Humidity Changed: ", humidity_changed)
 
-    if humidity_changed and (now - last_press_time['up'] > 3 and now - last_press_time['dn'] > 3):
-        save_config()
-        humidity_changed = False
-        mode = None
 
-    # Show the current setting when the button is pressed and released
-    if mode is None:
-        if button_name == 'up':
-            print('Up Button Pressed...', mode)
-            display_max_humidity(MAX_HUMIDITY)
-        else:
-            print('DN Button Pressed...')
-            display_min_humidity(MIN_HUMIDITY)
-    elif mode == 'config':
-        if button_name == 'up':
-            print('Up Config Button Pressed...', mode)
-        else:
-            print('DN Config Button Pressed...', mode)
-    else:
-        now = time.time()
-        if mode == 'max':
-            if button_name == 'up':
-                MAX_HUMIDITY += 1
-                display_max_humidity(MAX_HUMIDITY)
-                humidity_changed = True
-                last_press_time['up'] = now
-            elif button_name == 'dn':
-                MAX_HUMIDITY -= 1
-                display_max_humidity(MAX_HUMIDITY)
-                humidity_changed = True
-                last_press_time['dn'] = now
-        elif mode == 'min':
-            if button_name == 'up':
-                MIN_HUMIDITY += 1
-                display_min_humidity(MIN_HUMIDITY)
-                humidity_changed = True
-                last_press_time['up'] = now
-            elif button_name == 'dn':
-                MIN_HUMIDITY -= 1
-                display_min_humidity(MIN_HUMIDITY)
-                humidity_changed = True
-                last_press_time['dn'] = now
 
 
 def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
 
-    button_name = 'up' if button.pin.number == UP_BUTTON_PIN else 'dn'
-    last_press_time[button_name] = time.time()
 
-    if up_button.is_active and dn_button.is_active:
-        if mode != 'config':
-            print("Both buttons are being held...")
-            schedule.clear()
-            time.sleep(.2)
-            print('Starting schedular again...')
-            lcd2004Display.display_text_with_border(['Configuration Mode'])
-            BONNETDisplay.display_text_center_with_border('Configuration Mode')
-            mode = 'config'
-            return
-
-    if button_name == 'up':
-        print('Up Button Held...')
-        display_max_humidity(MAX_HUMIDITY)
-        mode = 'max'
-    else:
-        print('DN Button Held...')
-        display_min_humidity(MIN_HUMIDITY)
-        mode = 'min'
-    time.sleep(.2)
 
 
 def _fan_limit_exceeded():
@@ -407,8 +358,13 @@ if __name__ == "__main__":
     OLED_ROTATION = configManager.get_int_config('OLED_ROTATION')
 
     # Get button pin info
-    UP_BUTTON_PIN = configManager.get_int_config('up_button_pin')
-    DN_BUTTON_PIN = configManager.get_int_config('dn_button_pin')
+    BTN_L_PIN = configManager.get_int_config('BTN_L_PIN')
+    BTN_R_PIN = configManager.get_int_config('BTN_R_PIN')
+    BTN_U_PIN = configManager.get_int_config('BTN_U_PIN')
+    BTN_D_PIN = configManager.get_int_config('BTN_D_PIN')
+    BTN_C_PIN = configManager.get_int_config('BTN_C_PIN')
+    BTN_A_PIN = configManager.get_int_config('BTN_A_PIN')
+    BTN_B_PIN = configManager.get_int_config('BTN_B_PIN')
 
     # Get display related config info
     FONT = configManager.get_config('font')
@@ -443,16 +399,14 @@ if __name__ == "__main__":
     mode = None
 
     # GPIO setup using gpiozero for input buttons
-    up_button = Button(UP_BUTTON_PIN, pull_up=True, bounce_time=0.2, hold_time=BUTTON_HOLD_TIME)
-    dn_button = Button(DN_BUTTON_PIN, pull_up=True, bounce_time=0.2, hold_time=BUTTON_HOLD_TIME)
+    btn_lt = Button(BTN_L_PIN, pull_up=True, bounce_time=0.2, hold_time=BUTTON_HOLD_TIME)
+    btn_rt = Button(BTN_R_PIN, pull_up=True, bounce_time=0.2, hold_time=BUTTON_HOLD_TIME)
 
 
     # Attach event handlers
-    up_button.when_pressed = button_pressed_callback
-    up_button.when_held = button_hold_callback
+    btn_lt.when_pressed = button_pressed_callback
+    btn_rt.when_pressed = button_pressed_callback
 
-    dn_button.when_pressed = button_pressed_callback
-    dn_button.when_held = button_hold_callback
 
     # Initialize lines
     oled_lines = [""] * 4  # For four line ssd1306_display...
@@ -489,14 +443,13 @@ if __name__ == "__main__":
 
         # Display centered text
         BONNETDisplay.display_text_center("Initializing...")
-
-        time.sleep(5)
+        time.sleep(2)
 
         # Initialize fan controller
         print('Initializing fan controller...')
         fanController = EMC2101()
 
-        time.sleep(3)
+        time.sleep(2)
         internalsensor = Sensor('SHT41_Internal', 0x44)
 
         # sht30_sensor = Sensor('SHT30', 0x44)
