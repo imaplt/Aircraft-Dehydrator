@@ -32,6 +32,8 @@ class BONNETDisplay:
         self.cs_pin = DigitalInOut(board.CE0)
         self.dc_pin = DigitalInOut(board.D25)
         self.reset_pin = DigitalInOut(board.D24)
+        self.width = 240
+        self.height = 240
         self.BAUDRATE = 24000000
 
 		# Initialize the interface
