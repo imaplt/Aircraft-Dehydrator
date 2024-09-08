@@ -473,10 +473,6 @@ if __name__ == "__main__":
             print("Overall Status: Fail")
             # raise ValueError("Overall Status Failed")
 
-        # Initialize fan controller
-        print('Initializing fan controller...')
-        fanController = EMC2101()
-
         print ('Initializing LCD Display...')
         if isDeviceDetected(statuses, 'LCD2004'):
             lcd2004Display = LCD2004Display()
@@ -491,6 +487,11 @@ if __name__ == "__main__":
 
         # Display centered text
         ssd1306Display.display_text_center("Initializing...")
+
+        # Initialize fan controller
+        print('Initializing fan controller...')
+        fanController = EMC2101()
+
 
         time.sleep(3)
         internalsensor = Sensor('SHT41_Internal', 0x44)
