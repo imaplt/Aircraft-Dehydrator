@@ -8,6 +8,7 @@ import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import adafruit_ssd1306
 import adafruit_bitbangio
 from fan_controller import EMC2101
+from adafruit_rgb_display import st7789
 
 
 def query_i2c_devices(installed_devices):
@@ -20,6 +21,7 @@ def query_i2c_devices(installed_devices):
         "SHT41_External": {"address": 0x44, "status": "Not detected"},
         "LCD2004": {"address": 0x27, "status": "Not detected"},
         "LCD1602": {"address": 0x27, "status": "Not detected"},
+        "BONNET": {"address": SPI, "status": "Not detected"},
         "EMC2101": {"address": 0x4C, "status": "Not detected"},
         "FAN": {"address": 0x3C, "status": "Not detected"},
         "SSD1306": {"address": 0x3C, "status": "Not detected"}
@@ -116,6 +118,19 @@ def query_i2c_devices(installed_devices):
             devices["SSD1306"]["status"] = "Detected"
         except Exception as e:
             devices["SSD1306"]["status"] = f"Error: {str(e)}"
+            overall_status = "bad"
+
+    if "BONNET" in installed_devices:
+        try:
+            spi = board.SPI()
+            cs_pin = DigitalInOut(board.CE0)
+            dc_pin = DigitalInOut(board.D25)
+            reset_pin = DigitalInOut(board.D24)
+            BAUDRATE = 24000000
+            disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180, cs=cs_pin, dc=dc_pin, rst=reset_pin, baudrate=BAUDRATE,)
+            devices["BONNET"]["status"] = "Detected"
+        except Exception as e:
+            devices["BONNET"]["status"] = f"Error: {str(e)}"
             overall_status = "bad"
 
     for device in installed_devices:
