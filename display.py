@@ -82,7 +82,7 @@ class BONNETDisplay:
 
         # Set the font using config_manager
         self.set_font(self.config_manager.get_font_path(), self.config_manager.get_font_size())
-        self.set_font()
+        # self.set_font()
 
         # Initialize lines
         self.oled_lines = [""] * 4
