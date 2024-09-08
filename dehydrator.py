@@ -510,7 +510,7 @@ if __name__ == "__main__":
         internalprevious_output = {'temperature': 0, 'humidity': 0}
 
         print("Internal Mode: ", internalsensor.sensor_mode())  # TODO: Figure out what mode is...
-        ssd1306Display.display_default_four_rows()
+        BONNETDisplay.display_default_four_rows()
         time.sleep(2)
         schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL,
                        fan_interval=TASK_FAN, display_interval=TASK_DISPLAY_ROTATION)
