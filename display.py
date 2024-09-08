@@ -10,6 +10,27 @@ from digitalio import DigitalInOut, Direction
 from adafruit_rgb_display import st7789
 from colorsys import hsv_to_rgb
 
+# Color definitions as RGB tuples
+COLORS = {
+    "red": (255, 0, 0),
+    "green": (0, 255, 0),
+    "blue": (0, 0, 255),
+    "yellow": (255, 255, 0),
+    "cyan": (0, 255, 255),
+    "magenta": (255, 0, 255),
+    "white": (255, 255, 255),
+    "black": (0, 0, 0),
+    "orange": (255, 165, 0),
+    "purple": (128, 0, 128),
+    "pink": (255, 192, 203),
+    "brown": (165, 42, 42),
+    "gray": (128, 128, 128),
+    "light_gray": (211, 211, 211),
+    "dark_gray": (169, 169, 169),
+    "gold": (255, 215, 0),
+    "silver": (192, 192, 192),
+}
+
 class DisplayConfig:
     def __init__(self, font_path=None, font_size=10, border_size=1):
         self.font_path = font_path
@@ -24,6 +45,11 @@ class DisplayConfig:
 
     def get_border_size(self):
         return self.border_size
+
+    # Function to adjust brightness of a given color
+    def dim_color(self, color, brightness_factor):
+        return tuple(int(c * brightness_factor) for c in color)
+
 
 class BONNETDisplay:
     def __init__(self, configuration):
@@ -52,7 +78,7 @@ class BONNETDisplay:
         self.draw = ImageDraw.Draw(self.image)
 
         # Set the font using config_manager
-        # self.set_font(self.config_manager.get_font_path(), self.config_manager.get_font_size())
+        self.set_font(self.config_manager.get_font_path(), self.config_manager.get_font_size())
         self.set_font()
 
         # Initialize lines
