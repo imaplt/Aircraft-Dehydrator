@@ -483,7 +483,7 @@ if __name__ == "__main__":
 
         # Initialize displays...
         # Need to do this first so if there is an error cleanup can still work...
-        print('Initializing SSD Display...')
+        print('Initializing Primary Display...')
         BONNET_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
         BONNETDisplay = BONNETDisplay(BONNET_display_config)
 

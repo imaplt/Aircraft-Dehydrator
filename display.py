@@ -42,6 +42,11 @@ class BONNETDisplay:
         # Initialize display.
         self.disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180, cs=self.cs_pin, dc=self.dc_pin, rst=self.reset_pin, baudrate=self.BAUDRATE,)
 
+        # Turn on the Backlight
+        backlight = DigitalInOut(board.D26)
+        backlight.switch_to_output()
+        backlight.value = True
+
         # Create blank image for drawing.
         self.image = Image.new('RGB', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
@@ -60,6 +65,18 @@ class BONNETDisplay:
     def clear_screen(self):
         self.disp.fill(0)
         self._clear_image()
+        # Create blank image for drawing.
+        # Make sure to create image with mode 'RGB' for color.
+        width = self.disp.width
+        height = self.disp.height
+        image = Image.new("RGB", (width, height))
+
+        # Get drawing object to draw on image.
+        draw = ImageDraw.Draw(image)
+
+        # Clear display.
+        draw.rectangle((0, 0, width, height), outline=0, fill=(255, 0, 0))
+        self.disp.image(image)
 
     def _clear_image(self):
         self.image = Image.new('RGB', (self.width, self.height))
