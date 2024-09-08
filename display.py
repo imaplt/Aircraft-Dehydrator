@@ -31,15 +31,15 @@ class BONNETDisplay:
         self.config_manager = configuration
         
         # Create the display
-		self.cs_pin = DigitalInOut(board.CE0)
-		self.dc_pin = DigitalInOut(board.D25)
-		self.reset_pin = DigitalInOut(board.D24)
-		self.BAUDRATE = 24000000
+        self.cs_pin = DigitalInOut(board.CE0)
+        self.dc_pin = DigitalInOut(board.D25)
+        self.reset_pin = DigitalInOut(board.D24)
+        self.BAUDRATE = 24000000
 
 		# Initialize the interface
 		spi = board.SPI()
 		# Initialize display.
-		self.disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180, cs=cs_pin, dc=dc_pin, rst=reset_pin, baudrate=BAUDRATE,)
+        self.disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180, cs=cs_pin, dc=dc_pin, rst=reset_pin, baudrate=BAUDRATE,)
 
 		# Create blank image for drawing.
         self.image = Image.new('1', (self.width, self.height))
