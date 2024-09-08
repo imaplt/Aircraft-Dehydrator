@@ -98,7 +98,6 @@ class BONNETDisplay:
         position = (x_position, (self.height - text_height) // 2)
         self.draw.text(position, text, font=self.font, fill=255)
         self.disp.image(self.image)
-        self.disp.show()
 
     def display_default_four_rows(self):
         # Yeah, I know. I could make this prettier
@@ -127,7 +126,6 @@ class BONNETDisplay:
             position = (x_position, i * line_height + (line_height - text_height) // 2)
             self.draw.text(position, text, font=self.font, fill=255)
         self.disp.image(self.image)
-        self.disp.show()
 
     def update_line(self, line_number, text, justification='center'):
         if line_number < 0 or line_number >= 4:
@@ -156,7 +154,6 @@ class BONNETDisplay:
         self.draw.text(position, text, font=self.font, fill=255)
 
         self.disp.image(self.image)
-        self.disp.show()
 
     def display_text_center_with_border(self, text):
         self.clear_screen()
@@ -169,7 +166,6 @@ class BONNETDisplay:
         position = ((self.width - text_width) // 2, (self.height - text_height) // 2)
         self.draw.text(position, text, font=self.font, fill=255)
         self.disp.image(self.image)
-        self.disp.show()
 
 
 class SSD1306Display:
