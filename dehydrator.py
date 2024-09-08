@@ -6,7 +6,7 @@ from datetime import timedelta
 from config_manager import ConfigManager
 from logger import Logger as Log
 import system_status
-from display import BONNETDisplay as SSD1306Display, LCD2004Display, DisplayConfig
+from display import BONNETDisplay, LCD2004Display, DisplayConfig
 from gpiozero import Button
 from sensor import Sensor
 from fan_controller import EMC2101
@@ -65,7 +65,7 @@ def task_internal():
         internalprevious_output['temperature'] = internaloutput['temperature']
         internalprevious_output['humidity'] = internaloutput['humidity']
         print("Internal Sensor Reading:", internaloutput)
-        ssd1306Display.update_line(1, justification='left',
+        BONNETDisplay.update_line(1, justification='left',
                                    text=f"{internaloutput['humidity']}%" f" - {internaloutput['temperature']}°C")
         if internaloutput['humidity'] > MAX_HUMIDITY:
             started, run_time = fanController.set_fan_speed(100)
@@ -75,11 +75,11 @@ def task_internal():
                 logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN',
                            f"Fan started, exceeded MAX humidity of {MAX_HUMIDITY}%")
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
-                ssd1306Display.display_text_center_with_border('Fan Started...')
+                BONNETDisplay.display_text_center_with_border('Fan Started...')
                 FAN_RUNNING = True
                 time.sleep(1)
                 # Reset display back to previous lines
-                ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines, justification='left')
+                BONNETDisplay.display_four_rows_center(BONNETDisplay.oled_lines, justification='left')
                 print(run_time, MAX_FAN_RUNTIME, FAN_LIMIT)
             if timedelta(seconds=run_time) > MAX_FAN_RUNTIME:
                 MAX_FAN_RUNTIME = timedelta(seconds=run_time)
@@ -111,10 +111,10 @@ def task_internal():
                     _fan_limit_exceeded()
                 RUNNING_TIME = 0
                 save_config()
-                ssd1306Display.display_text_center_with_border('Fan Stopped...')
+                BOONETDisplay.display_text_center_with_border('Fan Stopped...')
                 time.sleep(1)
                 # Reset display back to prev lines
-                ssd1306Display.display_four_rows_center(ssd1306Display.oled_lines, justification='left')
+                BONNETDisplay.display_four_rows_center(BONNETDisplay.oled_lines, justification='left')
                 time.sleep(.1)  # Adjust as needed
 
 # @print_elapsed_time
@@ -331,7 +331,7 @@ def button_hold_callback(button):
             time.sleep(.2)
             print('Starting schedular again...')
             lcd2004Display.display_text_with_border(['Configuration Mode'])
-            ssd1306Display.display_text_center_with_border('Configuration Mode')
+            BONNETDisplay.display_text_center_with_border('Configuration Mode')
             mode = 'config'
             return
 
@@ -350,7 +350,7 @@ def _fan_limit_exceeded():
     # TODO: Should this be a hard limit? Some way to change this maybe?
     # Cancel all the jobs
     schedule.clear()
-    ssd1306Display.display_text_center_with_border('FAN LIMIT EXCEEDED')
+    BONNETDisplay.display_text_center_with_border('FAN LIMIT EXCEEDED')
     lcd2004Display.display_text_with_border(['FAN LIMIT EXCEEDED'])
     fanController.set_fan_speed(0)
     save_config()
@@ -362,14 +362,14 @@ def cleanup():
     # Want to add code here to update display, update log with run time etc
     print('Cleaning Up')
     try:
-        ssd1306Display.display_text_center_with_border('Shutting down...')
+        BONNETDisplay.display_text_center_with_border('Shutting down...')
         lcd2004Display.display_text_with_border(['Shutting down...'])
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
                    'System', 'System', "Shutting down...")
         # make sure fan is off
         fanController.set_fan_speed(0)
         time.sleep(3)
-        ssd1306Display.clear_screen()
+        BONNETDisplay.clear_screen()
         lcd2004Display.clear()
     except NameError:
         print('LCD Not Defined')
