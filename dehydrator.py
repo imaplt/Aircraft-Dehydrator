@@ -490,10 +490,11 @@ if __name__ == "__main__":
         # Display centered text
         BONNETDisplay.display_text_center("Initializing...")
 
+        time.sleep(5)
+
         # Initialize fan controller
         print('Initializing fan controller...')
         fanController = EMC2101()
-
 
         time.sleep(3)
         internalsensor = Sensor('SHT41_Internal', 0x44)

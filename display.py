@@ -37,12 +37,12 @@ class BONNETDisplay:
         self.height = 240
         self.BAUDRATE = 24000000
 
-		# Initialize the interface
+        # Initialize the interface
         spi = board.SPI()
         # Initialize display.
         self.disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180, cs=self.cs_pin, dc=self.dc_pin, rst=self.reset_pin, baudrate=self.BAUDRATE,)
 
-		# Create blank image for drawing.
+        # Create blank image for drawing.
         self.image = Image.new('RGB', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
 
