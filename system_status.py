@@ -7,6 +7,7 @@ import adafruit_shtc3
 import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import adafruit_ssd1306
 import adafruit_bitbangio
+from digitalio import DigitalInOut, Direction
 from fan_controller import EMC2101
 from adafruit_rgb_display import st7789
 
