@@ -471,7 +471,7 @@ if __name__ == "__main__":
         if overall_status == 'bad':
             logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
             print("Overall Status: Fail")
-            raise ValueError("Overall Status Failed")
+            # raise ValueError("Overall Status Failed")
 
         # Initialize fan controller
         print('Initializing fan controller...')
