@@ -111,7 +111,7 @@ def task_internal():
                     _fan_limit_exceeded()
                 RUNNING_TIME = 0
                 save_config()
-                BOONETDisplay.display_text_center_with_border('Fan Stopped...')
+                BONNETDisplay.display_text_center_with_border('Fan Stopped...')
                 time.sleep(1)
                 # Reset display back to prev lines
                 BONNETDisplay.display_four_rows_center(BONNETDisplay.oled_lines, justification='left')
@@ -152,7 +152,7 @@ def task_external():
     externalprevious_output['temperature'] = externaloutput['temperature']
     externalprevious_output['humidity'] = externaloutput['humidity']
     print("External Sensor Reading:", externaloutput)
-    ssd1306Display.update_line(3, justification='left',
+    BONNETDisplay.update_line(3, justification='left',
                                text=f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
     time.sleep(.1)
 
@@ -363,14 +363,16 @@ def cleanup():
     print('Cleaning Up')
     try:
         BONNETDisplay.display_text_center_with_border('Shutting down...')
-        lcd2004Display.display_text_with_border(['Shutting down...'])
+        if isDeviceDetected("LCD2004"):
+        	lcd2004Display.display_text_with_border(['Shutting down...'])
+            lcd2004Display.clear()
+
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
                    'System', 'System', "Shutting down...")
         # make sure fan is off
         fanController.set_fan_speed(0)
         time.sleep(3)
         BONNETDisplay.clear_screen()
-        lcd2004Display.clear()
     except NameError:
         print('LCD Not Defined')
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'FATAL',
