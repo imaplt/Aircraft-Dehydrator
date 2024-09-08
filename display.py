@@ -37,8 +37,8 @@ class BONNETDisplay:
         self.BAUDRATE = 24000000
 
 		# Initialize the interface
-		spi = board.SPI()
-		# Initialize display.
+        spi = board.SPI()
+        # Initialize display.
         self.disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180, cs=cs_pin, dc=dc_pin, rst=reset_pin, baudrate=BAUDRATE,)
 
 		# Create blank image for drawing.
