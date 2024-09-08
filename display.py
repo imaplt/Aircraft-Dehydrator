@@ -30,7 +30,7 @@ COLORS = {
 }
 
 class DisplayConfig:
-    def __init__(self, font_path=None, font_size=10, border_size=1):
+    def __init__(self, font_path=None, font_size=18, border_size=2):
         self.font_path = font_path
         self.font_size = font_size
         self.border_size = border_size
