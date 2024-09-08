@@ -81,6 +81,7 @@ class BONNETDisplay:
         self.draw = ImageDraw.Draw(self.image)
 
         # Set the font using config_manager
+        # self.set_font(self.config_manager.get_font_path(), self.config_manager.get_font_size())
         self.set_font()
 
         # Initialize lines
@@ -109,7 +110,7 @@ class BONNETDisplay:
         self.image = Image.new('RGB', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
 
-    def set_font(self, font_path=None, font_size=10):
+    def set_font(self, font_path=None, font_size=16):
         if font_path:
             self.font = ImageFont.truetype(font_path, font_size)
         else:
