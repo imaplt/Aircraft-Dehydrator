@@ -484,11 +484,11 @@ if __name__ == "__main__":
         # Initialize displays...
         # Need to do this first so if there is an error cleanup can still work...
         print('Initializing SSD Display...')
-        ssd1306_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
-        ssd1306Display = SSD1306Display(ssd1306_display_config)
+        BONNET_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
+        BONNETDisplay = BONNETDisplay(BONNET_display_config)
 
         # Display centered text
-        ssd1306Display.display_text_center("Initializing...")
+        BONNETDisplay.display_text_center("Initializing...")
 
         # Initialize fan controller
         print('Initializing fan controller...')
