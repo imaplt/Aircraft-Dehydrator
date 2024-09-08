@@ -6,7 +6,7 @@ from datetime import timedelta
 from config_manager import ConfigManager
 from logger import Logger as Log
 import system_status
-from display import SSD1306Display, LCD2004Display, DisplayConfig
+from display import BONNETDisplay as SSD1306Display, LCD2004Display, DisplayConfig
 from gpiozero import Button
 from sensor import Sensor
 from fan_controller import EMC2101
