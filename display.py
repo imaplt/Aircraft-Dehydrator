@@ -54,12 +54,10 @@ class BONNETDisplay:
 
     def reset_screen(self):
         self.disp.fill(0)
-        self.disp.show()
         self._clear_image()
 
     def clear_screen(self):
         self.disp.fill(0)
-        self.disp.show()
         self._clear_image()
 
     def _clear_image(self):
