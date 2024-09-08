@@ -4,8 +4,6 @@ import time
 import smbus2 as smbus
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
-import random
-from colorsys import hsv_to_rgb
 from digitalio import DigitalInOut, Direction
 from adafruit_rgb_display import st7789
 from colorsys import hsv_to_rgb
@@ -46,15 +44,11 @@ class DisplayConfig:
     def get_border_size(self):
         return self.border_size
 
-    # Function to adjust brightness of a given color
-    def dim_color(self, color, brightness_factor):
-        return tuple(int(c * brightness_factor) for c in color)
-
 
 class BONNETDisplay:
     def __init__(self, configuration):
         self.config_manager = configuration
-        
+
         # Create the display
         self.cs_pin = DigitalInOut(board.CE0)
         self.dc_pin = DigitalInOut(board.D25)
@@ -66,7 +60,16 @@ class BONNETDisplay:
         # Initialize the interface
         spi = board.SPI()
         # Initialize display.
-        self.disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180, cs=self.cs_pin, dc=self.dc_pin, rst=self.reset_pin, baudrate=self.BAUDRATE,)
+        self.disp = st7789.ST7789(
+            spi,
+            height=240,
+            y_offset=80,
+            rotation=180,
+            cs=self.cs_pin,
+            dc=self.dc_pin,
+            rst=self.reset_pin,
+            baudrate=self.BAUDRATE,
+        )
 
         # Turn on the Backlight
         backlight = DigitalInOut(board.D26)
@@ -78,7 +81,6 @@ class BONNETDisplay:
         self.draw = ImageDraw.Draw(self.image)
 
         # Set the font using config_manager
-        # self.set_font(self.config_manager.get_font_path(), self.config_manager.get_font_size())
         self.set_font()
 
         # Initialize lines
@@ -92,7 +94,6 @@ class BONNETDisplay:
         self.disp.fill(0)
         self._clear_image()
         # Create blank image for drawing.
-        # Make sure to create image with mode 'RGB' for color.
         width = self.disp.width
         height = self.disp.height
         image = Image.new("RGB", (width, height))
@@ -100,8 +101,8 @@ class BONNETDisplay:
         # Get drawing object to draw on image.
         draw = ImageDraw.Draw(image)
 
-        # Clear display.
-        draw.rectangle((0, 0, width, height), outline=0, fill=(255, 0, 0))
+        # Clear display (fill with black)
+        draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
         self.disp.image(image)
 
     def _clear_image(self):
@@ -122,9 +123,20 @@ class BONNETDisplay:
         max_chars = self.width // char_width
         return max_chars
 
-    # The justification parameter can be 'left', 'right', or 'center' (default).
-    def display_text_center(self, text, justification='center'):
+    def set_brightness(self, color_name, brightness_factor):
+        """ Adjust brightness of the named color. """
+        if color_name not in COLORS:
+            raise ValueError(f"Color '{color_name}' not found!")
+
+        color = COLORS[color_name]
+        return tuple(int(c * brightness_factor) for c in color)
+
+    def display_text_center(self, text, color_name="white", brightness_factor=1.0, justification='center'):
         self.clear_screen()
+
+        # Get color with brightness applied
+        color = self.set_brightness(color_name, brightness_factor)
+
         bbox = self.draw.textbbox((0, 0), text, font=self.font)
         text_width = bbox[2] - bbox[0]
         text_height = bbox[3] - bbox[1]
@@ -138,18 +150,22 @@ class BONNETDisplay:
             x_position = (self.width - text_width) // 2
 
         position = (x_position, (self.height - text_height) // 2)
-        self.draw.text(position, text, font=self.font, fill=255)
+        self.draw.text(position, text, font=self.font, fill=color)
         self.disp.image(self.image)
 
-    def display_default_four_rows(self):
-        # Yeah, I know. I could make this prettier
+    def display_default_four_rows(self, color_name="white", brightness_factor=1.0):
         self.oled_lines = ["Internal:", "reading...", "External:", "reading..."]
-        self.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], justification='left')
+        self.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], color_name,
+                                      brightness_factor, justification='left')
 
-    def display_four_rows_center(self, texts, justification='center'):
+    def display_four_rows_center(self, texts, color_name="white", brightness_factor=1.0, justification='center'):
         self.clear_screen()
         num_lines = min(4, len(texts))
         line_height = self.height // num_lines
+
+        # Get color with brightness applied
+        color = self.set_brightness(color_name, brightness_factor)
+
         for i in range(num_lines):
             text = texts[i]
             self.oled_lines[i] = text
@@ -166,14 +182,17 @@ class BONNETDisplay:
                 x_position = (self.width - text_width) // 2
 
             position = (x_position, i * line_height + (line_height - text_height) // 2)
-            self.draw.text(position, text, font=self.font, fill=255)
+            self.draw.text(position, text, font=self.font, fill=color)
         self.disp.image(self.image)
 
-    def update_line(self, line_number, text, justification='center'):
+    def update_line(self, line_number, text, color_name="white", brightness_factor=1.0, justification='center'):
         if line_number < 0 or line_number >= 4:
             raise ValueError("line_number must be between 0 and 3")
 
         self.oled_lines[line_number] = text
+
+        # Get color with brightness applied
+        color = self.set_brightness(color_name, brightness_factor)
 
         # Clear the specific line area
         line_height = self.height // 4
@@ -193,20 +212,24 @@ class BONNETDisplay:
             x_position = (self.width - text_width) // 2
 
         position = (x_position, y_position + (line_height - text_height) // 2)
-        self.draw.text(position, text, font=self.font, fill=255)
+        self.draw.text(position, text, font=self.font, fill=color)
 
         self.disp.image(self.image)
 
-    def display_text_center_with_border(self, text):
+    def display_text_center_with_border(self, text, color_name="white", brightness_factor=1.0):
         self.clear_screen()
+
+        # Get color with brightness applied
+        color = self.set_brightness(color_name, brightness_factor)
+
         border_size = self.config_manager.get_border_size()
         self.draw.rectangle((border_size, border_size, self.width - border_size - 1, self.height - border_size - 1),
-                            outline=255, fill=0)
+                            outline=color, fill=0)
         bbox = self.draw.textbbox((0, 0), text, font=self.font)
         text_width = bbox[2] - bbox[0]
         text_height = bbox[3] - bbox[1]
         position = ((self.width - text_width) // 2, (self.height - text_height) // 2)
-        self.draw.text(position, text, font=self.font, fill=255)
+        self.draw.text(position, text, font=self.font, fill=color)
         self.disp.image(self.image)
 
 
