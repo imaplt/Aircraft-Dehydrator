@@ -81,7 +81,7 @@ class BONNETDisplay:
         self.draw = ImageDraw.Draw(self.image)
 
         # Set the font using config_manager
-        # self.set_font(self.config_manager.get_font_path(), self.config_manager.get_font_size())
+        self.set_font(self.config_manager.get_font_path(), self.config_manager.get_font_size())
         self.set_font()
 
         # Initialize lines
