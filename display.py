@@ -8,6 +8,7 @@ import random
 from colorsys import hsv_to_rgb
 from digitalio import DigitalInOut, Direction
 from adafruit_rgb_display import st7789
+from colorsys import hsv_to_rgb
 
 class DisplayConfig:
     def __init__(self, font_path=None, font_size=10, border_size=1):
@@ -42,7 +43,7 @@ class BONNETDisplay:
         self.disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180, cs=self.cs_pin, dc=self.dc_pin, rst=self.reset_pin, baudrate=self.BAUDRATE,)
 
 		# Create blank image for drawing.
-        self.image = Image.new('1', (self.width, self.height))
+        self.image = Image.new('RGB', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
 
         # Set the font using config_manager
@@ -61,7 +62,7 @@ class BONNETDisplay:
         self._clear_image()
 
     def _clear_image(self):
-        self.image = Image.new('1', (self.width, self.height))
+        self.image = Image.new('RGB', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
 
     def set_font(self, font_path=None, font_size=10):
