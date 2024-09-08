@@ -363,7 +363,7 @@ def cleanup():
     print('Cleaning Up')
     try:
         BONNETDisplay.display_text_center_with_border('Shutting down...')
-        if isDeviceDetected("LCD2004"):
+        if isDeviceDetected(statuses, 'LCD2004'):
             lcd2004Display.display_text_with_border(['Shutting down...'])
             lcd2004Display.clear()
 
