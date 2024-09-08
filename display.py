@@ -26,8 +26,6 @@ class DisplayConfig:
 
 class BONNETDisplay:
     def __init__(self, configuration):
-        self.width = width
-        self.height = height
         self.config_manager = configuration
         
         # Create the display
