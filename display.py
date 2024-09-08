@@ -4,7 +4,10 @@ import time
 import smbus2 as smbus
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
-
+import random
+from colorsys import hsv_to_rgb
+from digitalio import DigitalInOut, Direction
+from adafruit_rgb_display import st7789
 
 class DisplayConfig:
     def __init__(self, font_path=None, font_size=10, border_size=1):
@@ -22,18 +25,23 @@ class DisplayConfig:
         return self.border_size
 
 class BONNETDisplay:
-    def __init__(self, configuration, width=128, height=64, i2c_address=0x3C):
+    def __init__(self, configuration):
         self.width = width
         self.height = height
-        self.i2c_address = i2c_address
         self.config_manager = configuration
+        
+        # Create the display
+		self.cs_pin = DigitalInOut(board.CE0)
+		self.dc_pin = DigitalInOut(board.D25)
+		self.reset_pin = DigitalInOut(board.D24)
+		self.BAUDRATE = 24000000
 
-        # Initialize I2C interface.
-        self.i2c = busio.I2C(board.SCL, board.SDA)
+		# Initialize the interface
+		spi = board.SPI()
+		# Initialize display.
+		self.disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180, cs=cs_pin, dc=dc_pin, rst=reset_pin, baudrate=BAUDRATE,)
 
-        # Initialize display.
-        self.disp = adafruit_ssd1306.SSD1306_I2C(self.width, self.height, self.i2c, addr=self.i2c_address)
-        # Create blank image for drawing.
+		# Create blank image for drawing.
         self.image = Image.new('1', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
 
