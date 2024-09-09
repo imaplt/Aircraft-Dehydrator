@@ -214,7 +214,7 @@ class BONNETDisplay:
 
     def display_four_rows_center(self, texts, color_name="white", brightness_factor=1.0, justification='center'):
         self.clear_screen()
-        num_lines = min(4, len(texts))
+        num_lines = min(5, len(texts))
         line_height = self.height // num_lines
 
         # Get color with brightness applied
