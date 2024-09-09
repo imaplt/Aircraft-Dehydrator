@@ -322,8 +322,11 @@ def button_pressed_callback(button):
     else:
         print("Unknown button")
 
-    print(f"Up last pressed: {last_press_time['up']} DN last pressed: {last_press_time['dn']}")
-    print("Humidity Changed: ", humidity_changed)
+    # Show the current page
+    show_page(current_page)
+
+    # print(f"Up last pressed: {last_press_time['up']} DN last pressed: {last_press_time['dn']}")
+    # print("Humidity Changed: ", humidity_changed)
 
 
 def button_hold_callback(button):
