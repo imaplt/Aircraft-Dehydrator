@@ -260,6 +260,7 @@ def display_set_humidity():
     # Humidity Set Page - Max and Min values
     BONNETDisplay.clear_screen()
     BONNETDisplay.display_text("Humidity Set",10, 40)
+    BONNETDisplay.display_text("Max:", 10, 80)
     BONNETDisplay.display_text(f"{MAX_HUMIDITY:.1f}%",10, 80)
     BONNETDisplay.display_text("Min:",10, 120)
     BONNETDisplay.display_text(f"{MIN_HUMIDITY:.1f}%", 100, 120)
@@ -339,19 +340,17 @@ def button_pressed_callback(button):
         print("Down button pressed")
     elif button.pin.number == BTN_C_PIN:
         print("Center button pressed")
-    elif button.pin.number == BTN_A_PIN and current_page == 3:
-        print("A button pressed")
-        # If on page 4 and center button is pressed, adjust data
+    elif button.pin.number == BTN_A_PIN and current_page == 4:
+        print("A button pressed AND current page is 3")
         edit_humidity_set()
+    elif button.pin.number == BTN_A_PIN:
+        print("A button pressed")
     elif button.pin.number == BTN_B_PIN:
         print("B button pressed")
     else:
         print("Unknown button")
     # Show the current page
     show_page(current_page)
-
-    # print(f"Up last pressed: {last_press_time['up']} DN last pressed: {last_press_time['dn']}")
-    # print("Humidity Changed: ", humidity_changed)
 
 def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
