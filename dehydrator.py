@@ -258,6 +258,7 @@ def edit_humidity_set():
 
 def display_set_humidity():
     # Humidity Set Page - Max and Min values
+    BONNETDisplay.clear_screen()
     BONNETDisplay.display_text("Humidity Set",10, 40)
     BONNETDisplay.display_text(f"{MAX_HUMIDITY:.1f}%",10, 80)
     BONNETDisplay.display_text("Min:",10, 120)
