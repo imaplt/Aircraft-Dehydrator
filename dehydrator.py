@@ -241,6 +241,35 @@ def display_min_humidity(value):
 def display_max_humidity(value):
     print(f"Max Humidity: {value}%")
 
+# Display function for each page
+def display_page_1():
+    # Render static data from global variables
+    BONNETDisplay.clear_screen()
+    BONNETDisplay.display_text_center(page_1_data, color_name="blue", brightness_factor=1.0)
+
+def display_page_2():
+    BONNETDisplay.clear_screen()
+    BONNETDisplay.display_text_center(page_2_data, color_name="green", brightness_factor=1.0)
+
+def display_page_3():
+    BONNETDisplay.clear_screen()
+    BONNETDisplay.display_text_center(page_3_data, color_name="yellow", brightness_factor=1.0)
+
+def display_page_4():
+    # This page contains adjustable data
+    BONNETDisplay.clear_screen()
+    BONNETDisplay.display_text_center(page_4_data, color_name="red", brightness_factor=1.0)
+
+# Function to switch between pages
+def show_page(page_index):
+    if page_index == 0:
+        display_page_1()
+    elif page_index == 1:
+        display_page_2()
+    elif page_index == 2:
+        display_page_3()
+    elif page_index == 3:
+        display_page_4()
 
 def save_config():
     global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
@@ -264,14 +293,22 @@ def save_config():
 
 
 def button_pressed_callback(button):
-    global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
+    global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page
 
     now = time.time()
 
     if button.pin.number == BTN_L_PIN:
         print("Left button pressed")
+        # Navigate to previous page
+        current_page -= 1
+        if current_page < 0:
+            current_page = total_pages - 1  # Wrap around to the last page
     elif button.pin.number == BTN_R_PIN:
         print("Right button pressed")
+        # Navigate to next page
+        current_page += 1
+        if current_page >= total_pages:
+            current_page = 0  # Wrap around to the first page
     elif button.pin.number == BTN_U_PIN:
         print("Up button pressed")
     elif button.pin.number == BTN_D_PIN:
@@ -289,12 +326,8 @@ def button_pressed_callback(button):
     print("Humidity Changed: ", humidity_changed)
 
 
-
-
 def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
-
-
 
 
 def _fan_limit_exceeded():
@@ -397,16 +430,32 @@ if __name__ == "__main__":
     BUTTON_HOLD_TIME = 3
     humidity_changed = False
     mode = None
+    # Variable to hold current page index
+    current_page = 0
+    total_pages = 4
+    # Global variables for static page data
+    page_1_data = "Static Data for Page 1"
+    page_2_data = "Static Data for Page 2"
+    page_3_data = "Static Data for Page 3"
+    page_4_data = "Adjustable Data for Page 4"
 
     # GPIO setup using gpiozero for input buttons
-    btn_lt = Button(BTN_L_PIN, pull_up=True, bounce_time=0.2, hold_time=BUTTON_HOLD_TIME)
-    btn_rt = Button(BTN_R_PIN, pull_up=True, bounce_time=0.2, hold_time=BUTTON_HOLD_TIME)
-
+    btn_lt = Button(BTN_L_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
+    btn_rt = Button(BTN_R_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
+    btn_up = Button(BTN_U_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
+    btn_dn = Button(BTN_D_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
+    btn_ctr = Button(BTN_C_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
+    btn_a = Button(BTN_A_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
+    btn_b = Button(BTN_B_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
 
     # Attach event handlers
     btn_lt.when_pressed = button_pressed_callback
     btn_rt.when_pressed = button_pressed_callback
-
+    btn_up.when_pressed = button_pressed_callback
+    btn_dn.when_pressed = button_pressed_callback
+    btn_ctr.when_pressed = button_pressed_callback
+    btn_a.when_pressed = button_pressed_callback
+    btn_b.when_pressed = button_pressed_callback
 
     # Initialize lines
     oled_lines = [""] * 4  # For four line ssd1306_display...
@@ -444,6 +493,9 @@ if __name__ == "__main__":
         # Display centered text
         BONNETDisplay.display_text_center("Initializing...")
         time.sleep(2)
+
+        # Initialize to show the first page
+        show_page(current_page)
 
         # Initialize fan controller
         print('Initializing fan controller...')
