@@ -360,8 +360,8 @@ class SSD1306Display:
 
     def display_default_four_rows(self):
         # Yeah, I know. I could make this prettier
-        self.oled_lines = ["Internal:", "reading...", "External:", "reading...", ""]
-        self.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], justification='left')
+        self.oled_lines = ["Internal:", "reading...", "External:", "reading...", " "]
+        self.display_four_rows_center(["Internal:", "reading...", "External:", "reading...", " "], justification='left')
 
     def display_four_rows_center(self, texts, justification='center'):
         self.clear_screen()
@@ -389,7 +389,7 @@ class SSD1306Display:
 
     def update_line(self, line_number, text, justification='center'):
         if line_number < 0 or line_number >= 4:
-            raise ValueError("line_number must be between 0 and 3")
+            raise ValueError("line_number must be between 0 and 4")
 
         self.oled_lines[line_number] = text
 
