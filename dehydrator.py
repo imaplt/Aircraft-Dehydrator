@@ -32,7 +32,8 @@ def celsius_to_fahrenheit(celsius):
 # @print_elapsed_time
 def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
-        CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME, INTERNAL_TEMP, INTERNAL_HUMIDITY
+        CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
+        INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
@@ -122,7 +123,8 @@ def task_internal():
                 BONNETDisplay.display_four_rows_center(BONNETDisplay.oled_lines, justification='left')
                 time.sleep(.1)  # Adjust as needed
     if time.time() - last_page_changed  > 5:
-        show_page(0)
+        current_page = 0
+        show_page(current_page)
 # @print_elapsed_time
 def task_external():
     global EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY, EXTERNAL_TEMP, EXTERNAL_HUMIDITY
