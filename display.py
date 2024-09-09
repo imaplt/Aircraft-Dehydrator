@@ -308,7 +308,7 @@ class SSD1306Display:
         self.set_font()
 
         # Initialize lines
-        self.oled_lines = [""] * 4
+        self.oled_lines = [""] * 5
 
     def reset_screen(self):
         self.disp.fill(0)
@@ -365,7 +365,7 @@ class SSD1306Display:
 
     def display_four_rows_center(self, texts, justification='center'):
         self.clear_screen()
-        num_lines = min(4, len(texts))
+        num_lines = min(5, len(texts))
         line_height = self.height // num_lines
         for i in range(num_lines):
             text = texts[i]

@@ -66,8 +66,11 @@ def task_internal():
         internalprevious_output['temperature'] = internaloutput['temperature']
         internalprevious_output['humidity'] = internaloutput['humidity']
         print("Internal Sensor Reading:", internaloutput)
-        BONNETDisplay.update_line(1, justification='left',
-                                   text=f"{internaloutput['humidity']}%" f" - {internaloutput['temperature']}°C")
+        INTERNAL_HUMIDITY = internaloutput['humidity']
+        INTERNAL_TEMP = internaloutput['temperature']
+        if current_page == 0:
+            BONNETDisplay.update_line(1, justification='left',
+                                   text=f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C")
         if internaloutput['humidity'] > MAX_HUMIDITY:
             started, run_time = fanController.set_fan_speed(100)
             if started:
