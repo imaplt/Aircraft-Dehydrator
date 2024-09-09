@@ -208,8 +208,8 @@ class BONNETDisplay:
         self.disp.image(self.image)
 
     def display_default_four_rows(self, color_name="white", brightness_factor=1.0):
-        self.oled_lines = ["Internal:", "reading...", "External:", "reading..."]
-        self.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], color_name,
+        self.oled_lines = ["Internal:", "reading...", "External:", "reading...", " "]
+        self.display_four_rows_center(["Internal:", "reading...", "External:", "reading...", " "], color_name,
                                       brightness_factor, justification='left')
 
     def display_four_rows_center(self, texts, color_name="white", brightness_factor=1.0, justification='center'):

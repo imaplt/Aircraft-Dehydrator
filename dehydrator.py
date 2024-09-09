@@ -32,7 +32,7 @@ def celsius_to_fahrenheit(celsius):
 # @print_elapsed_time
 def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
-        CYCLE_COUNT, TOTAL_CYCLE_DURATION, FAN_RUNNING, RUNNING_TIME, MAX_FAN_RUNTIME, INTERNAL_TEMP, INTERNAL_HUMIDITY
+        CYCLE_COUNT, TOTAL_CYCLE_DURATION, FAN_RUNNING, RUNNING_TIME, FAN_MAX_RUNTIME, INTERNAL_TEMP, INTERNAL_HUMIDITY
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
@@ -85,9 +85,9 @@ def task_internal():
                 time.sleep(1)
                 # Reset display back to previous lines
                 BONNETDisplay.display_four_rows_center(BONNETDisplay.oled_lines, justification='left')
-                print(run_time, MAX_FAN_RUNTIME, FAN_LIMIT)
-            if timedelta(seconds=run_time) > MAX_FAN_RUNTIME:
-                MAX_FAN_RUNTIME = timedelta(seconds=run_time)
+                print(run_time, FAN_MAX_RUNTIME, FAN_LIMIT)
+            if timedelta(seconds=run_time) > FAN_MAX_RUNTIME:
+                FAN_MAX_RUNTIME = timedelta(seconds=run_time)
             if timedelta(seconds=run_time) > FAN_LIMIT:
                 # TODO: Add FAN_LIMIT logic, maybe a method or function?
                 print("Fan limit exceeded")
@@ -106,8 +106,8 @@ def task_internal():
                 FAN_RUNNING = False
                 RUNNING_TIME = timedelta(seconds=run_time)
                 #  TODO: Saving limit multiple times
-                if RUNNING_TIME > MAX_FAN_RUNTIME:
-                    MAX_FAN_RUNTIME = RUNNING_TIME
+                if RUNNING_TIME > FAN_MAX_RUNTIME:
+                    FAN_MAX_RUNTIME = RUNNING_TIME
                 if RUNNING_TIME > FAN_LIMIT:
                     # TODO: Add FAN_LIMIT logic, maybe a method or function?
                     print("Fan limit exceeded")
@@ -247,9 +247,9 @@ def display_default_page():
 def display_fan_stats():
     # BONNETDisplay.clear_screen()
     BONNETDisplay.update_line(0,"Fan Stats:",justification='left')
-    BONNETDisplay.update_line(1, f"C {MAX_FAN_RUNTIME}", justification='left')
-    BONNETDisplay.update_line(2, f"M {MAX_FAN_RUNTIME}", justification='left')
-    BONNETDisplay.update_line(3, f"T {MAX_FAN_RUNTIME}", justification='left')
+    BONNETDisplay.update_line(1, f"C {FAN_MAX_RUNTIME}", justification='left')
+    BONNETDisplay.update_line(2, f"M {FAN_MAX_RUNTIME}", justification='left')
+    BONNETDisplay.update_line(3, f"T {TOTAL_CYCLE_DURATION}", justification='left')
     # BONNETDisplay.display_text_center(page_2_data, color_name="green", brightness_factor=1.0)
 
 def display_internal_stats():
@@ -287,7 +287,7 @@ def save_config():
     global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
     global EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
-    global CYCLE_COUNT, TOTAL_CYCLE_DURATION, MAX_FAN_RUNTIME
+    global CYCLE_COUNT, TOTAL_CYCLE_DURATION, FAN_MAX_RUNTIME
 
     configManager.update_config('min_humidity', MIN_HUMIDITY)
     configManager.update_config('max_humidity', MAX_HUMIDITY)
@@ -301,7 +301,7 @@ def save_config():
     configManager.update_config('external_low_humidity', EXTERNAL_LOW_HUMIDITY, 'LOG')
     configManager.update_config('cycle_count', CYCLE_COUNT, 'LOG')
     configManager.set_duration_config('total_cycle_duration', TOTAL_CYCLE_DURATION, 'LOG')
-    configManager.set_duration_config('MAX_FAN_RUNTIME', MAX_FAN_RUNTIME, 'LOG')
+    configManager.set_duration_config('MAX_FAN_RUNTIME', FAN_MAX_RUNTIME, 'LOG')
 
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page
@@ -426,7 +426,7 @@ if __name__ == "__main__":
     EXTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'external_low_humidity')
     CYCLE_COUNT = configManager.get_int_config('cycle_count')
     TOTAL_CYCLE_DURATION = configManager.get_duration_config('LOG', 'total_cycle_duration')
-    MAX_FAN_RUNTIME = configManager.get_duration_config('LOG', 'MAX_FAN_RUNTIME')
+    FAN_MAX_RUNTIME = configManager.get_duration_config('LOG', 'MAX_FAN_RUNTIME')
     FAN_LIMIT = configManager.get_duration_config('DEFAULT', 'FAN_LIMIT')
 
     # Display configuration
@@ -445,11 +445,6 @@ if __name__ == "__main__":
     # Variable to hold current page index
     current_page = 0
     total_pages = 5
-    # Global variables for static page data
-    page_1_data = "Static Data for Page 1"
-    page_2_data = "Static Data for Page 2"
-    page_3_data = "Static Data for Page 3"
-    page_4_data = "Adjustable Data for Page 4"
 
     # GPIO setup using gpiozero for input buttons
     btn_lt = Button(BTN_L_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
