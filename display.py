@@ -85,7 +85,7 @@ class BONNETDisplay:
         # self.set_font()
 
         # Initialize lines
-        self.oled_lines = [""] * 4
+        self.oled_lines = [""] * 5
 
     def reset_screen(self):
         self.disp.fill(0)
@@ -240,8 +240,8 @@ class BONNETDisplay:
         self.disp.image(self.image)
 
     def update_line(self, line_number, text, color_name="white", brightness_factor=1.0, justification='center'):
-        if line_number < 0 or line_number >= 4:
-            raise ValueError("line_number must be between 0 and 3")
+        if line_number < 0 or line_number >= 5:
+            raise ValueError("line_number must be between 0 and 4")
 
         self.oled_lines[line_number] = text
 

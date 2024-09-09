@@ -32,7 +32,8 @@ def celsius_to_fahrenheit(celsius):
 # @print_elapsed_time
 def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
-        CYCLE_COUNT, TOTAL_CYCLE_DURATION, FAN_RUNNING, RUNNING_TIME, MAX_FAN_RUNTIME
+        CYCLE_COUNT, TOTAL_CYCLE_DURATION, FAN_RUNNING, RUNNING_TIME, MAX_FAN_RUNTIME, INTERNAL_TEMP, INTERNAL_HUMIDITY
+
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
 
@@ -75,6 +76,7 @@ def task_internal():
                 logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN',
                            f"Fan started, exceeded MAX humidity of {MAX_HUMIDITY}%")
                 print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
+                # TODO: Update to save current page and then return
                 BONNETDisplay.display_text_center_with_border('Fan Started...')
                 FAN_RUNNING = True
                 time.sleep(1)
@@ -156,7 +158,6 @@ def task_external():
                                text=f"{externaloutput['humidity']}% - {externaloutput['temperature']}°C")
     time.sleep(.1)
 
-
 #  @print_elapsed_time
 def _cycle_fan():
     # TODO: How do we want to engage this?
@@ -183,7 +184,6 @@ def lcd_display(screen_no):
         lcd_lines[3] = f"Running - {str(FAN_RUNNING)}"
         lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
 
-
 def oled_display():
     global lcd_lines
     lcd_lines[0] = f"Int Max:{INTERNAL_HIGH_TEMP}C {INTERNAL_HIGH_HUMIDITY}%"
@@ -191,7 +191,6 @@ def oled_display():
     lcd_lines[2] = f"Ext Max:{EXTERNAL_HIGH_TEMP}C {EXTERNAL_HIGH_HUMIDITY}%"
     lcd_lines[3] = f"Ext Min:{EXTERNAL_LOW_TEMP}C {EXTERNAL_LOW_HUMIDITY}%"
     lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
-
 
 # Task to alternate screens
 def task_alternate_screens():
@@ -202,7 +201,6 @@ def task_alternate_screens():
         lcd_display(2)
         task_alternate_screens.current_screen = 1
 
-
 def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1, display_interval=30):
     schedule.every(int_interval).seconds.do(task_internal)
     schedule.every(ext_interval).minutes.do(task_external)
@@ -210,12 +208,10 @@ def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1, display_inter
     if DISPLAY_ENABLED:
         schedule.every(display_interval).seconds.do(task_alternate_screens)
 
-
 def run_scheduler():
     while True:
         schedule.run_pending()
         time.sleep(1)
-
 
 def heat_sensor():
     # TODO: Add code to heat sensors when the humidity gets high. Only applies to SHT4X series sensors
@@ -227,16 +223,13 @@ def heat_sensor():
     internalsensor.heat_sensor()
     logger.log(timestamp, 'INFO', 'SYSTEM', 'INTERNAL', "Heating Internal sensor...")
 
-
 def read_installed_devices(config):
     devices = config.get_config('installed_devices').split(',')
     devices = [device.strip() for device in devices]  # Remove any extra whitespace
     return devices
 
-
 def display_min_humidity(value):
     print(f"Min Humidity: {value}%")
-
 
 def display_max_humidity(value):
     print(f"Max Humidity: {value}%")
@@ -251,19 +244,30 @@ def display_default_page():
 def display_fan_stats():
     # BONNETDisplay.clear_screen()
     BONNETDisplay.update_line(0,"Fan Stats:",justification='left')
-    BONNETDisplay.update_line(1, "C", justification='left')
-    BONNETDisplay.update_line(2, "M", justification='left')
-    BONNETDisplay.update_line(3, "F", justification='left')
+    BONNETDisplay.update_line(1, f"C {MAX_FAN_RUNTIME}", justification='left')
+    BONNETDisplay.update_line(2, f"M {MAX_FAN_RUNTIME}", justification='left')
+    BONNETDisplay.update_line(3, f"T {MAX_FAN_RUNTIME}", justification='left')
     # BONNETDisplay.display_text_center(page_2_data, color_name="green", brightness_factor=1.0)
 
 def display_internal_stats():
     # BONNETDisplay.clear_screen()
-    BONNETDisplay.display_text_center(page_3_data, color_name="yellow", brightness_factor=1.0)
+    BONNETDisplay.update_line(0, "Internal Stats:", justification='left')
+    BONNETDisplay.update_line(1, f"Max Temp {INTERNAL_HIGH_TEMP}", justification='left')
+    BONNETDisplay.update_line(2, f"Min Temp {INTERNAL_LOW_TEMP}", justification='left')
+    BONNETDisplay.update_line(3, f"Max Hum {INTERNAL_HIGH_HUMIDITY}", justification='left')
+    BONNETDisplay.update_line(4, f"Min Hum {INTERNAL_LOW_HUMIDITY}", justification='left')
+    # BONNETDisplay.display_text_center(page_3_data, color_name="yellow", brightness_factor=1.0)
 
 def display_external_stats():
     # This page contains adjustable data
     # BONNETDisplay.clear_screen()
-    BONNETDisplay.display_text_center(page_4_data, color_name="red", brightness_factor=1.0)
+    BONNETDisplay.update_line(0, "External Stats:", justification='left')
+    BONNETDisplay.update_line(1, f"Max Temp {EXTERNAL_HIGH_TEMP}", justification='left')
+    BONNETDisplay.update_line(2, f"Min Temp {EXTERNAL_LOW_TEMP}", justification='left')
+    BONNETDisplay.update_line(3, f"Max Hum {EXTERNAL_HIGH_HUMIDITY}", justification='left')
+    BONNETDisplay.update_line(4, f"Min Hum {EXTERNAL_LOW_HUMIDITY}", justification='left')
+
+    # BONNETDisplay.display_text_center(page_4_data, color_name="red", brightness_factor=1.0)
 
 # Function to switch between pages
 def show_page(page_index):
@@ -295,7 +299,6 @@ def save_config():
     configManager.update_config('cycle_count', CYCLE_COUNT, 'LOG')
     configManager.set_duration_config('total_cycle_duration', TOTAL_CYCLE_DURATION, 'LOG')
     configManager.set_duration_config('MAX_FAN_RUNTIME', MAX_FAN_RUNTIME, 'LOG')
-
 
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page
@@ -333,10 +336,8 @@ def button_pressed_callback(button):
     # print(f"Up last pressed: {last_press_time['up']} DN last pressed: {last_press_time['dn']}")
     # print("Humidity Changed: ", humidity_changed)
 
-
 def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
-
 
 def _fan_limit_exceeded():
     # TODO: Should this be a hard limit? Some way to change this maybe?
@@ -348,7 +349,6 @@ def _fan_limit_exceeded():
     save_config()
     while True:
         time.sleep(1)
-
 
 def cleanup():
     # Want to add code here to update display, update log with run time etc
@@ -372,7 +372,6 @@ def cleanup():
     finally:
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'FATAL',
                    'System', 'System', "System Shutting down..")
-
 
 def isDeviceDetected(statuses, device):
     for status in statuses:
@@ -438,9 +437,11 @@ if __name__ == "__main__":
     BUTTON_HOLD_TIME = 3
     humidity_changed = False
     mode = None
+    INTERNAL_TEMP = 0
+    INTERNAL_HUMIDITY = 0
     # Variable to hold current page index
     current_page = 0
-    total_pages = 4
+    total_pages = 5
     # Global variables for static page data
     page_1_data = "Static Data for Page 1"
     page_2_data = "Static Data for Page 2"
@@ -466,7 +467,7 @@ if __name__ == "__main__":
     btn_b.when_pressed = button_pressed_callback
 
     # Initialize lines
-    oled_lines = [""] * 4  # For four line ssd1306_display...
+    oled_lines = [""] * 5  # For four line ssd1306_display...
     lcd_lines = [""] * 4  # For four line ssd1306_display...
 
     FAN_RUNNING = False
