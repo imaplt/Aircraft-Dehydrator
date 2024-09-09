@@ -242,34 +242,39 @@ def display_max_humidity(value):
     print(f"Max Humidity: {value}%")
 
 # Display function for each page
-def display_page_1():
+def display_default_page():
     # Render static data from global variables
-    BONNETDisplay.clear_screen()
-    BONNETDisplay.display_text_center(page_1_data, color_name="blue", brightness_factor=1.0)
+    # BONNETDisplay.clear_screen()
+    BONNETDisplay.display_default_four_rows()
+    #BONNETDisplay.display_text_center(page_1_data, color_name="blue", brightness_factor=1.0)
 
-def display_page_2():
-    BONNETDisplay.clear_screen()
-    BONNETDisplay.display_text_center(page_2_data, color_name="green", brightness_factor=1.0)
+def display_fan_stats():
+    # BONNETDisplay.clear_screen()
+    BONNETDisplay.update_line(0,"Fan Stats:",justification='left')
+    BONNETDisplay.update_line(1, "C", justification='left')
+    BONNETDisplay.update_line(2, "M", justification='left')
+    BONNETDisplay.update_line(3, "F", justification='left')
+    # BONNETDisplay.display_text_center(page_2_data, color_name="green", brightness_factor=1.0)
 
-def display_page_3():
-    BONNETDisplay.clear_screen()
+def display_internal_stats():
+    # BONNETDisplay.clear_screen()
     BONNETDisplay.display_text_center(page_3_data, color_name="yellow", brightness_factor=1.0)
 
-def display_page_4():
+def display_external_stats():
     # This page contains adjustable data
-    BONNETDisplay.clear_screen()
+    # BONNETDisplay.clear_screen()
     BONNETDisplay.display_text_center(page_4_data, color_name="red", brightness_factor=1.0)
 
 # Function to switch between pages
 def show_page(page_index):
     if page_index == 0:
-        display_page_1()
+        display_default_page()
     elif page_index == 1:
-        display_page_2()
+        display_fan_stats()
     elif page_index == 2:
-        display_page_3()
+        display_internal_stats()
     elif page_index == 3:
-        display_page_4()
+        display_external_stats()
 
 def save_config():
     global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
@@ -518,7 +523,6 @@ if __name__ == "__main__":
         internalprevious_output = {'temperature': 0, 'humidity': 0}
 
         print("Internal Mode: ", internalsensor.sensor_mode())  # TODO: Figure out what mode is...
-        BONNETDisplay.display_default_four_rows()
         time.sleep(2)
         schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL,
                        fan_interval=TASK_FAN, display_interval=TASK_DISPLAY_ROTATION)
