@@ -360,7 +360,7 @@ class SSD1306Display:
 
     def display_default_four_rows(self):
         # Yeah, I know. I could make this prettier
-        self.oled_lines = ["Internal:", "reading...", "External:", "reading..."]
+        self.oled_lines = ["Internal:", "reading...", "External:", "reading...", ""]
         self.display_four_rows_center(["Internal:", "reading...", "External:", "reading..."], justification='left')
 
     def display_four_rows_center(self, texts, justification='center'):
@@ -394,7 +394,7 @@ class SSD1306Display:
         self.oled_lines[line_number] = text
 
         # Clear the specific line area
-        line_height = self.height // 4
+        line_height = self.height // 5
         y_position = line_number * line_height
         self.draw.rectangle((0, y_position, self.width, y_position + line_height), outline=0, fill=0)
 
