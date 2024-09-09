@@ -111,6 +111,7 @@ class BONNETDisplay:
         self.draw = ImageDraw.Draw(self.image)
 
     def set_font(self, font_path=None, font_size=16):
+        print(font_path, font_size)
         if font_path:
             self.font = ImageFont.truetype(font_path, font_size)
         else:
