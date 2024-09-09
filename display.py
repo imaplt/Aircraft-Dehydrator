@@ -207,6 +207,13 @@ class BONNETDisplay:
         self.draw.text(position, text, font=self.font, fill=color)
         self.disp.image(self.image)
 
+    def display_text(self, text, x_pos, y_pos, color_name="white", brightness_factor=1.0):
+        # Get color with brightness applied
+        color = self.set_brightness(color_name, brightness_factor)
+        position = (x_pos, y_pos)
+        self.draw.text(position, text, font=self.font, fill=color)
+        self.disp.image(self.image)
+
     def display_default_four_rows(self, color_name="white", brightness_factor=1.0):
         self.oled_lines = ["Internal:", "reading...", "External:", "reading...", " "]
         self.display_four_rows_center(["Internal:", "reading...", "External:", "reading...", " "], color_name,

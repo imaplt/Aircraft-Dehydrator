@@ -174,7 +174,6 @@ def _cycle_fan():
     time.sleep(FAN_DURATION)
     fanController.set_fan_speed(0)
 
-
 def lcd_display(screen_no):
     global lcd_lines
     if screen_no == 1:
@@ -240,7 +239,6 @@ def display_min_humidity(value):
 def display_max_humidity(value):
     print(f"Max Humidity: {value}%")
 
-# Display function for each page
 def display_default_page():
     # Render static data from global variables
     # BONNETDisplay.clear_screen()
@@ -254,6 +252,16 @@ def display_fan_stats():
     BONNETDisplay.update_line(2, f"M {FAN_MAX_RUNTIME}", justification='left')
     BONNETDisplay.update_line(3, f"T {FAN_TOTAL_DURATION}", justification='left')
     # BONNETDisplay.display_text_center(page_2_data, color_name="green", brightness_factor=1.0)
+
+def edit_humidity_set():
+    print("Humidity Set")
+
+def display_set_humidity():
+    # Humidity Set Page - Max and Min values
+    BONNETDisplay.display_text("Humidity Set",10, 40)
+    BONNETDisplay.display_text(f"{MAX_HUMIDITY:.1f}%",10, 80)
+    BONNETDisplay.display_text("Min:",10, 120)
+    BONNETDisplay.display_text(f"{MIN_HUMIDITY:.1f}%", 100, 120)
 
 def display_internal_stats():
     # BONNETDisplay.clear_screen()
@@ -275,7 +283,6 @@ def display_external_stats():
 
     # BONNETDisplay.display_text_center(page_4_data, color_name="red", brightness_factor=1.0)
 
-# Function to switch between pages
 def show_page(page_index):
     if page_index == 0:
         display_default_page()
@@ -285,6 +292,8 @@ def show_page(page_index):
         display_internal_stats()
     elif page_index == 3:
         display_external_stats()
+    elif page_index == 4:
+        display_set_humidity()
 
 def save_config():
     global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
@@ -329,8 +338,10 @@ def button_pressed_callback(button):
         print("Down button pressed")
     elif button.pin.number == BTN_C_PIN:
         print("Center button pressed")
-    elif button.pin.number == BTN_A_PIN:
+    elif button.pin.number == BTN_A_PIN and current_page == 3:
         print("A button pressed")
+        # If on page 4 and center button is pressed, adjust data
+        edit_humidity_set()
     elif button.pin.number == BTN_B_PIN:
         print("B button pressed")
     else:
