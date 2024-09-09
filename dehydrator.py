@@ -121,7 +121,7 @@ def task_internal():
                 # Reset display back to prev lines
                 BONNETDisplay.display_four_rows_center(BONNETDisplay.oled_lines, justification='left')
                 time.sleep(.1)  # Adjust as needed
-    if time.time() + 5 > last_page_changed:
+    if last_page_changed + 5 > time.time():
         show_page(0)
 # @print_elapsed_time
 def task_external():
