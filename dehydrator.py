@@ -121,7 +121,8 @@ def task_internal():
                 # Reset display back to prev lines
                 BONNETDisplay.display_four_rows_center(BONNETDisplay.oled_lines, justification='left')
                 time.sleep(.1)  # Adjust as needed
-
+    if time.time() + 5 > last_page_changed:
+        show_page(0)
 # @print_elapsed_time
 def task_external():
     global EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY, EXTERNAL_TEMP, EXTERNAL_HUMIDITY
@@ -330,6 +331,8 @@ def display_external_stats():
     # BONNETDisplay.display_text_center(page_4_data, color_name="red", brightness_factor=1.0)
 
 def show_page(page_index):
+    global last_page_changed
+    last_page_changed = time.time()
     if page_index == 0:
         display_default_page()
     elif page_index == 1:
@@ -495,6 +498,7 @@ if __name__ == "__main__":
 
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}
+    last_page_changed = 0
     BUTTON_HOLD_TIME = 3
     humidity_changed = False
     mode = None
