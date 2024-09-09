@@ -258,7 +258,7 @@ def display_internal_stats():
     BONNETDisplay.update_line(1, f"Max Temp {INTERNAL_HIGH_TEMP}", justification='left')
     BONNETDisplay.update_line(2, f"Min Temp {INTERNAL_LOW_TEMP}", justification='left')
     BONNETDisplay.update_line(3, f"Max Hum {INTERNAL_HIGH_HUMIDITY}", justification='left')
-    BONNETDisplay.update_line(4, f"Min Hum {INTERNAL_LOW_HUMIDITY}", justification='left')
+    # BONNETDisplay.update_line(4, f"Min Hum {INTERNAL_LOW_HUMIDITY}", justification='left')
     # BONNETDisplay.display_text_center(page_3_data, color_name="yellow", brightness_factor=1.0)
 
 def display_external_stats():
@@ -268,7 +268,7 @@ def display_external_stats():
     BONNETDisplay.update_line(1, f"Max Temp {EXTERNAL_HIGH_TEMP}", justification='left')
     BONNETDisplay.update_line(2, f"Min Temp {EXTERNAL_LOW_TEMP}", justification='left')
     BONNETDisplay.update_line(3, f"Max Hum {EXTERNAL_HIGH_HUMIDITY}", justification='left')
-    BONNETDisplay.update_line(4, f"Min Hum {EXTERNAL_LOW_HUMIDITY}", justification='left')
+    # BONNETDisplay.update_line(4, f"Min Hum {EXTERNAL_LOW_HUMIDITY}", justification='left')
 
     # BONNETDisplay.display_text_center(page_4_data, color_name="red", brightness_factor=1.0)
 
