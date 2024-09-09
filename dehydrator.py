@@ -365,7 +365,7 @@ def save_config():
     configManager.set_duration_config('MAX_FAN_RUNTIME', FAN_MAX_RUNTIME, 'LOG')
 
 def button_pressed_callback(button):
-    global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state
+    global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, humidity_mode
     now = time.time()
 
     if button.pin.number == BTN_L_PIN:
@@ -373,16 +373,13 @@ def button_pressed_callback(button):
         current_page -= 1
         if current_page < 0:
             current_page = total_pages - 1  # Wrap around to the last page
-        humidity_mode = "selection"  # Reset humidity mode when changing pages
-        display_set_humidity()
-
+        humidity_mode = "selection"  # Reset humidity mode when changing page
     elif button.pin.number == BTN_R_PIN:
         # Navigate to next page
         current_page += 1
         if current_page >= total_pages:
             current_page = 0  # Wrap around to the first page
         humidity_mode = "selection"  # Reset humidity mode when changing pages
-        display_set_humidity()
     elif button.pin.number == BTN_U_PIN:
         print("Up button pressed")
     elif button.pin.number == BTN_D_PIN:
