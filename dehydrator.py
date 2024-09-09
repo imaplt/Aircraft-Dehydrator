@@ -335,7 +335,6 @@ def button_pressed_callback(button):
         print("B button pressed")
     else:
         print("Unknown button")
-
     # Show the current page
     show_page(current_page)
 
@@ -384,7 +383,6 @@ def isDeviceDetected(statuses, device):
         if device in status and 'Detected' in status:
             return True
     return False
-
 
 if __name__ == "__main__":
     # Get configuration items
