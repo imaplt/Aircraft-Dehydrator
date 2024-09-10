@@ -259,7 +259,7 @@ class BONNETDisplay:
         color = self.set_brightness(color_name, brightness_factor)
 
         # Load the specified font size for this line
-        font = ImageFont.truetype("/path/to/font.ttf", size=font_size)
+        font = ImageFont.truetype(font=self.font.path, size=font_size)
 
         # Calculate the bounding box for the text
         bbox = self.draw.textbbox((0, 0), text, font=font)
@@ -292,7 +292,7 @@ class BONNETDisplay:
         Calculate the height of a specific line based on the font size.
         This ensures lines with different font sizes are handled properly.
         """
-        font = ImageFont.truetype("/path/to/font.ttf", size=font_size)
+        font = ImageFont.truetype(font=self.font.path, size=font_size)
         # Measure the bounding box of a sample character (e.g., "W") to get the line height
         bbox = self.draw.textbbox((0, 0), "W", font=font)
         text_height = bbox[3] - bbox[1]
