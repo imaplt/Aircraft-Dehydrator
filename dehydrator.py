@@ -387,17 +387,17 @@ def button_pressed_callback(button):
         print("Down button pressed")
     elif button.pin.number == BTN_C_PIN:
         print("Center button pressed")
-    elif button.pin.number == BTN_A_PIN and current_page == 4:
-        print("A button pressed AND current page is 3")
-        edit_humidity_set(button)
     elif button.pin.number == BTN_A_PIN:
         print("A button pressed")
     elif button.pin.number == BTN_B_PIN:
         print("B button pressed")
     else:
         print("Unknown button")
-    # Show the current page
+    
     show_page(current_page)
+        
+    if current_page == 4:
+        edit_humidity_set(button)
 
 def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
