@@ -85,7 +85,7 @@ def task_internal():
                 FAN_RUNNING = True
                 time.sleep(1)
                 # Reset display back to previous lines
-                BONNETDisplay.display_four_rows_center(BONNETDisplay.oled_lines, justification='left')
+                BONNETDisplay.display_rows_center(BONNETDisplay.oled_lines, justification='left')
                 print(run_time, FAN_MAX_RUNTIME, FAN_LIMIT)
             if timedelta(seconds=run_time) > FAN_MAX_RUNTIME:
                 FAN_MAX_RUNTIME = timedelta(seconds=run_time)
@@ -120,7 +120,7 @@ def task_internal():
                 BONNETDisplay.display_text_center_with_border('Fan Stopped...')
                 time.sleep(1)
                 # Reset display back to prev lines
-                BONNETDisplay.display_four_rows_center(BONNETDisplay.oled_lines, justification='left')
+                BONNETDisplay.display_rows_center(BONNETDisplay.oled_lines, justification='left')
                 time.sleep(.1)  # Adjust as needed
     if time.time() - last_page_changed  > 5:
         current_page = 0
@@ -496,7 +496,7 @@ if __name__ == "__main__":
 
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}
-    last_page_changed = 0
+    last_page_changed = time.time()
     BUTTON_HOLD_TIME = 3
     humidity_changed = False
     mode = None

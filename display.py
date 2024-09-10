@@ -217,10 +217,10 @@ class BONNETDisplay:
 
     def display_default_four_rows(self, color_name="white", brightness_factor=1.0):
         self.oled_lines = ["Internal:", "reading...", "External:", "reading...", " "]
-        self.display_four_rows_center(["Internal:", "reading...", "External:", "reading...", " "], color_name,
-                                      brightness_factor, justification='left')
+        self.display_rows_center(["Internal:", "reading...", "External:", "reading...", " "], color_name,
+                                 brightness_factor, justification='left')
 
-    def display_four_rows_center(self, texts, color_name="white", brightness_factor=1.0, justification='center'):
+    def display_rows_center(self, texts, color_name="white", brightness_factor=1.0, justification='center'):
         self.clear_screen()
         num_lines = min(5, len(texts))
         line_height = self.height // num_lines
@@ -247,23 +247,30 @@ class BONNETDisplay:
             self.draw.text(position, text, font=self.font, fill=color)
         self.disp.image(self.image)
 
-    def update_line(self, line_number, text, color_name="white", brightness_factor=1.0, justification='center'):
-        if line_number < 0 or line_number >= 5:
-            raise ValueError("line_number must be between 0 and 4")
+    def update_line(self, line_number, text, color_name="white", brightness_factor=1.0, font_size=10,
+                    justification='center'):
+        if line_number < 0 or line_number >= len(self.oled_lines):
+            raise ValueError("line_number must be between 0 and {len(self.oled_lines)-1}")
 
+        # Update the internal storage for the line's text
         self.oled_lines[line_number] = text
 
-        # Get color with brightness applied
+        # Get the color with brightness applied
         color = self.set_brightness(color_name, brightness_factor)
 
-        # Clear the specific line area
-        line_height = self.height // 4
-        y_position = line_number * line_height
-        self.draw.rectangle((0, y_position, self.width, y_position + line_height), outline=0, fill=0)
+        # Load the specified font size for this line
+        font = ImageFont.truetype("/path/to/font.ttf", size=font_size)
 
-        bbox = self.draw.textbbox((0, 0), text, font=self.font)
+        # Calculate the bounding box for the text
+        bbox = self.draw.textbbox((0, 0), text, font=font)
         text_width = bbox[2] - bbox[0]
         text_height = bbox[3] - bbox[1]
+
+        # Calculate the vertical position of the line
+        y_position = sum(self.get_line_height(i, font_size) for i in range(line_number))
+
+        # Clear only the specific area for the line (based on text height)
+        self.draw.rectangle((0, y_position, self.width, y_position + text_height), outline=0, fill=0)
 
         # Calculate horizontal position based on justification
         if justification == 'left':
@@ -273,10 +280,23 @@ class BONNETDisplay:
         else:  # default to center
             x_position = (self.width - text_width) // 2
 
-        position = (x_position, y_position + (line_height - text_height) // 2)
-        self.draw.text(position, text, font=self.font, fill=color)
+        # Draw the text with the custom font and color
+        position = (x_position, y_position)
+        self.draw.text(position, text, font=font, fill=color)
 
+        # Update the display with the new image
         self.disp.image(self.image)
+
+    def get_line_height(self, line_number, font_size):
+        """
+        Calculate the height of a specific line based on the font size.
+        This ensures lines with different font sizes are handled properly.
+        """
+        font = ImageFont.truetype("/path/to/font.ttf", size=font_size)
+        # Measure the bounding box of a sample character (e.g., "W") to get the line height
+        bbox = self.draw.textbbox((0, 0), "W", font=font)
+        text_height = bbox[3] - bbox[1]
+        return text_height
 
     def display_text_center_with_border(self, text, color_name="white", brightness_factor=1.0):
         self.clear_screen()
