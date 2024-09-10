@@ -122,7 +122,7 @@ def task_internal():
                 # Reset display back to prev lines
                 BONNETDisplay.display_rows_center(BONNETDisplay.oled_lines, justification='left')
                 time.sleep(.1)  # Adjust as needed
-    if time.time() - last_page_changed  > 5:
+    if time.time() - last_page_changed  > 5 and current_page > 0:
         current_page = 0
         show_page(current_page)
 # @print_elapsed_time
@@ -199,7 +199,6 @@ def oled_display():
     lcd_lines[3] = f"Ext Min:{EXTERNAL_LOW_TEMP}C {EXTERNAL_LOW_HUMIDITY}%"
     lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
 
-# Task to alternate screens
 def task_alternate_screens():
     if task_alternate_screens.current_screen == 1:
         lcd_display(1)
@@ -254,6 +253,8 @@ def display_fan_stats():
     BONNETDisplay.update_line(2, f"M {FAN_MAX_RUNTIME}", justification='left')
     BONNETDisplay.update_line(3, f"T {FAN_TOTAL_DURATION}", justification='left')
     # BONNETDisplay.display_text_center(page_2_data, color_name="green", brightness_factor=1.0)
+    BONNETDisplay.display_rows_center(["Fan Stats:", f"C {FAN_RUNNING_TIME}",f"M {FAN_MAX_RUNTIME}",
+                                       f"T {FAN_TOTAL_DURATION}", " " ], 'white',1.0, justification='left')
 
 def edit_humidity_set(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, humidity_mode, humidity_selected, humidity_blink_state
@@ -312,24 +313,18 @@ def display_set_humidity():
     BONNETDisplay.display_text(f"{MIN_HUMIDITY:.1f}%", 100, 120, color_name=min_color)
 
 def display_internal_stats():
-    # BONNETDisplay.clear_screen()
-    BONNETDisplay.update_line(0, "Internal Stats:", justification='left')
-    BONNETDisplay.update_line(1, f"Max Temp {INTERNAL_HIGH_TEMP}", justification='left')
-    BONNETDisplay.update_line(2, f"Min Temp {INTERNAL_LOW_TEMP}", justification='left')
-    BONNETDisplay.update_line(3, f"Max Hum {INTERNAL_HIGH_HUMIDITY}", justification='left')
-    BONNETDisplay.update_line(4, f"Min Hum {INTERNAL_LOW_HUMIDITY}", justification='left')
     # BONNETDisplay.display_text_center(page_3_data, color_name="yellow", brightness_factor=1.0)
+    BONNETDisplay.display_rows_center(["Internal Stats:", f"Max Temp {INTERNAL_HIGH_TEMP}",
+                                           f"Min Temp {INTERNAL_LOW_TEMP}", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
+                                           f"Min Hum {INTERNAL_LOW_HUMIDITY}"], 'white',1.0, justification='left')
+
 
 def display_external_stats():
-    # This page contains adjustable data
-    # BONNETDisplay.clear_screen()
-    BONNETDisplay.update_line(0, "External Stats:", justification='left')
-    BONNETDisplay.update_line(1, f"Max Temp {EXTERNAL_HIGH_TEMP}", justification='left')
-    BONNETDisplay.update_line(2, f"Min Temp {EXTERNAL_LOW_TEMP}", justification='left')
-    BONNETDisplay.update_line(3, f"Max Hum {EXTERNAL_HIGH_HUMIDITY}", justification='left')
-    BONNETDisplay.update_line(4, f"Min Hum {EXTERNAL_LOW_HUMIDITY}", justification='left')
 
-    # BONNETDisplay.display_text_center(page_4_data, color_name="red", brightness_factor=1.0)
+    BONNETDisplay.display_rows_center(["External Stats:", f"Max Temp {EXTERNAL_HIGH_TEMP}",
+                                       f"Min Temp {EXTERNAL_LOW_TEMP}", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
+                                       f"Min Hum {EXTERNAL_LOW_HUMIDITY}"], 'white',1.0, justification='left')
+
 
 def show_page(page_index):
     global last_page_changed
