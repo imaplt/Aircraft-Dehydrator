@@ -166,7 +166,6 @@ def task_external():
         BONNETDisplay.update_line(3, justification='left',
                                text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C")
     time.sleep(.1)
-
 #  @print_elapsed_time
 def _cycle_fan():
     # TODO: How do we want to engage this?
