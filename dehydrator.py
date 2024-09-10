@@ -397,7 +397,7 @@ def button_pressed_callback(button):
         
     if current_page == 4:
         edit_humidity_set(button)
-    else
+    else:
     	show_page(current_page)
 
 def button_hold_callback(button):
