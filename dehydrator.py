@@ -394,11 +394,11 @@ def button_pressed_callback(button):
         print("B button pressed")
     else:
         print("Unknown button")
+    
+    show_page(current_page)
         
     if current_page == 4:
         edit_humidity_set(button)
-    else:
-    	show_page(current_page)
 
 def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
