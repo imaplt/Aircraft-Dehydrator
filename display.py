@@ -215,7 +215,7 @@ class BONNETDisplay:
         self.draw.text(position, text, font=self.font, fill=color)
         self.disp.image(self.image)
 
-    def display_default_four_rows(self, color_name="white", brightness_factor=1.0):
+    def display_default_rows(self, color_name="white", brightness_factor=1.0):
         self.oled_lines = ["Internal:", "reading...", "External:", "reading...", " "]
         self.display_rows_center(["Internal:", "reading...", "External:", "reading...", " "], color_name,
                                  brightness_factor, justification='left')
@@ -247,7 +247,7 @@ class BONNETDisplay:
             self.draw.text(position, text, font=self.font, fill=color)
         self.disp.image(self.image)
 
-    def update_line(self, line_number, text, color_name="white", brightness_factor=1.0, font_size=10,
+    def update_line(self, line_number, text, color_name="white", brightness_factor=1.0, font_size=24,
                     justification='center'):
         if line_number < 0 or line_number >= len(self.oled_lines):
             raise ValueError("line_number must be between 0 and {len(self.oled_lines)-1}")

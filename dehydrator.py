@@ -243,7 +243,7 @@ def display_max_humidity(value):
 def display_default_page():
     # Render static data from global variables
     # BONNETDisplay.clear_screen()
-    BONNETDisplay.display_default_four_rows()
+    BONNETDisplay.display_default_rows()
     #BONNETDisplay.display_text_center(page_1_data, color_name="blue", brightness_factor=1.0)
 
 def display_fan_stats():
@@ -312,13 +312,11 @@ def display_internal_stats():
                                            f"Min Temp {INTERNAL_LOW_TEMP}", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
                                            f"Min Hum {INTERNAL_LOW_HUMIDITY}"], 'white',1.0, justification='left')
 
-
 def display_external_stats():
 
     BONNETDisplay.display_rows_center(["External Stats:", f"Max Temp {EXTERNAL_HIGH_TEMP}",
                                        f"Min Temp {EXTERNAL_LOW_TEMP}", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
                                        f"Min Hum {EXTERNAL_LOW_HUMIDITY}"], 'white',1.0, justification='left')
-
 
 def show_page(page_index):
     global last_page_changed
