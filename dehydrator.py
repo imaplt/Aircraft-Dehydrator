@@ -247,12 +247,6 @@ def display_default_page():
     #BONNETDisplay.display_text_center(page_1_data, color_name="blue", brightness_factor=1.0)
 
 def display_fan_stats():
-    # BONNETDisplay.clear_screen()
-    BONNETDisplay.update_line(0,"Fan Stats:",justification='left')
-    BONNETDisplay.update_line(1, f"C {FAN_RUNNING_TIME}", justification='left')
-    BONNETDisplay.update_line(2, f"M {FAN_MAX_RUNTIME}", justification='left')
-    BONNETDisplay.update_line(3, f"T {FAN_TOTAL_DURATION}", justification='left')
-    # BONNETDisplay.display_text_center(page_2_data, color_name="green", brightness_factor=1.0)
     BONNETDisplay.display_rows_center(["Fan Stats:", f"C {FAN_RUNNING_TIME}",f"M {FAN_MAX_RUNTIME}",
                                        f"T {FAN_TOTAL_DURATION}", " " ], 'white',1.0, justification='left')
 
