@@ -36,7 +36,7 @@ def task_internal():
         INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page
 
     if fanController.fan_engaged and current_page == 1:
-        FAN_RUNNING_TIME = time.time() -  fanController.start_time
+        FAN_RUNNING_TIME = timedelta(seconds=(time.time() -  fanController.start_time))
         display_fan_stats()
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -88,7 +88,8 @@ def task_internal():
                 FAN_RUNNING = True
                 time.sleep(1)
                 # Reset display back to previous lines
-                BONNETDisplay.display_rows_center(BONNETDisplay.oled_lines, justification='left')
+                display_fan_stats()
+                # BONNETDisplay.display_rows_center(BONNETDisplay.oled_lines, justification='left')
                 print(run_time, FAN_MAX_RUNTIME, FAN_LIMIT)
             if timedelta(seconds=run_time) > FAN_MAX_RUNTIME:
                 FAN_MAX_RUNTIME = timedelta(seconds=run_time)
@@ -249,7 +250,7 @@ def display_default_page():
 
 
 def display_fan_stats():
-    BONNETDisplay.display_rows_center(["Fan Stats:", f"C {0}",f"M {FAN_MAX_RUNTIME}",
+    BONNETDisplay.display_rows_center(["Fan Stats:", f"C {FAN_RUNNING_TIME}",f"M {FAN_MAX_RUNTIME}",
                                        f"T {FAN_TOTAL_DURATION}", " " ], 'white',1.0, justification='left')
 
 def edit_humidity_set(button):
