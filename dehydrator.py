@@ -377,7 +377,7 @@ def button_pressed_callback(button):
 
     if button.pin.number == BTN_L_PIN:
         if current_page == 5:
-            selected_option == 1
+            selected_option = 1
             draw_fan_limit()
         else:
             # Navigate to previous page
@@ -410,7 +410,8 @@ def button_pressed_callback(button):
             elif selected_option == 2:
                 FAN_LIMIT *= 2  # Double the fan limit
                 # TODO:  Add schedule back here
-                current_page == 0  # Return to page 0
+                current_page = 0  # Return to page 0
+                show_page(current_page)
                 schedule_tasks()
     elif button.pin.number == BTN_B_PIN:
          print("B button pressed")
@@ -429,7 +430,7 @@ def button_hold_callback(button):
 def _fan_limit_exceeded():
     global current_page
     schedule.clear()
-    current_page == 5
+    current_page = 5
     BONNETDisplay.display_text_center_with_border('FAN LIMIT EXCEEDED')
     time.sleep(3)
     if isDeviceDetected(statuses, 'LCD2004'):
