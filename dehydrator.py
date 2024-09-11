@@ -326,9 +326,11 @@ def display_external_stats():
                                        f"Min Hum {EXTERNAL_LOW_HUMIDITY}"], 'white',1.0, justification='left')
 
 def draw_fan_limit():
-    global selected_option
+    global selected_option, current_page
+
+    current_page == 5
     BONNETDisplay.display_ok_clear("Fan Limit Exceeded",ok_text="OK", clear_text="CLEAR", color_name="white",
-                                   brightness_factor=1.0, justification='center')
+                                   brightness_factor=1.0, selected=1)
 
 def show_page(page_index):
     global last_page_changed
