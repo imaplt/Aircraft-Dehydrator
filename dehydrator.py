@@ -130,7 +130,7 @@ def task_internal():
                 show_page(current_page)
                 # TODO: Update to only correct the right line.
                 # BONNETDisplay.display_rows_center(BONNETDisplay.oled_lines, justification='left')
-    if time.time() - last_page_changed  > 8 and current_page > 0:
+    if time.time() - last_page_changed  > 8 and (0 < current_page < 5):
         current_page = 0
         show_page(current_page)
 # @print_elapsed_time
@@ -367,7 +367,8 @@ def save_config():
     configManager.set_duration_config('MAX_FAN_RUNTIME', FAN_MAX_RUNTIME, 'LOG')
 
 def button_pressed_callback(button):
-    global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, humidity_mode
+    global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, \
+        humidity_mode, FAN_LIMIT
     now = time.time()
 
     if button.pin.number == BTN_L_PIN:
@@ -390,8 +391,15 @@ def button_pressed_callback(button):
         print("Center button pressed")
     elif button.pin.number == BTN_A_PIN:
         print("A button pressed")
+        if current_page == 5:
+            if selected_option == "OK":
+                cleanup()  # Call the cleanup function
+            elif selected_option == "CLEAR":
+                FAN_LIMIT *= 2  # Double the fan limit
+                # TODO:  Add schedule back here
+                current_page == 0  # Return to page 0
     elif button.pin.number == BTN_B_PIN:
-        print("B button pressed")
+         print("B button pressed")
     else:
         print("Unknown button")
     
