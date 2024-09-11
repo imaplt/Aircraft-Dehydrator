@@ -37,6 +37,7 @@ def task_internal():
 
     if fanController.fan_engaged and current_page == 1:
         FAN_RUNNING_TIME = timedelta(seconds=(int(time.time() -  fanController.start_time)))
+        # TODO: Update only the current time line...
         display_fan_stats()
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -252,7 +253,6 @@ def display_default_page():
     BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", "Ambient Sensor:",
                                        f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "], 'white', 1.0, justification='left')
 
-
 def display_fan_stats():
     BONNETDisplay.display_rows_center(["Fan Stats:", f"C {FAN_RUNNING_TIME}",f"M {FAN_MAX_RUNTIME}",
                                        f"T {FAN_TOTAL_DURATION}", " " ], 'white',1.0, justification='left')
@@ -401,7 +401,11 @@ def _fan_limit_exceeded():
     # Cancel all the jobs
     schedule.clear()
     BONNETDisplay.display_text_center_with_border('FAN LIMIT EXCEEDED')
-    lcd2004Display.display_text_with_border(['FAN LIMIT EXCEEDED'])
+    time.sleep(10)
+    if isDeviceDetected(statuses, 'LCD2004'):
+        lcd2004Display = LCD2004Display()
+        lcd2004Display.clear()
+        lcd2004Display.display_text_with_border(['FAN LIMIT EXCEEDED'])
     fanController.set_fan_speed(0)
     save_config()
     while True:
