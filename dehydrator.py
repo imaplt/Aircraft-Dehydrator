@@ -330,7 +330,7 @@ def draw_fan_limit():
 
     current_page == 5
     BONNETDisplay.display_ok_clear("Fan Limit Exceeded",ok_text="OK", clear_text="CLEAR", color_name="white",
-                                   brightness_factor=1.0, selected=1)
+                                   brightness_factor=1.0, selected=selected_option)
 
 def show_page(page_index):
     global last_page_changed
@@ -368,21 +368,29 @@ def save_config():
 
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, \
-        humidity_mode, FAN_LIMIT
+        humidity_mode, FAN_LIMIT, selected_option
     now = time.time()
 
     if button.pin.number == BTN_L_PIN:
-        # Navigate to previous page
-        current_page -= 1
-        if current_page < 0:
-            current_page = total_pages - 1  # Wrap around to the last page
-        humidity_mode = "selection"  # Reset humidity mode when changing page
+        if current_page == 5:
+            selected_option == 1
+            draw_fan_limit()
+        else:
+            # Navigate to previous page
+            current_page -= 1
+            if current_page < 0:
+                current_page = total_pages - 1  # Wrap around to the last page
+            humidity_mode = "selection"  # Reset humidity mode when changing page
     elif button.pin.number == BTN_R_PIN:
-        # Navigate to next page
-        current_page += 1
-        if current_page >= total_pages:
-            current_page = 0  # Wrap around to the first page
-        humidity_mode = "selection"  # Reset humidity mode when changing pages
+        if current_page == 5:
+            selected_option = 2
+            draw_fan_limit()
+        else:
+            # Navigate to next page
+            current_page += 1
+            if current_page >= total_pages:
+                current_page = 0  # Wrap around to the first page
+            humidity_mode = "selection"  # Reset humidity mode when changing pages
     elif button.pin.number == BTN_U_PIN:
         print("Up button pressed")
     elif button.pin.number == BTN_D_PIN:
@@ -392,9 +400,10 @@ def button_pressed_callback(button):
     elif button.pin.number == BTN_A_PIN:
         print("A button pressed")
         if current_page == 5:
-            if selected_option == "OK":
+            print("current page:5")
+            if selected_option == 1:
                 cleanup()  # Call the cleanup function
-            elif selected_option == "CLEAR":
+            elif selected_option == 2:
                 FAN_LIMIT *= 2  # Double the fan limit
                 # TODO:  Add schedule back here
                 current_page == 0  # Return to page 0
@@ -521,10 +530,9 @@ if __name__ == "__main__":
     humidity_mode = "selection"  # Can be 'selection' or 'edit'
     humidity_selected = "max"  # Can be 'max' or 'min'
     humidity_blink_state = True  # Used for blinking the value in edit mode
-
-    # Variable to hold current page index
     current_page = 0
     total_pages = 5
+    current_selected = 1
 
     # GPIO setup using gpiozero for input buttons
     btn_lt = Button(BTN_L_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
