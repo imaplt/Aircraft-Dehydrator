@@ -74,7 +74,7 @@ def task_internal():
         INTERNAL_HUMIDITY = internaloutput['humidity']
         INTERNAL_TEMP = internaloutput['temperature']
         if current_page == 0:
-            display_fan_stats()
+            display_default_page()
             # TODO: Updated only the correct line.
             # BONNETDisplay.update_line(1, text=f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", justification='left')
         if internaloutput['humidity'] > MAX_HUMIDITY:
@@ -90,7 +90,7 @@ def task_internal():
                 FAN_RUNNING = True
                 time.sleep(2)
                 # Reset display back to previous lines
-                display_default_page()
+                show_page(current_page)
                 # BONNETDisplay.display_rows_center(BONNETDisplay.oled_lines, justification='left')
                 print(run_time, FAN_MAX_RUNTIME, FAN_LIMIT)
             if timedelta(seconds=run_time) > FAN_MAX_RUNTIME:
@@ -124,12 +124,11 @@ def task_internal():
                 FAN_RUNNING_TIME = 0
                 save_config()
                 BONNETDisplay.display_text_center_with_border('Fan Stopped...')
-                time.sleep(1)
+                time.sleep(2)
                 # Reset display back to prev lines
-                display_default_page()
+                show_page(current_page)
                 # TODO: Update to only correct the right line.
                 # BONNETDisplay.display_rows_center(BONNETDisplay.oled_lines, justification='left')
-                time.sleep(.1)  # Adjust as needed
     if time.time() - last_page_changed  > 8 and current_page > 0:
         current_page = 0
         show_page(current_page)
@@ -167,7 +166,7 @@ def task_external():
     # Update previous output values
     externalprevious_output['temperature'] = externaloutput['temperature']
     externalprevious_output['humidity'] = externaloutput['humidity']
-    print("External Sensor Reading:", externaloutput)
+    print("Ambient Sensor Reading:", externaloutput)
     EXTERNAL_TEMP = externaloutput['temperature']
     EXTERNAL_HUMIDITY = externaloutput['humidity']
     if current_page == 0:
@@ -250,7 +249,7 @@ def display_max_humidity(value):
 
 def display_default_page():
     # Render static data from global variables
-    BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", "External Sensor:",
+    BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", "Ambient Sensor:",
                                        f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "], 'white', 1.0, justification='left')
 
 
@@ -322,7 +321,7 @@ def display_internal_stats():
 
 def display_external_stats():
 
-    BONNETDisplay.display_rows_center(["External Stats:", f"Max Temp {EXTERNAL_HIGH_TEMP}",
+    BONNETDisplay.display_rows_center(["Ambient Stats:", f"Max Temp {EXTERNAL_HIGH_TEMP}",
                                        f"Min Temp {EXTERNAL_LOW_TEMP}", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
                                        f"Min Hum {EXTERNAL_LOW_HUMIDITY}"], 'white',1.0, justification='left')
 
