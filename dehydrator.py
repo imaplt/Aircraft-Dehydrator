@@ -372,6 +372,8 @@ def button_pressed_callback(button):
         humidity_mode, FAN_LIMIT, selected_option
     now = time.time()
 
+    print(f"Page: {current_page} Button: {button.pin.number}")
+
     if button.pin.number == BTN_L_PIN:
         if current_page == 5:
             selected_option == 1
