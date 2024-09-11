@@ -88,7 +88,7 @@ def task_internal():
                 # TODO: Update to save current page and then return
                 BONNETDisplay.display_text_center_with_border('Fan Started...')
                 FAN_RUNNING = True
-                time.sleep(1)
+                time.sleep(2)
                 # Reset display back to previous lines
                 display_default_page()
                 # BONNETDisplay.display_rows_center(BONNETDisplay.oled_lines, justification='left')
