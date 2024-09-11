@@ -70,8 +70,7 @@ def task_internal():
         INTERNAL_HUMIDITY = internaloutput['humidity']
         INTERNAL_TEMP = internaloutput['temperature']
         if current_page == 0:
-            BONNETDisplay.update_line(1, justification='left',
-                                   text=f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C")
+            BONNETDisplay.update_line(1, text=f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", justification='left')
         if internaloutput['humidity'] > MAX_HUMIDITY:
             started, run_time = fanController.set_fan_speed(100)
             if started:
@@ -163,8 +162,7 @@ def task_external():
     EXTERNAL_TEMP = externaloutput['temperature']
     EXTERNAL_HUMIDITY = externaloutput['humidity']
     if current_page == 0:
-        BONNETDisplay.update_line(3, justification='left',
-                               text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C")
+        BONNETDisplay.update_line(3, text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C", justification='left')
     time.sleep(.1)
 #  @print_elapsed_time
 def _cycle_fan():
