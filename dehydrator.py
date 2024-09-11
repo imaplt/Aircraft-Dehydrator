@@ -74,7 +74,9 @@ def task_internal():
         INTERNAL_HUMIDITY = internaloutput['humidity']
         INTERNAL_TEMP = internaloutput['temperature']
         if current_page == 0:
-            BONNETDisplay.update_line(1, text=f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", justification='left')
+            display_fan_stats()
+            # TODO: Updated only the correct line.
+            # BONNETDisplay.update_line(1, text=f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", justification='left')
         if internaloutput['humidity'] > MAX_HUMIDITY:
             started, run_time = fanController.set_fan_speed(100)
             if started:
@@ -88,7 +90,7 @@ def task_internal():
                 FAN_RUNNING = True
                 time.sleep(1)
                 # Reset display back to previous lines
-                display_fan_stats()
+                display_default_page()
                 # BONNETDisplay.display_rows_center(BONNETDisplay.oled_lines, justification='left')
                 print(run_time, FAN_MAX_RUNTIME, FAN_LIMIT)
             if timedelta(seconds=run_time) > FAN_MAX_RUNTIME:
@@ -167,7 +169,9 @@ def task_external():
     EXTERNAL_TEMP = externaloutput['temperature']
     EXTERNAL_HUMIDITY = externaloutput['humidity']
     if current_page == 0:
-        BONNETDisplay.update_line(3, text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C", justification='left')
+        display_default_page()
+        # TODO: Only update the correct line here.
+        # BONNETDisplay.update_line(3, text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C", justification='left')
     time.sleep(.1)
 #  @print_elapsed_time
 def _cycle_fan():
