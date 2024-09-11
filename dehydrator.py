@@ -402,8 +402,6 @@ def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
 
 def _fan_limit_exceeded():
-    # TODO: Should this be a hard limit? Some way to change this maybe?
-    # Cancel all the jobs
     schedule.clear()
     BONNETDisplay.display_text_center_with_border('FAN LIMIT EXCEEDED')
     time.sleep(5)
