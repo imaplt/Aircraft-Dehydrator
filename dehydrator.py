@@ -126,9 +126,11 @@ def task_internal():
                 BONNETDisplay.display_text_center_with_border('Fan Stopped...')
                 time.sleep(1)
                 # Reset display back to prev lines
-                BONNETDisplay.display_rows_center(BONNETDisplay.oled_lines, justification='left')
+                display_default_page()
+                # TODO: Update to only correct the right line.
+                # BONNETDisplay.display_rows_center(BONNETDisplay.oled_lines, justification='left')
                 time.sleep(.1)  # Adjust as needed
-    if time.time() - last_page_changed  > 5 and current_page > 0:
+    if time.time() - last_page_changed  > 8 and current_page > 0:
         current_page = 0
         show_page(current_page)
 # @print_elapsed_time
@@ -172,7 +174,6 @@ def task_external():
         display_default_page()
         # TODO: Only update the correct line here.
         # BONNETDisplay.update_line(3, text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C", justification='left')
-    time.sleep(.1)
 #  @print_elapsed_time
 def _cycle_fan():
     # TODO: How do we want to engage this?
