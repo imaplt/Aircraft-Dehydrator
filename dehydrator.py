@@ -410,6 +410,7 @@ def button_pressed_callback(button):
                 FAN_LIMIT *= 2  # Double the fan limit
                 # TODO:  Add schedule back here
                 current_page == 0  # Return to page 0
+                schedule_tasks()
     elif button.pin.number == BTN_B_PIN:
          print("B button pressed")
     else:
@@ -425,6 +426,7 @@ def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
 
 def _fan_limit_exceeded():
+    global current_page
     schedule.clear()
     current_page == 5
     BONNETDisplay.display_text_center_with_border('FAN LIMIT EXCEEDED')
