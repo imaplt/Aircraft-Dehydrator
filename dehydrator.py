@@ -36,7 +36,7 @@ def task_internal():
         INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page
 
     if fanController.fan_engaged and current_page == 1:
-        FAN_RUNNING_TIME = timedelta(seconds=(time.time() -  fanController.start_time))
+        FAN_RUNNING_TIME = timedelta(seconds=(int(time.time() -  fanController.start_time)))
         display_fan_stats()
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
