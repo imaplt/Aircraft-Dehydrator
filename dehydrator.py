@@ -406,15 +406,16 @@ def _fan_limit_exceeded():
     # Cancel all the jobs
     schedule.clear()
     BONNETDisplay.display_text_center_with_border('FAN LIMIT EXCEEDED')
-    time.sleep(10)
+    time.sleep(5)
     if isDeviceDetected(statuses, 'LCD2004'):
         lcd2004Display = LCD2004Display()
         lcd2004Display.clear()
         lcd2004Display.display_text_with_border(['FAN LIMIT EXCEEDED'])
+    draw_fan_limit()
     fanController.set_fan_speed(0)
     save_config()
     while True:
-        time.sleep(1)
+        time.sleep(10)
 
 def cleanup():
     # Want to add code here to update display, update log with run time etc
