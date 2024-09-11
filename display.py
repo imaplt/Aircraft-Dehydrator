@@ -247,50 +247,73 @@ class BONNETDisplay:
             self.draw.text(position, text, font=self.font, fill=color)
         self.disp.image(self.image)
 
-    def display_ok_clear(self, text, ok_text="OK", clear_text="CLEAR", color_name="white", brightness_factor=1.0, justification='center'):
-
+    def display_ok_clear(self, text, ok_text="OK", clear_text="CLEAR", color_name="white", brightness_factor=1.0,
+                         selected=1):
+        # Clear the screen
         self.clear_screen()
 
         # Adjust brightness (apply brightness multiplier to the color)
         color = self.set_brightness(color_name, brightness_factor)
-        # display_brightness = tuple([int(c * brightness) for c in color])
 
         border_size = self.config_manager.get_border_size()
 
         # Draw the outer border
-        self.draw.rectangle((border_size, border_size, self.width - border_size - 1, self.height - border_size - 1),
-                            outline=color, fill=0)
+        self.draw.rectangle(
+            (border_size, border_size, self.width - border_size - 1, self.height - border_size - 1),
+            outline=color, fill=0
+        )
 
-        # Split text by spaces to check the number of words
+        # Split the text by spaces to check the number of words and handle the layout dynamically
         words = text.split()
+
         if len(words) <= 2:
-            # Display the text on one line if 1 or 2 words
-            self.draw.text((40, 40), text, font=self.font)
+            # Single line display for 1 or 2 words
+            text_bbox = self.draw.textbbox((0, 0), text, font=self.font)
+            text_width = text_bbox[2] - text_bbox[0]
+            text_x = (self.width - text_width) // 2  # Centered horizontally
+            self.draw.text((text_x, 40), text, font=self.font, fill=color)
         elif len(words) == 3:
-            # Display the first two words on the first line and the last word on the next line
+            # Two-line display for 3 words (first two words on the first line, last word on the second)
             first_line = " ".join(words[:2])
             second_line = words[2]
-            self.draw.text((30, 40), first_line, font=self.font)
-            self.draw.text((60, 80), second_line, font=self.font)
 
-        # Draw OK and CLEAR options, equidistant at the bottom
-        ok_width, _ = self.draw.textsize(ok_text, font=self.font)
-        clear_width, _ = self.draw.textsize(clear_text, font=self.font)
+            # Calculate the bounding boxes to center the text
+            first_line_bbox = self.draw.textbbox((0, 0), first_line, font=self.font)
+            second_line_bbox = self.draw.textbbox((0, 0), second_line, font=self.font)
 
-        # Calculate the positions for OK and CLEAR to be equidistant
-        ok_x = (240 // 4) - (ok_width // 2)  # Equidistant OK
-        clear_x = (3 * 240 // 4) - (clear_width // 2)  # Equidistant CLEAR
-        bottom_y = 180  # Y-coordinate for both OK and CLEAR
+            first_line_width = first_line_bbox[2] - first_line_bbox[0]
+            second_line_width = second_line_bbox[2] - second_line_bbox[0]
+
+            first_line_x = (self.width - first_line_width) // 2
+            second_line_x = (self.width - second_line_width) // 2
+
+            # Draw the text
+            self.draw.text((first_line_x, 40), first_line, font=self.font, fill=color)
+            self.draw.text((second_line_x, 80), second_line, font=self.font, fill=color)
+
+        # Draw OK and CLEAR options at the bottom, equidistant
+        ok_bbox = self.draw.textbbox((0, 0), ok_text, font=self.font)
+        clear_bbox = self.draw.textbbox((0, 0), clear_text, font=self.font)
+
+        ok_width = ok_bbox[2] - ok_bbox[0]
+        clear_width = clear_bbox[2] - clear_bbox[0]
+
+        ok_x = (self.width // 4) - (ok_width // 2)  # Equidistant OK
+        clear_x = (3 * self.width // 4) - (clear_width // 2)  # Equidistant CLEAR
+        bottom_y = self.height - 40  # Y-coordinate for both OK and CLEAR options
 
         # Highlight the selected option
-        # if selected_option == "OK":
-        #     self.draw.text((ok_x, bottom_y), ok_text, font=self.font, fill="red")  # Highlight OK
-        #     self.draw.text((clear_x, bottom_y), clear_text, font=self.font, fill="white")
-        # else:
-        #     self.draw.text((ok_x, bottom_y), ok_text, font=self.font, fill="white")
-        #     self.draw.text((clear_x, bottom_y), clear_text, font=self.font, fill="red")  # Highlight CLEAR
+        if selected == 1:
+            # OK is highlighted
+            self.draw.text((ok_x, bottom_y), ok_text, font=self.font, fill="red")
+            self.draw.text((clear_x, bottom_y), clear_text, font=self.font, fill="white")
+        else:
+            # CLEAR is highlighted
+            self.draw.text((ok_x, bottom_y), ok_text, font=self.font, fill="white")
+            self.draw.text((clear_x, bottom_y), clear_text, font=self.font, fill="red")
 
-        self.disp.image(self.image)  # Display the updated image
+        # Update the display with the modified image
+        self.disp.image(self.image)
 
     def update_line(self, line_number, text, color_name="white", brightness_factor=1.0, font_size=24,
                     justification='center'):
