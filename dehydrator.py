@@ -406,6 +406,7 @@ def button_pressed_callback(button):
         if current_page == 5:
             print("current page:5")
             if selected_option == 1:
+                schedule.clear()
                 cleanup()  # Call the cleanup function
             elif selected_option == 2:
                 FAN_LIMIT *= 2  # Double the fan limit
