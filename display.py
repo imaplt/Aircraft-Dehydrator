@@ -247,6 +247,51 @@ class BONNETDisplay:
             self.draw.text(position, text, font=self.font, fill=color)
         self.disp.image(self.image)
 
+    def display_ok_clear(self, text, ok_text="OK", clear_text="CLEAR", color_name="white", brightness_factor=1.0, justification='center'):
+
+        self.clear_screen()
+
+        # Adjust brightness (apply brightness multiplier to the color)
+        color = self.set_brightness(color_name, brightness_factor)
+        # display_brightness = tuple([int(c * brightness) for c in color])
+
+        border_size = self.config_manager.get_border_size()
+
+        # Draw the outer border
+        self.draw.rectangle((border_size, border_size, self.width - border_size - 1, self.height - border_size - 1),
+                            outline=color, fill=0)
+
+        # Split text by spaces to check the number of words
+        words = text.split()
+        if len(words) <= 2:
+            # Display the text on one line if 1 or 2 words
+            self.draw.text((40, 40), text, font=self.font)
+        elif len(words) == 3:
+            # Display the first two words on the first line and the last word on the next line
+            first_line = " ".join(words[:2])
+            second_line = words[2]
+            self.draw.text((30, 40), first_line, font=self.font)
+            self.draw.text((60, 80), second_line, font=self.font)
+
+        # Draw OK and CLEAR options, equidistant at the bottom
+        ok_width, _ = self.draw.textsize(ok_text, font=self.font)
+        clear_width, _ = self.draw.textsize(clear_text, font=self.font)
+
+        # Calculate the positions for OK and CLEAR to be equidistant
+        ok_x = (240 // 4) - (ok_width // 2)  # Equidistant OK
+        clear_x = (3 * 240 // 4) - (clear_width // 2)  # Equidistant CLEAR
+        bottom_y = 180  # Y-coordinate for both OK and CLEAR
+
+        # Highlight the selected option
+        # if selected_option == "OK":
+        #     self.draw.text((ok_x, bottom_y), ok_text, font=self.font, fill="red")  # Highlight OK
+        #     self.draw.text((clear_x, bottom_y), clear_text, font=self.font, fill="white")
+        # else:
+        #     self.draw.text((ok_x, bottom_y), ok_text, font=self.font, fill="white")
+        #     self.draw.text((clear_x, bottom_y), clear_text, font=self.font, fill="red")  # Highlight CLEAR
+
+        self.disp.image(self.image)  # Display the updated image
+
     def update_line(self, line_number, text, color_name="white", brightness_factor=1.0, font_size=24,
                     justification='center'):
         if line_number < 0 or line_number >= len(self.oled_lines):
