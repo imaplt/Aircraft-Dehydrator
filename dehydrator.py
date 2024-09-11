@@ -249,7 +249,7 @@ def display_default_page():
 
 
 def display_fan_stats():
-    BONNETDisplay.display_rows_center(["Fan Stats:", f"C {FAN_RUNNING_TIME}",f"M {FAN_MAX_RUNTIME}",
+    BONNETDisplay.display_rows_center(["Fan Stats:", f"C {0}",f"M {FAN_MAX_RUNTIME}",
                                        f"T {FAN_TOTAL_DURATION}", " " ], 'white',1.0, justification='left')
 
 def edit_humidity_set(button):
