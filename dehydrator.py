@@ -35,6 +35,10 @@ def task_internal():
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
         INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page
 
+    if fanController.fan_engaged and current_page == 1:
+        FAN_RUNNING_TIME = time.time() -  fanController.start_time
+        display_fan_stats()
+
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
 
@@ -240,9 +244,9 @@ def display_max_humidity(value):
 
 def display_default_page():
     # Render static data from global variables
-    # BONNETDisplay.clear_screen()
-    BONNETDisplay.display_default_rows()
-    #BONNETDisplay.display_text_center(page_1_data, color_name="blue", brightness_factor=1.0)
+    BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", "External Sensor:",
+                                       f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "], 'white', 1.0, justification='left')
+
 
 def display_fan_stats():
     BONNETDisplay.display_rows_center(["Fan Stats:", f"C {FAN_RUNNING_TIME}",f"M {FAN_MAX_RUNTIME}",
