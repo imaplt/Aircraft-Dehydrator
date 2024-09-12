@@ -299,7 +299,7 @@ def edit_humidity_set(button):
 def display_set_humidity():
     BONNETDisplay.clear_screen()
     BONNETDisplay.display_text("Humidity Set", 10, 40)
-
+    print("Displaying set humidity...")
     # Highlight selected values
     if humidity_selected == "max":
         max_color = "red" if humidity_blink_state or humidity_mode == "selection" else "black"
