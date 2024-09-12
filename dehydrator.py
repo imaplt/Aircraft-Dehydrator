@@ -540,7 +540,7 @@ if __name__ == "__main__":
     humidity_selected = "max"  # Can be 'max' or 'min'
     humidity_blink_state = True  # Used for blinking the value in edit mode
     current_page = 0
-    total_pages = 5
+    total_pages = 4
     selected_option = 1
 
     # GPIO setup using gpiozero for input buttons
