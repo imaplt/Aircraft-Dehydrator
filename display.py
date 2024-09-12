@@ -269,7 +269,7 @@ class BONNETDisplay:
             # else:
             #     fan_color = "white"  # White when the fan is not running
             # Get color with brightness applied
-            fan_color = self.set_brightness("white", 1.0)
+            fan_color = self.set_brightness("green", 1.0)
             # Tint the fan icon based on the fan status and display it
             colored_fan_icon = tint_icon(fan_icon, fan_color)
             self.image.paste(colored_fan_icon, (10, 190), colored_fan_icon.split()[-1])  # Paste with transparency mask
