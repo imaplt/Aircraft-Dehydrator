@@ -45,9 +45,16 @@ class DisplayConfig:
 
 
 def tint_icon(icon, color):
-    # Create a colored version of the icon
-    colored_icon = ImageOps.colorize(icon.convert("L"), black="black", white=color)
-    return colored_icon
+    # Split the icon into its RGB and Alpha components
+    icon_rgb, icon_alpha = icon.convert("RGB"), icon.split()[-1]
+
+    # Create a solid color image the same size as the icon
+    colorized_icon = Image.new("RGBA", icon.size, color=color)
+
+    # Composite the colorized image with the original alpha channel
+    tinted_icon = Image.composite(colorized_icon, icon_rgb, icon_alpha)
+
+    return tinted_icon
 
 
 class BONNETDisplay:
@@ -235,8 +242,8 @@ class BONNETDisplay:
         # Get color with brightness applied
         color = self.set_brightness(color_name, brightness_factor)
 
-        # Load the fan icon
-        fan_icon = Image.open("fan_icon.png").resize((24, 24))  # Resize the fan icon to fit the display
+        # Load the fan icon with transparency
+        fan_icon = Image.open("fan_icon.png").convert("RGBA").resize((24, 24))  # Ensure icon is in RGBA mode
 
         for i in range(num_lines):
             text = texts[i]
@@ -264,7 +271,7 @@ class BONNETDisplay:
             fan_color = "white"
             # Tint the fan icon based on the fan status and display it
             colored_fan_icon = tint_icon(fan_icon, fan_color)
-            self.draw.bitmap((10, 180), colored_fan_icon)
+            self.image.paste(colored_fan_icon, (10, 180), colored_fan_icon.split()[-1])  # Paste with transparency mask
         self.disp.image(self.image)
 
     def display_ok_clear(self, text, ok_text="OK", clear_text="CLEAR", color_name="white", brightness_factor=1.0,
