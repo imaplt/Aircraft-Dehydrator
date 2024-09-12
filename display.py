@@ -243,7 +243,7 @@ class BONNETDisplay:
         color = self.set_brightness(color_name, brightness_factor)
 
         # Load the fan icon with transparency
-        fan_icon = Image.open("fan_icon.png").convert("RGBA").resize((32, 32))  # Ensure icon is in RGBA mode
+        fan_icon = Image.open("fan_icon.png").convert("RGBA").resize((48, 48))  # Ensure icon is in RGBA mode
 
         for i in range(num_lines):
             text = texts[i]
@@ -268,10 +268,10 @@ class BONNETDisplay:
             #     fan_color = "green"  # Green when the fan is running
             # else:
             #     fan_color = "white"  # White when the fan is not running
-            fan_color = "white"
+            fan_color = "green"
             # Tint the fan icon based on the fan status and display it
             colored_fan_icon = tint_icon(fan_icon, fan_color)
-            self.image.paste(colored_fan_icon, (10, 206), colored_fan_icon.split()[-1])  # Paste with transparency mask
+            self.image.paste(colored_fan_icon, (10, 190), colored_fan_icon.split()[-1])  # Paste with transparency mask
         self.disp.image(self.image)
 
     def display_ok_clear(self, text, ok_text="OK", clear_text="CLEAR", color_name="white", brightness_factor=1.0,
