@@ -231,7 +231,7 @@ class BONNETDisplay:
 
     def display_default_rows(self, color_name="white", brightness_factor=1.0):
         self.oled_lines = ["Internal:", "reading...", "External:", "reading...", " "]
-        self.display_rows_center(["Internal:", "reading...", "External:", "reading...", " "], color_name,
+        self.display_rows_center(["Internal:", "reading...", "External:", "reading...", " "],0, color_name,
                                  brightness_factor, justification='left')
 
     def display_rows_center(self, texts, current_page, color_name="white", brightness_factor=1.0, justification='center'):
@@ -243,7 +243,7 @@ class BONNETDisplay:
         color = self.set_brightness(color_name, brightness_factor)
 
         # Load the fan icon with transparency
-        fan_icon = Image.open("fan_icon.png").convert("RGBA").resize((24, 24))  # Ensure icon is in RGBA mode
+        fan_icon = Image.open("fan_icon.png").convert("RGBA").resize((32, 32))  # Ensure icon is in RGBA mode
 
         for i in range(num_lines):
             text = texts[i]
@@ -271,7 +271,7 @@ class BONNETDisplay:
             fan_color = "white"
             # Tint the fan icon based on the fan status and display it
             colored_fan_icon = tint_icon(fan_icon, fan_color)
-            self.image.paste(colored_fan_icon, (10, 180), colored_fan_icon.split()[-1])  # Paste with transparency mask
+            self.image.paste(colored_fan_icon, (10, 206), colored_fan_icon.split()[-1])  # Paste with transparency mask
         self.disp.image(self.image)
 
     def display_ok_clear(self, text, ok_text="OK", clear_text="CLEAR", color_name="white", brightness_factor=1.0,
