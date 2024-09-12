@@ -44,17 +44,22 @@ class DisplayConfig:
         return self.border_size
 
 
+# Function to tint the fan icon based on status and preserve transparency
 def tint_icon(icon, color):
-    # Split the icon into its RGB and Alpha components
-    icon_rgb, icon_alpha = icon.convert("RGB"), icon.split()[-1]
+    # Separate the RGB and alpha channels
+    icon_rgb = icon.convert("RGB")
+    icon_alpha = icon.getchannel("A")
 
-    # Create a solid color image the same size as the icon
-    colorized_icon = Image.new("RGBA", icon.size, color=color)
+    # Create a solid color image (RGBA) to apply as a tint
+    solid_color = Image.new("RGBA", icon.size, color)
 
-    # Composite the colorized image with the original alpha channel
-    tinted_icon = Image.composite(colorized_icon, icon_rgb, icon_alpha)
+    # Combine the original alpha channel with the solid color image
+    colored_icon = Image.composite(solid_color, icon_rgb, icon_alpha)
 
-    return tinted_icon
+    # Restore the alpha channel to preserve transparency
+    colored_icon.putalpha(icon_alpha)
+
+    return colored_icon
 
 
 class BONNETDisplay:
@@ -270,7 +275,7 @@ class BONNETDisplay:
             #     fan_color = "white"  # White when the fan is not running
             # Get color with brightness applied
             fan_color = self.set_brightness("green", 1.0)
-            fan_color = (0, 255, 0)
+            fan_color = (0, 255, 0, 255)
             # Tint the fan icon based on the fan status and display it
             colored_fan_icon = tint_icon(fan_icon, fan_color)
             self.image.paste(colored_fan_icon, (10, 190), colored_fan_icon.split()[-1])  # Paste with transparency mask
