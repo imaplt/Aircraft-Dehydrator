@@ -424,7 +424,7 @@ def button_pressed_callback(button):
     else:
         print("Unknown button")
     
-    if current_page < 4:
+    if current_page < 5:
         show_page(current_page)
         
     if current_page == 4:
