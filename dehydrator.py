@@ -263,6 +263,7 @@ def edit_humidity_set(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, humidity_mode, humidity_selected, humidity_blink_state
 
     print("Running Edit Humidity")
+    print(button.pin.number)
     if humidity_mode == "selection":
         # In selection mode: toggle between 'max' and 'min' with U and D buttons
         if button.pin.number == BTN_U_PIN or button.pin.number == BTN_D_PIN:
