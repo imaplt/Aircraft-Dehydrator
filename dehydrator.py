@@ -97,7 +97,6 @@ def task_internal():
             if timedelta(seconds=run_time) > FAN_MAX_RUNTIME:
                 FAN_MAX_RUNTIME = timedelta(seconds=run_time)
             if timedelta(seconds=run_time) > FAN_LIMIT:
-                # TODO: Add FAN_LIMIT logic, maybe a method or function?
                 print("Fan limit exceeded")
                 current_page = 5
                 logger.log(timestamp, 'WARN', 'SYSTEM', 'FAN',
@@ -129,13 +128,11 @@ def task_internal():
                 time.sleep(2)
                 # Reset display back to prev lines
                 show_page(current_page)
-                # TODO: Update to only correct the right line.
-                # BONNETDisplay.display_rows_center(BONNETDisplay.oled_lines, justification='left')
     if time.time() - last_page_changed  > 8 and (0 < current_page < 5):
         current_page = 0
         show_page(current_page)
 # @print_elapsed_time
-def task_external():
+def task_ambient():
     global EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY, EXTERNAL_TEMP, EXTERNAL_HUMIDITY
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -218,7 +215,7 @@ def task_alternate_screens():
 
 def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1, display_interval=30):
     schedule.every(int_interval).seconds.do(task_internal)
-    schedule.every(ext_interval).minutes.do(task_external)
+    schedule.every(ext_interval).minutes.do(task_ambient)
     # schedule.every(fan_interval).minutes.do(task_fan)
     if DISPLAY_ENABLED:
         schedule.every(display_interval).seconds.do(task_alternate_screens)
@@ -255,8 +252,12 @@ def display_default_page():
                                        f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "], 'white', 1.0, justification='left')
 
 def display_fan_stats():
-    BONNETDisplay.display_rows_center(["Fan Stats:", f"C {FAN_RUNNING_TIME}",f"M {FAN_MAX_RUNTIME}",
-                                       f"T {FAN_TOTAL_DURATION}", " " ], 'white',1.0, justification='left')
+    if FAN_RUNNING_TIME == 0:
+        BONNETDisplay.display_rows_center(["Fan Stats:", "Current: NOT RUNNING", f"Max: {FAN_MAX_RUNTIME}",
+                                           f"Total: {FAN_TOTAL_DURATION}", " "], 'white', 1.0, justification='left')
+    else:
+        BONNETDisplay.display_rows_center(["Fan Stats:", f"Current: {FAN_RUNNING_TIME}",f"Max: {FAN_MAX_RUNTIME}",
+                                           f"Total: {FAN_TOTAL_DURATION}", " " ], 'white',1.0, justification='left')
 
 def edit_humidity_set(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, humidity_mode, humidity_selected, humidity_blink_state
@@ -407,7 +408,7 @@ def button_pressed_callback(button):
             print("current page:5")
             if selected_option == 1:
                 schedule.clear()
-                cleanup()  # Call the cleanup function
+                raise ValueError("Fan limit exceeded. Ok Selected")
             elif selected_option == 2:
                 FAN_LIMIT *= 2  # Double the fan limit
                 # TODO:  Add schedule back here
@@ -623,7 +624,7 @@ if __name__ == "__main__":
                        fan_interval=TASK_FAN, display_interval=TASK_DISPLAY_ROTATION)
 
         # Need to run the External once to update the values
-        task_external()
+        task_ambient()
         if DISPLAY_ENABLED:
             lcd_display(1)
 
