@@ -2,11 +2,10 @@ import board
 import busio
 import time
 import smbus2 as smbus
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 import adafruit_ssd1306
-from digitalio import DigitalInOut, Direction
+from digitalio import DigitalInOut
 from adafruit_rgb_display import st7789
-from colorsys import hsv_to_rgb
 
 # Color definitions as RGB tuples
 COLORS = {
@@ -43,6 +42,12 @@ class DisplayConfig:
 
     def get_border_size(self):
         return self.border_size
+
+
+def tint_icon(icon, color):
+    # Create a colored version of the icon
+    colored_icon = ImageOps.colorize(icon.convert("L"), black="black", white=color)
+    return colored_icon
 
 
 class BONNETDisplay:
@@ -186,6 +191,8 @@ class BONNETDisplay:
             self.disp.image(self.image)
             time.sleep(fade_out_time / steps)
 
+    # Function to tint the fan icon based on status
+
     def display_text_center(self, text, color_name="white", brightness_factor=1.0, justification='center'):
         self.clear_screen()
 
@@ -220,13 +227,16 @@ class BONNETDisplay:
         self.display_rows_center(["Internal:", "reading...", "External:", "reading...", " "], color_name,
                                  brightness_factor, justification='left')
 
-    def display_rows_center(self, texts, color_name="white", brightness_factor=1.0, justification='center'):
+    def display_rows_center(self, texts, current_page, color_name="white", brightness_factor=1.0, justification='center'):
         self.clear_screen()
         num_lines = min(5, len(texts))
         line_height = self.height // num_lines
 
         # Get color with brightness applied
         color = self.set_brightness(color_name, brightness_factor)
+
+        # Load the fan icon
+        fan_icon = Image.open("fan_icon.png").resize((24, 24))  # Resize the fan icon to fit the display
 
         for i in range(num_lines):
             text = texts[i]
@@ -245,6 +255,16 @@ class BONNETDisplay:
 
             position = (x_position, i * line_height + (line_height - text_height) // 2)
             self.draw.text(position, text, font=self.font, fill=color)
+            # Display the fan icon with the appropriate color based on fan status
+        if current_page == 0:
+            # if
+            #     fan_color = "green"  # Green when the fan is running
+            # else:
+            #     fan_color = "white"  # White when the fan is not running
+            fan_color = "white"
+            # Tint the fan icon based on the fan status and display it
+            colored_fan_icon = tint_icon(fan_icon, fan_color)
+            self.draw.bitmap((10, 180), colored_fan_icon)
         self.disp.image(self.image)
 
     def display_ok_clear(self, text, ok_text="OK", clear_text="CLEAR", color_name="white", brightness_factor=1.0,

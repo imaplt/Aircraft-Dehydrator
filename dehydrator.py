@@ -249,7 +249,7 @@ def display_max_humidity(value):
 def display_default_page():
     # Render static data from global variables
     BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", "Ambient Sensor:",
-                                       f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "], 'white', 1.0, justification='left')
+                                       f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "],current_page, 'white', 1.0, justification='left')
 
 def display_fan_stats():
     if FAN_RUNNING_TIME == 0:
