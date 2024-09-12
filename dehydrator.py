@@ -249,15 +249,15 @@ def display_max_humidity(value):
 def display_default_page():
     # Render static data from global variables
     BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", "Ambient Sensor:",
-                                       f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "],current_page, 'white', 1.0, justification='left')
+                                       f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "],0, 'white', 1.0, justification='left')
 
 def display_fan_stats():
     if FAN_RUNNING_TIME == 0:
         BONNETDisplay.display_rows_center(["Fan Stats:", "Current: NOT RUNNING", f"Max: {FAN_MAX_RUNTIME}",
-                                           f"Total: {FAN_TOTAL_DURATION}", " "], 'white', 1.0, justification='left')
+                                           f"Total: {FAN_TOTAL_DURATION}", " "], 1,'white', 1.0, justification='left')
     else:
         BONNETDisplay.display_rows_center(["Fan Stats:", f"Current: {FAN_RUNNING_TIME}",f"Max: {FAN_MAX_RUNTIME}",
-                                           f"Total: {FAN_TOTAL_DURATION}", " " ], 'white',1.0, justification='left')
+                                           f"Total: {FAN_TOTAL_DURATION}", " " ], 1,'white',1.0, justification='left')
 
 def edit_humidity_set(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, humidity_mode, humidity_selected, humidity_blink_state
@@ -319,13 +319,13 @@ def display_internal_stats():
     # BONNETDisplay.display_text_center(page_3_data, color_name="yellow", brightness_factor=1.0)
     BONNETDisplay.display_rows_center(["Internal Stats:", f"Max Temp {INTERNAL_HIGH_TEMP}",
                                            f"Min Temp {INTERNAL_LOW_TEMP}", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
-                                           f"Min Hum {INTERNAL_LOW_HUMIDITY}"], 'white',1.0, justification='left')
+                                           f"Min Hum {INTERNAL_LOW_HUMIDITY}"], 2,'white',1.0, justification='left')
 
 def display_external_stats():
 
     BONNETDisplay.display_rows_center(["Ambient Stats:", f"Max Temp {EXTERNAL_HIGH_TEMP}",
                                        f"Min Temp {EXTERNAL_LOW_TEMP}", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
-                                       f"Min Hum {EXTERNAL_LOW_HUMIDITY}"], 'white',1.0, justification='left')
+                                       f"Min Hum {EXTERNAL_LOW_HUMIDITY}"], 3,'white',1.0, justification='left')
 
 def draw_fan_limit():
     global selected_option, current_page
