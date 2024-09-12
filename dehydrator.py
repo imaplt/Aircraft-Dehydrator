@@ -128,7 +128,7 @@ def task_internal():
                 time.sleep(2)
                 # Reset display back to prev lines
                 show_page(current_page)
-    if time.time() - last_page_changed  > 8 and (0 < current_page < 5):
+    if time.time() - last_page_changed  > 8 and (0 < current_page < 4):
         current_page = 0
         show_page(current_page)
 # @print_elapsed_time
