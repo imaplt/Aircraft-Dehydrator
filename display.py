@@ -239,16 +239,14 @@ class BONNETDisplay:
         self.display_rows_center(["Internal:", "reading...", "External:", "reading...", " "],0, color_name,
                                  brightness_factor, justification='left')
 
-    def display_rows_center(self, texts, current_page, color_name="white", brightness_factor=1.0, justification='center'):
+    def display_rows_center(self, texts, current_page, fan_running=False, color_name="white",
+                            brightness_factor=1.0, justification='center'):
         self.clear_screen()
         num_lines = min(5, len(texts))
         line_height = self.height // num_lines
 
         # Get color with brightness applied
         color = self.set_brightness(color_name, brightness_factor)
-
-        # Load the fan icon with transparency
-        fan_icon = Image.open("fan_icon.png").convert("RGBA").resize((48, 48))  # Ensure icon is in RGBA mode
 
         for i in range(num_lines):
             text = texts[i]
@@ -269,13 +267,12 @@ class BONNETDisplay:
             self.draw.text(position, text, font=self.font, fill=color)
             # Display the fan icon with the appropriate color based on fan status
         if current_page == 0:
-            # if
-            #     fan_color = "green"  # Green when the fan is running
-            # else:
-            #     fan_color = "white"  # White when the fan is not running
-            # Get color with brightness applied
-            fan_color = self.set_brightness("green", 1.0)
-            fan_color = (0, 255, 0, 255)
+            # Load the fan icon with transparency
+            fan_icon = Image.open("fan_icon.png").convert("RGBA").resize((48, 48))  # Ensure icon is in RGBA mode
+            if fan_running:
+                fan_color = (0, 255, 0, 255)  # Green (RGBA)
+            else:
+                fan_color = (255, 255, 255, 255)  # White (RGBA)
             # Tint the fan icon based on the fan status and display it
             colored_fan_icon = tint_icon(fan_icon, fan_color)
             self.image.paste(colored_fan_icon, (10, 190), colored_fan_icon.split()[-1])  # Paste with transparency mask
@@ -405,15 +402,52 @@ class BONNETDisplay:
 
         # Get color with brightness applied
         color = self.set_brightness(color_name, brightness_factor)
-
         border_size = self.config_manager.get_border_size()
+
+        # Draw border
         self.draw.rectangle((border_size, border_size, self.width - border_size - 1, self.height - border_size - 1),
                             outline=color, fill=0)
-        bbox = self.draw.textbbox((0, 0), text, font=self.font)
-        text_width = bbox[2] - bbox[0]
-        text_height = bbox[3] - bbox[1]
-        position = ((self.width - text_width) // 2, (self.height - text_height) // 2)
-        self.draw.text(position, text, font=self.font, fill=color)
+
+        # Split the text into words
+        words = text.split()
+
+        # Initialize the lines
+        if len(words) > 2:
+            first_line = " ".join(words[:2])
+            second_line = " ".join(words[2:])
+        else:
+            first_line = text
+            second_line = None
+
+        # Calculate bounding box for the first line
+        bbox_first_line = self.draw.textbbox((0, 0), first_line, font=self.font)
+        text_width_first_line = bbox_first_line[2] - bbox_first_line[0]
+        text_height_first_line = bbox_first_line[3] - bbox_first_line[1]
+
+        # If there is a second line, calculate its bounding box
+        if second_line:
+            bbox_second_line = self.draw.textbbox((0, 0), second_line, font=self.font)
+            text_width_second_line = bbox_second_line[2] - bbox_second_line[0]
+            text_height_second_line = bbox_second_line[3] - bbox_second_line[1]
+
+            # Calculate the total height for both lines with some spacing
+            total_text_height = text_height_first_line + text_height_second_line + 10  # Adjust 10 for spacing between lines
+        else:
+            total_text_height = text_height_first_line
+
+        # Center position for the first line
+        y_start = (self.height - total_text_height) // 2
+        position_first_line = ((self.width - text_width_first_line) // 2, y_start)
+
+        # Draw the first line
+        self.draw.text(position_first_line, first_line, font=self.font, fill=color)
+
+        # If there's a second line, calculate its position and draw it
+        if second_line:
+            position_second_line = ((self.width - text_width_second_line) // 2, y_start + text_height_first_line + 10)
+            self.draw.text(position_second_line, second_line, font=self.font, fill=color)
+
+        # Display the image
         self.disp.image(self.image)
 
 
