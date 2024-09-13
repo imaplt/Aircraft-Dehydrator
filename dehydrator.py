@@ -118,8 +118,8 @@ def task_internal():
     def display_on_current_page():
         """Update the default page display if needed."""
         if current_page == 0:
-            display_default_page()
-            # BONNETDisplay.update_line(1, text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C", justification='left')
+            # display_default_page()
+            BONNETDisplay.update_line(2, text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C", justification='left')
 
     # Main block to handle sensor change and fan control
     INTERNAL_HUMIDITY = internaloutput['humidity']
@@ -392,7 +392,8 @@ def button_pressed_callback(button):
         else:
             current_page -= 1
             if current_page < 0:
-                current_page = total_pages - 1  # Wrap around to the last page
+                # Wrap around to the last page accounting for config page
+                current_page = total_pages - 2
             humidity_mode = "selection"  # Reset humidity mode when changing page
     elif button.pin.number == BTN_R_PIN:
         if current_page == 5:
