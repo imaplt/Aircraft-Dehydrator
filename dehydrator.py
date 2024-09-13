@@ -321,10 +321,10 @@ def display_set_humidity():
 
     # Display the values with corresponding highlighting
     BONNETDisplay.display_text("Max:", 10, 80)
-    BONNETDisplay.display_text(f"{MAX_HUMIDITY:.1f}%", 100, 80, color_name=max_color)
+    BONNETDisplay.display_text(f"{MAX_HUMIDITY}%", 100, 80, color_name=max_color)
 
     BONNETDisplay.display_text("Min:", 10, 120)
-    BONNETDisplay.display_text(f"{MIN_HUMIDITY:.1f}%", 100, 120, color_name=min_color)
+    BONNETDisplay.display_text(f"{MIN_HUMIDITY}%", 100, 120, color_name=min_color)
 
 def display_internal_stats():
     # BONNETDisplay.display_text_center(page_3_data, color_name="yellow", brightness_factor=1.0)
