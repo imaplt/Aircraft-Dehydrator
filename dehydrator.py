@@ -44,88 +44,102 @@ def task_internal():
     internaloutput = internalsensor.read_sensor()
 
     # Update the config file with stats
-    log_changed = False
-    # Update high and low humidity
-    if internaloutput['humidity'] > INTERNAL_HIGH_HUMIDITY:
-        INTERNAL_HIGH_HUMIDITY = internaloutput['humidity']
-        log_changed = True
-    elif internaloutput['humidity'] < INTERNAL_LOW_HUMIDITY:
-        INTERNAL_LOW_HUMIDITY = internaloutput['humidity']
-        log_changed = True
+    new_high_humidity = max(INTERNAL_HIGH_HUMIDITY, internaloutput['humidity'])
+    new_low_humidity = min(INTERNAL_LOW_HUMIDITY, internaloutput['humidity'])
 
-    # Update high and low temperature
-    if internaloutput['temperature'] > INTERNAL_HIGH_TEMP:
-        INTERNAL_HIGH_TEMP = internaloutput['temperature']
-        log_changed = True
-    elif internaloutput['temperature'] < INTERNAL_LOW_TEMP:
-        INTERNAL_LOW_TEMP = internaloutput['temperature']
-        log_changed = True
+    new_high_temp = max(INTERNAL_HIGH_TEMP, internaloutput['temperature'])
+    new_low_temp = min(INTERNAL_LOW_TEMP, internaloutput['temperature'])
 
+    # Check if any of the values changed
+    log_changed = (
+            new_high_humidity != INTERNAL_HIGH_HUMIDITY or
+            new_low_humidity != INTERNAL_LOW_HUMIDITY or
+            new_high_temp != INTERNAL_HIGH_TEMP or
+            new_low_temp != INTERNAL_LOW_TEMP
+    )
+
+    # Update the variables if they changed
     if log_changed:
+        INTERNAL_HIGH_HUMIDITY = new_high_humidity
+        INTERNAL_LOW_HUMIDITY = new_low_humidity
+        INTERNAL_HIGH_TEMP = new_high_temp
+        INTERNAL_LOW_TEMP = new_low_temp
         save_config()
 
-    if abs(internaloutput['humidity'] - internalprevious_output['humidity']) > 0.2:
+    def handle_fan_operation(started, stopped, run_time, action):
+        global FAN_RUNNING, FAN_TOTAL_DURATION, CYCLE_COUNT  # Explicitly declare global variables
+        """Handle fan start/stop operations, including logging, display updates, and timing."""
+        if action == "start" and started:
+            fanController.start_time = time.time()
+            logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan started, exceeded MAX humidity of {MAX_HUMIDITY}%")
+            print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
+            BONNETDisplay.display_text_center_with_border('Fan Started...')
+            time.sleep(3)
+            FAN_RUNNING = True
+        elif action == "stop" and stopped:
+            print(f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
+            logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
+            logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan run time: {str(timedelta(seconds=run_time))}")
+            FAN_TOTAL_DURATION += timedelta(seconds=run_time)
+            CYCLE_COUNT += 1
+            FAN_RUNNING = False
+            BONNETDisplay.display_text_center_with_border('Fan Stopped...')
+            time.sleep(2)
+
+        # Update maximum runtime and check limits
+        fan_runtime_exceeded(run_time)
+
+        # Reset display back to previous page
+        show_page(current_page)
+
+    def fan_runtime_exceeded(run_time):
+        """Check if the fan runtime exceeds set limits and handle warnings."""
+        global FAN_MAX_RUNTIME, FAN_RUNNING_TIME  # Explicitly declare global variables
+        FAN_RUNNING_TIME = timedelta(seconds=run_time)
+
+        if FAN_RUNNING_TIME > FAN_MAX_RUNTIME:
+            FAN_MAX_RUNTIME = FAN_RUNNING_TIME
+        if FAN_RUNNING_TIME > FAN_LIMIT:
+            print("Fan limit exceeded")
+            logger.log(timestamp, 'WARN', 'SYSTEM', 'FAN', f"Fan time limit exceeded: {FAN_LIMIT}")
+            _fan_limit_exceeded()
+
+    def update_internal_output_and_log():
+        global INTERNAL_TEMP, INTERNAL_HUMIDITY
+        """Log internal sensor reading and update previous output values."""
         logger.log(timestamp, 'INFO', 'SENSORS', 'INTERNAL',
-                   f"Temperature: {internaloutput['temperature']}C,"
-                   f" Humidity: {internaloutput['humidity']}%")
-        # Update previous output values
+                   f"Temperature: {internaloutput['temperature']}C, Humidity: {internaloutput['humidity']}%")
+        print("Internal Sensor Reading:", internaloutput)
         internalprevious_output['temperature'] = internaloutput['temperature']
         internalprevious_output['humidity'] = internaloutput['humidity']
-        print("Internal Sensor Reading:", internaloutput)
         INTERNAL_HUMIDITY = internaloutput['humidity']
         INTERNAL_TEMP = internaloutput['temperature']
+
+    def display_on_current_page():
+        """Update the default page display if needed."""
         if current_page == 0:
             display_default_page()
-            # TODO: Updated only the correct line.
-            # BONNETDisplay.update_line(1, text=f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", justification='left')
+            BONNETDisplay.update_line(1, text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C", justification='left')
+
+    # Main block to handle sensor change and fan control
+    if abs(internaloutput['humidity'] - internalprevious_output['humidity']) > 0.2:
+        # Update log and internal values
+        update_internal_output_and_log()
+
+        # Display the updated information on the current page if applicable
+        display_on_current_page()
+
+        # Handle fan start logic based on humidity thresholds
         if internaloutput['humidity'] > MAX_HUMIDITY:
             started, run_time = fanController.set_fan_speed(100)
-            if started:
-                # Set start time here.
-                fanController.start_time = time.time()
-                logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN',
-                           f"Fan started, exceeded MAX humidity of {MAX_HUMIDITY}%")
-                print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
-                # TODO: Update to save current page and then return
-                BONNETDisplay.display_text_center_with_border('Fan Started...')
-                FAN_RUNNING = True
-                time.sleep(3)
-                # Reset display back to previous page
-                show_page(current_page)
-                print(run_time, FAN_MAX_RUNTIME, FAN_LIMIT)
-            if timedelta(seconds=run_time) > FAN_MAX_RUNTIME:
-                FAN_MAX_RUNTIME = timedelta(seconds=run_time)
-            if timedelta(seconds=run_time) > FAN_LIMIT:
-                print("Fan limit exceeded")
-                current_page = 5
-                logger.log(timestamp, 'WARN', 'SYSTEM', 'FAN',
-                           f"Fan time limit exceeded: {FAN_LIMIT}")
-                _fan_limit_exceeded()
+            handle_fan_operation(started, False, run_time, "start")
         elif internaloutput['humidity'] < MIN_HUMIDITY:
             stopped, run_time = fanController.set_fan_speed(0)
-            if stopped:
-                print(f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY }%")
-                logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN',
-                           f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY }%")
-                logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan run time: {str(timedelta(seconds=run_time))}")
-                FAN_TOTAL_DURATION += timedelta(seconds=run_time)
-                CYCLE_COUNT += 1
-                FAN_RUNNING = False
-                FAN_RUNNING_TIME = timedelta(seconds=run_time)
-                #  TODO: Saving limit multiple times
-                if FAN_RUNNING_TIME > FAN_MAX_RUNTIME:
-                    FAN_MAX_RUNTIME = FAN_RUNNING_TIME
-                if FAN_RUNNING_TIME > FAN_LIMIT:
-                    print("Fan limit exceeded")
-                    logger.log(timestamp, 'WARN', 'SYSTEM', 'FAN',
-                               f"Fan Time limit exceeded: {FAN_LIMIT}%")
-                    _fan_limit_exceeded()
-                FAN_RUNNING_TIME = 0
-                save_config()
-                BONNETDisplay.display_text_center_with_border('Fan Stopped...')
-                time.sleep(2)
-                # Reset display back to prev lines
-                show_page(current_page)
+            handle_fan_operation(False, stopped, run_time, "stop")
+
+        # Save configuration changes if needed
+        save_config()
+
     if time.time() - last_page_changed  > 8 and (0 < current_page < 4):
         current_page = 0
         show_page(current_page)
@@ -251,7 +265,7 @@ def display_default_page():
 
 def display_fan_stats():
     if FAN_RUNNING_TIME == 0:
-        BONNETDisplay.display_rows_center(["Fan Stats:", "Current: NOT RUNNING", f"Max: {FAN_MAX_RUNTIME}",
+        BONNETDisplay.display_rows_center(["Fan Stats:", "Current: N/A", f"Max: {FAN_MAX_RUNTIME}",
                                            f"Total: {FAN_TOTAL_DURATION}", " "], 1, FAN_RUNNING,'white', 1.0, justification='left')
     else:
         BONNETDisplay.display_rows_center(["Fan Stats:", f"Current: {FAN_RUNNING_TIME}",f"Max: {FAN_MAX_RUNTIME}",
@@ -410,7 +424,7 @@ def button_pressed_callback(button):
             print("current page:5")
             if selected_option == 1:
                 schedule.clear()
-                raise ValueError("Fan limit exceeded. Ok Selected")
+                cleanup()
             elif selected_option == 2:
                 FAN_LIMIT *= 2  # Double the fan limit
                 current_page = 0  # Return to page 0
@@ -457,7 +471,7 @@ def cleanup():
                    'System', 'System', "Shutting down...")
         # make sure fan is off
         fanController.set_fan_speed(0)
-        time.sleep(3)
+        time.sleep(1)
         BONNETDisplay.clear_screen()
     except NameError:
         print('LCD Not Defined')
@@ -633,16 +647,11 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected!")
-
     except ValueError as e:
-        #  TODO: Systems has failed, what to do next?
         print("\nValue Error!",e)
-
     except OSError as e:
         print("\nOS Error!", e)
-
     except NameError as e:
         print("\nName Error!",e)
-
     finally:
         cleanup()
