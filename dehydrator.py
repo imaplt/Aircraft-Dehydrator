@@ -119,7 +119,8 @@ def task_internal():
         """Update the default page display if needed."""
         if current_page == 0:
             # display_default_page()
-            BONNETDisplay.update_line(2, text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C", justification='left')
+            # BONNETDisplay.update_line(2, text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C", justification='left')
+            BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C",x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
 
     # Main block to handle sensor change and fan control
     INTERNAL_HUMIDITY = internaloutput['humidity']
