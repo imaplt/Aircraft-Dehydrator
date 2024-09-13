@@ -74,7 +74,7 @@ def task_internal():
             logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan started, exceeded MAX humidity of {MAX_HUMIDITY}%")
             print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
             BONNETDisplay.display_text_center_with_border('Fan Started...')
-            time.sleep(3)
+            time.sleep(2)
             FAN_RUNNING = True
         elif action == "stop" and stopped:
             print(f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
@@ -105,15 +105,12 @@ def task_internal():
             _fan_limit_exceeded()
 
     def update_internal_output_and_log():
-        global INTERNAL_TEMP, INTERNAL_HUMIDITY
         """Log internal sensor reading and update previous output values."""
         logger.log(timestamp, 'INFO', 'SENSORS', 'INTERNAL',
                    f"Temperature: {internaloutput['temperature']}C, Humidity: {internaloutput['humidity']}%")
         print("Internal Sensor Reading:", internaloutput)
         internalprevious_output['temperature'] = internaloutput['temperature']
         internalprevious_output['humidity'] = internaloutput['humidity']
-        INTERNAL_HUMIDITY = internaloutput['humidity']
-        INTERNAL_TEMP = internaloutput['temperature']
 
     def display_on_current_page():
         """Update the default page display if needed."""
@@ -122,27 +119,28 @@ def task_internal():
             # BONNETDisplay.update_line(1, text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C", justification='left')
 
     # Main block to handle sensor change and fan control
+    INTERNAL_HUMIDITY = internaloutput['humidity']
+    INTERNAL_TEMP = internaloutput['temperature']
+
+    # Display the updated information on the current page if applicable
+    display_on_current_page()
+
+    # Handle fan start logic based on humidity thresholds
+    if internaloutput['humidity'] > MAX_HUMIDITY:
+        started, run_time = fanController.set_fan_speed(100)
+        handle_fan_operation(started, False, run_time, "start")
+    elif internaloutput['humidity'] < MIN_HUMIDITY:
+        stopped, run_time = fanController.set_fan_speed(0)
+        handle_fan_operation(False, stopped, run_time, "stop")
+
     if abs(internaloutput['humidity'] - internalprevious_output['humidity']) > 0.2:
         # Update log and internal values
         update_internal_output_and_log()
 
-        # Display the updated information on the current page if applicable
-        display_on_current_page()
-
-        # Handle fan start logic based on humidity thresholds
-        if internaloutput['humidity'] > MAX_HUMIDITY:
-            started, run_time = fanController.set_fan_speed(100)
-            handle_fan_operation(started, False, run_time, "start")
-        elif internaloutput['humidity'] < MIN_HUMIDITY:
-            stopped, run_time = fanController.set_fan_speed(0)
-            handle_fan_operation(False, stopped, run_time, "stop")
-
-        # Save configuration changes if needed
-        save_config()
-
     if time.time() - last_page_changed  > 8 and (0 < current_page < 4):
         current_page = 0
         show_page(current_page)
+
 # @print_elapsed_time
 def task_ambient():
     global EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY, EXTERNAL_TEMP, EXTERNAL_HUMIDITY
@@ -313,7 +311,6 @@ def edit_humidity_set(button):
 def display_set_humidity():
     BONNETDisplay.clear_screen()
     BONNETDisplay.display_text("Humidity Set", 10, 40)
-    print("Displaying set humidity...")
     # Highlight selected values
     if humidity_selected == "max":
         max_color = "red" if humidity_blink_state or humidity_mode == "selection" else "black"
@@ -343,9 +340,7 @@ def display_external_stats():
 
 def draw_fan_limit():
     global selected_option, current_page
-
     current_page = 5
-    print("Current page is 5")
     BONNETDisplay.display_ok_clear("Fan Limit Exceeded",ok_text="OK", clear_text="CLEAR", color_name="white",
                                    brightness_factor=1.0, selected=selected_option)
 
@@ -386,27 +381,21 @@ def save_config():
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, \
         humidity_mode, FAN_LIMIT, selected_option
-    now = time.time()
-
-    print(f"Page: {current_page} Button: {button.pin.number}")
 
     if button.pin.number == BTN_L_PIN:
         if current_page == 5:
             selected_option = 1
             draw_fan_limit()
         else:
-            # Navigate to previous page
             current_page -= 1
             if current_page < 0:
                 current_page = total_pages - 1  # Wrap around to the last page
-            print("Current page is {}".format(current_page))
             humidity_mode = "selection"  # Reset humidity mode when changing page
     elif button.pin.number == BTN_R_PIN:
         if current_page == 5:
             selected_option = 2
             draw_fan_limit()
         else:
-            # Navigate to next page
             current_page += 1
             if current_page >= total_pages:
                 current_page = 0  # Wrap around to the first page
@@ -421,14 +410,13 @@ def button_pressed_callback(button):
     elif button.pin.number == BTN_A_PIN:
         print("A button pressed")
         if current_page == 5:
-            print("current page:5")
-            if selected_option == 1:
+            if selected_option == 1: # OK Selected
                 schedule.clear()
                 cleanup()
-            elif selected_option == 2:
+                exit()
+            elif selected_option == 2: # CLEAR Selected
                 FAN_LIMIT *= 2  # Double the fan limit
                 current_page = 0  # Return to page 0
-                show_page(current_page)
                 schedule_tasks()
     elif button.pin.number == BTN_B_PIN:
          print("B button pressed")
