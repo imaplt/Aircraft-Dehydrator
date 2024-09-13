@@ -399,7 +399,6 @@ def button_pressed_callback(button):
             current_page += 1
             if current_page >= total_pages:
                 current_page = 0  # Wrap around to the first page
-            print("Current page is {}".format(current_page))
             humidity_mode = "selection"  # Reset humidity mode when changing pages
     elif button.pin.number == BTN_U_PIN:
         print("Up button pressed")
