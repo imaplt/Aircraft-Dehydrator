@@ -319,7 +319,7 @@ def display_internal_stats():
     # BONNETDisplay.display_text_center(page_3_data, color_name="yellow", brightness_factor=1.0)
     BONNETDisplay.display_rows_center(["Internal Stats:", f"Max Temp {INTERNAL_HIGH_TEMP}",
                                            f"Min Temp {INTERNAL_LOW_TEMP}", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
-                                           f"Min Hum {INTERNAL_LOW_HUMIDITY}"], 2,'white',1.0, justification='left')
+                                           f"Min Hum {INTERNAL_LOW_HUMIDITY}"], 2, FAN_RUNNING,'white',1.0, justification='left')
 
 def display_external_stats():
 
