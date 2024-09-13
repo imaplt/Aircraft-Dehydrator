@@ -290,16 +290,16 @@ def edit_humidity_set(button):
         # In edit mode: adjust the selected humidity value with U and D buttons
         if button.pin.number == BTN_U_PIN:
             if humidity_selected == "max":
-                MAX_HUMIDITY = round(MAX_HUMIDITY + 0.1, 1)
+                MAX_HUMIDITY = round(MAX_HUMIDITY + 1, 1)
             else:
-                MIN_HUMIDITY = round(MIN_HUMIDITY + 0.1, 1)
+                MIN_HUMIDITY = round(MIN_HUMIDITY + 1, 1)
             display_set_humidity()
 
         elif button.pin.number == BTN_D_PIN:
             if humidity_selected == "max":
-                MAX_HUMIDITY = round(MAX_HUMIDITY - 0.1, 1)
+                MAX_HUMIDITY = round(MAX_HUMIDITY - 1, 1)
             else:
-                MIN_HUMIDITY = round(MIN_HUMIDITY - 0.1, 1)
+                MIN_HUMIDITY = round(MIN_HUMIDITY - 1, 1)
             display_set_humidity()
 
         # Save the value and exit edit mode when 'B' button is pressed
