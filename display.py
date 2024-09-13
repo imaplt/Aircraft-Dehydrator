@@ -265,6 +265,7 @@ class BONNETDisplay:
 
             position = (x_position, i * line_height + (line_height - text_height) // 2)
             self.draw.text(position, text, font=self.font, fill=color)
+            print(text, position)
             # Display the fan icon with the appropriate color based on fan status
         if current_page == 0:
             # Load the fan icon with transparency
