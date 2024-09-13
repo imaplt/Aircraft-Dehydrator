@@ -96,7 +96,7 @@ def task_internal():
         """Check if the fan runtime exceeds set limits and handle warnings."""
         global FAN_MAX_RUNTIME, FAN_RUNNING_TIME  # Explicitly declare global variables
         if run_time is None:
-            FAN_MAX_RUNTIME = 0
+            FAN_RUNNING_TIME = timedelta(seconds=0)
         else:
             FAN_RUNNING_TIME = timedelta(seconds=run_time)
 
