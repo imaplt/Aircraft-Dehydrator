@@ -76,6 +76,7 @@ def task_internal():
             BONNETDisplay.display_text_center_with_border('Fan Started...')
             time.sleep(2)
             FAN_RUNNING = True
+            show_page(current_page)
         elif action == "stop" and stopped:
             print(f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
             logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
@@ -85,12 +86,12 @@ def task_internal():
             FAN_RUNNING = False
             BONNETDisplay.display_text_center_with_border('Fan Stopped...')
             time.sleep(2)
+            show_page(current_page)
 
         # Update maximum runtime and check limits
         fan_runtime_exceeded(run_time)
 
-        # Reset display back to previous page
-        show_page(current_page)
+
 
     def fan_runtime_exceeded(run_time):
         """Check if the fan runtime exceeds set limits and handle warnings."""
@@ -154,38 +155,42 @@ def task_ambient():
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     externaloutput = externalsensor.read_sensor()
-    # Update the config file with stats
-    log_changed = False
 
-    if externaloutput['humidity'] > EXTERNAL_HIGH_HUMIDITY:
-        EXTERNAL_HIGH_HUMIDITY = externaloutput['humidity']
-        log_changed = True
-    elif externaloutput['humidity'] < EXTERNAL_LOW_HUMIDITY:
-        EXTERNAL_LOW_HUMIDITY = externaloutput['humidity']
-        log_changed = True
+    # Calculate new high and low values
+    new_high_humidity = max(EXTERNAL_HIGH_HUMIDITY, externaloutput['humidity'])
+    new_low_humidity = min(EXTERNAL_LOW_HUMIDITY, externaloutput['humidity'])
 
-    # Update high and low temperature for external values
-    if externaloutput['temperature'] > EXTERNAL_HIGH_TEMP:
-        EXTERNAL_HIGH_TEMP = externaloutput['temperature']
-        log_changed = True
-    elif externaloutput['temperature'] < EXTERNAL_LOW_TEMP:
-        EXTERNAL_LOW_TEMP = externaloutput['temperature']
-        log_changed = True
+    new_high_temp = max(EXTERNAL_HIGH_TEMP, externaloutput['temperature'])
+    new_low_temp = min(EXTERNAL_LOW_TEMP, externaloutput['temperature'])
 
+    # Check if any values changed
+    log_changed = (
+            new_high_humidity != EXTERNAL_HIGH_HUMIDITY or
+            new_low_humidity != EXTERNAL_LOW_HUMIDITY or
+            new_high_temp != EXTERNAL_HIGH_TEMP or
+            new_low_temp != EXTERNAL_LOW_TEMP
+    )
+
+    # Update the variables if they changed
     if log_changed:
+        EXTERNAL_HIGH_HUMIDITY = new_high_humidity
+        EXTERNAL_LOW_HUMIDITY = new_low_humidity
+        EXTERNAL_HIGH_TEMP = new_high_temp
+        EXTERNAL_LOW_TEMP = new_low_temp
         save_config()
 
-    # No need to check differences as this will be logged every x seconds unlike the internal one
+    # Log the sensor data every X seconds
     logger.log(timestamp, 'INFO', 'SENSORS', 'EXTERNAL',
                f"Temperature: {externaloutput['temperature']}C,"
                f" Humidity: {externaloutput['humidity']}%")
-    # Update previous output values
+
+    # Update the global variables and print the reading
     externalprevious_output['temperature'] = externaloutput['temperature']
     externalprevious_output['humidity'] = externaloutput['humidity']
-    print("Ambient Sensor Reading:", externaloutput)
     EXTERNAL_TEMP = externaloutput['temperature']
     EXTERNAL_HUMIDITY = externaloutput['humidity']
-    # Updating ambient in internal task since it runs evey second.
+
+    print("Ambient Sensor Reading:", externaloutput)
 
 #  @print_elapsed_time
 def _cycle_fan():
