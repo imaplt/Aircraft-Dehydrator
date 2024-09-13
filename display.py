@@ -231,6 +231,10 @@ class BONNETDisplay:
         # Get color with brightness applied
         color = self.set_brightness(color_name, brightness_factor)
         position = (x_pos, y_pos)
+        bbox = self.draw.textbbox((0, 0), text, font=self.font)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+        self.draw.rectangle((x_pos, y_pos, text_width, text_height ), outline=0, fill=(0, 0, 0))
         self.draw.text(position, text, font=self.font, fill=color)
         self.disp.image(self.image)
 
