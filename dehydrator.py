@@ -122,6 +122,8 @@ def task_internal():
             # BONNETDisplay.update_line(2, text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C", justification='left')
             BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C",
                                        x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
+            BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C",
+                                       x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
 
     # Main block to handle sensor change and fan control
     INTERNAL_HUMIDITY = internaloutput['humidity']
@@ -183,10 +185,8 @@ def task_ambient():
     print("Ambient Sensor Reading:", externaloutput)
     EXTERNAL_TEMP = externaloutput['temperature']
     EXTERNAL_HUMIDITY = externaloutput['humidity']
-    if current_page == 0:
-        display_default_page()
-        # TODO: Only update the correct line here.
-        # BONNETDisplay.update_line(3, text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C", justification='left')
+    # Updating ambient in internal task since it runs evey second.
+
 #  @print_elapsed_time
 def _cycle_fan():
     # TODO: How do we want to engage this?

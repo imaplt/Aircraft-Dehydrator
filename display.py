@@ -235,7 +235,7 @@ class BONNETDisplay:
         text_width = bbox[2] - bbox[0]
         text_height = bbox[3] - bbox[1]
         # Clear only the specific area for the line (based on text height)
-        self.draw.rectangle((0, y_pos, self.width, y_pos + text_height), outline=0, fill=0)
+        self.draw.rectangle((0, y_pos, self.width, y_pos + text_height + 2), outline=0, fill=0)
         #self.draw.rectangle((x_pos, y_pos, text_width, text_height ), outline=0, fill=(0, 0, 0))
         self.draw.text(position, text, font=self.font, fill=color)
         self.disp.image(self.image)
