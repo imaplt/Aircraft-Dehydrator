@@ -124,7 +124,7 @@ def task_internal():
             BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C",
                                        x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
         elif current_page == 1: # Fan Stats
-            BONNETDisplay.display_text(text=f"Current: {FAN_RUNNING_TIME}",
+            BONNETDisplay.display_text(text=f"Current: {FAN_RUNNING_TIME}  ",
                                        x_pos=0, y_pos=63, color_name="white", brightness_factor=1.0)
             # BONNETDisplay.display_rows_center(["Fan Stats:", f"Current: {FAN_RUNNING_TIME}", f"Max: {FAN_MAX_RUNTIME}",
             #                                    f"Total: {FAN_TOTAL_DURATION}", " "], 1, FAN_RUNNING, 'white', 1.0,
@@ -475,7 +475,6 @@ def cleanup():
         fanController.set_fan_speed(0)
         time.sleep(1)
         BONNETDisplay.clear_screen()
-        exit()
     except NameError:
         print('LCD Not Defined')
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'FATAL',
@@ -483,6 +482,7 @@ def cleanup():
     finally:
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'FATAL',
                    'System', 'System', "System Shutting down..")
+    exit()
 
 def isDeviceDetected(statuses, device):
     for status in statuses:
