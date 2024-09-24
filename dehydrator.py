@@ -449,8 +449,8 @@ def button_pressed_callback(button):
 
 def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
-    if button.pin.number == BTN_R_PIN:
-        print("Button R held...")
+    if button.pin.number == BTN_B_PIN:
+        print("Button B held...")
         BONNETDisplay.clear_screen()
 
 def _fan_limit_exceeded():
