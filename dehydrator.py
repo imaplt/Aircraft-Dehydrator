@@ -405,7 +405,7 @@ def button_pressed_callback(button):
             current_page -= 1
             if current_page < 0:
                 # Wrap around to the last page accounting for config page
-                current_page = total_pages - 2
+                current_page = total_pages - 1
             humidity_mode = "selection"  # Reset humidity mode when changing page
     elif button.pin.number == BTN_R_PIN:
         print("Button R Pressed")
