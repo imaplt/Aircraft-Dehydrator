@@ -38,7 +38,7 @@ def task_internal():
     if fanController.fan_engaged and current_page == 1:
         FAN_RUNNING_TIME = timedelta(seconds=(int(time.time() -  fanController.start_time)))
         # TODO: Update only the current time line...
-        display_fan_stats()
+        # display_fan_stats()
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     internaloutput = internalsensor.read_sensor()
