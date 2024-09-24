@@ -91,8 +91,6 @@ def task_internal():
         # Update maximum runtime and check limits
         fan_runtime_exceeded(run_time)
 
-
-
     def fan_runtime_exceeded(run_time):
         """Check if the fan runtime exceeds set limits and handle warnings."""
         global FAN_MAX_RUNTIME, FAN_RUNNING_TIME  # Explicitly declare global variables
@@ -116,22 +114,28 @@ def task_internal():
         internalprevious_output['temperature'] = internaloutput['temperature']
         internalprevious_output['humidity'] = internaloutput['humidity']
 
-    def display_on_current_page():
+    def update_current_page():
         """Update the default page display if needed."""
-        if current_page == 0:
+        if current_page == 0: # Default page
             # display_default_page()
             # BONNETDisplay.update_line(2, text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C", justification='left')
             BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C",
                                        x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
             BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C",
                                        x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
+        elif current_page == 1: # Fan Stats
+            BONNETDisplay.display_text(text=f"Current: {FAN_RUNNING_TIME}",
+                                       x_pos=0, y_pos=63, color_name="white", brightness_factor=1.0)
+            # BONNETDisplay.display_rows_center(["Fan Stats:", f"Current: {FAN_RUNNING_TIME}", f"Max: {FAN_MAX_RUNTIME}",
+            #                                    f"Total: {FAN_TOTAL_DURATION}", " "], 1, FAN_RUNNING, 'white', 1.0,
+            #                                   justification='left')
 
     # Main block to handle sensor change and fan control
     INTERNAL_HUMIDITY = internaloutput['humidity']
     INTERNAL_TEMP = internaloutput['temperature']
 
     # Display the updated information on the current page if applicable
-    display_on_current_page()
+    update_current_page()
 
     # Handle fan start logic based on humidity thresholds
     if internaloutput['humidity'] > MAX_HUMIDITY:
