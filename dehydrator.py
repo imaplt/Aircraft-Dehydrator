@@ -446,6 +446,7 @@ def button_pressed_callback(button):
     if current_page == 4:
         edit_humidity_set(button)
 
+
 def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
     if button.pin.number == BTN_R_PIN:
@@ -584,6 +585,7 @@ if __name__ == "__main__":
     btn_ctr.when_pressed = button_pressed_callback
     btn_a.when_pressed = button_pressed_callback
     btn_b.when_pressed = button_pressed_callback
+    btn_b.when_pressed = button_hold_callback
 
     # Initialize lines
     oled_lines = [""] * 5  # For five line bonnet display...
