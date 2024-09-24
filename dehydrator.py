@@ -97,7 +97,7 @@ def task_internal():
         if run_time is None:
             FAN_RUNNING_TIME = timedelta(seconds=0)
         else:
-            FAN_RUNNING_TIME = timedelta(seconds=run_time)
+            FAN_RUNNING_TIME = timedelta(seconds=int(run_time))
 
         if FAN_RUNNING_TIME > FAN_MAX_RUNTIME:
             FAN_MAX_RUNTIME = FAN_RUNNING_TIME

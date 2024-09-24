@@ -105,8 +105,12 @@ class BONNETDisplay:
         self.oled_lines = [""] * 5
 
     def reset_screen(self):
-        self.disp.fill(0)
+        # Turn on the Backlight
+        backlight = DigitalInOut(board.D26)
+        backlight.switch_to_output()
+        backlight.value = True
         self._clear_image()
+
 
     def clear_screen(self):
         self.disp.fill(0)
