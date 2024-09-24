@@ -448,10 +448,12 @@ def button_pressed_callback(button):
 
 
 def button_hold_callback(button):
-    global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode
+    global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page
     if button.pin.number == BTN_B_PIN:
         print("Button B held...")
-        BONNETDisplay.clear_screen()
+        BONNETDisplay.reset_screen()
+        current_page = 0
+        display_default_page()
 
 def _fan_limit_exceeded():
     global current_page
