@@ -587,7 +587,7 @@ if __name__ == "__main__":
     btn_ctr.when_pressed = button_pressed_callback
     btn_a.when_pressed = button_pressed_callback
     btn_b.when_pressed = button_pressed_callback
-    btn_b.when_pressed = button_hold_callback
+    btn_b.when_held = button_hold_callback
 
     # Initialize lines
     oled_lines = [""] * 5  # For five line bonnet display...
