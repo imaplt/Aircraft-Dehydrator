@@ -395,8 +395,9 @@ def save_config():
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, \
         humidity_mode, FAN_LIMIT, selected_option
-
+    print("Current starting page:", current_page)
     if button.pin.number == BTN_L_PIN:
+        print("Button L pressed")
         if current_page == 5:
             selected_option = 1
             draw_fan_limit()
@@ -407,6 +408,7 @@ def button_pressed_callback(button):
                 current_page = total_pages - 2
             humidity_mode = "selection"  # Reset humidity mode when changing page
     elif button.pin.number == BTN_R_PIN:
+        print("Button R Pressed")
         if current_page == 5:
             selected_option = 2
             draw_fan_limit()
@@ -436,7 +438,8 @@ def button_pressed_callback(button):
          print("B button pressed")
     else:
         print("Unknown button")
-    
+
+    print("Selected page: ", current_page)
     if current_page < 5:
         show_page(current_page)
         
