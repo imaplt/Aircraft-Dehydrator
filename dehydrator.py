@@ -116,16 +116,18 @@ def task_internal():
 
     def update_current_page():
         """Update the default page display if needed."""
-        # UOM = 'F' # Update this to get from config
-        # if UOM == 'F':
-        #     INTERNAL_TEMP = celsius_to_fahrenheit(INTERNAL_TEMP)
-        #     EXTERNAL_TEMP = celsius_to_fahrenheit(EXTERNAL_TEMP)
-
         if current_page == 0: # Default page
-            BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {celsius_to_fahrenheit(INTERNAL_TEMP)}°F",
-                                       x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
-            BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {celsius_to_fahrenheit(EXTERNAL_TEMP)}°F",
-                                       x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
+            if UOM == 'F':
+                BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {celsius_to_fahrenheit(INTERNAL_TEMP)}°F",
+                                           x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
+                BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {celsius_to_fahrenheit(EXTERNAL_TEMP)}°F",
+                                           x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
+            else:
+                BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C",
+                                           x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
+                BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C",
+                                           x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
+
         elif current_page == 1: # Fan Stats
             print("Fan running time:", FAN_RUNNING_TIME)
             BONNETDisplay.display_text(text=f"Current: {FAN_RUNNING_TIME}",
@@ -346,15 +348,28 @@ def display_set_humidity():
 
 def display_internal_stats():
     # BONNETDisplay.display_text_center(page_3_data, color_name="yellow", brightness_factor=1.0)
-    BONNETDisplay.display_rows_center(["Internal Stats:", f"Max Temp {INTERNAL_HIGH_TEMP}",
-                                           f"Min Temp {INTERNAL_LOW_TEMP}", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
+    if UOM == 'F':
+     BONNETDisplay.display_rows_center(["Internal Stats:", f"Max Temp {celsius_to_fahrenheit(INTERNAL_HIGH_TEMP)}",
+                                           f"Min Temp {celsius_to_fahrenheit(INTERNAL_LOW_TEMP)}", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
                                            f"Min Hum {INTERNAL_LOW_HUMIDITY}"], 2, FAN_RUNNING,'white',1.0, justification='left')
+    else:
+        BONNETDisplay.display_rows_center(["Internal Stats:", f"Max Temp {INTERNAL_HIGH_TEMP}",
+                                           f"Min Temp {INTERNAL_LOW_TEMP}", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
+                                           f"Min Hum {INTERNAL_LOW_HUMIDITY}"], 2, FAN_RUNNING, 'white', 1.0,
+                                          justification='left')
+
 
 def display_external_stats():
+    if UOM == 'F':
+        BONNETDisplay.display_rows_center(["Ambient Stats:", f"Max Temp {celsius_to_fahrenheit(EXTERNAL_HIGH_TEMP)}",
+                                           f"Min Temp {celsius_to_fahrenheit(EXTERNAL_LOW_TEMP)}", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
+                                           f"Min Hum {EXTERNAL_LOW_HUMIDITY}"], 3, FAN_RUNNING,'white',1.0, justification='left')
+    else:
+        BONNETDisplay.display_rows_center(["Ambient Stats:", f"Max Temp {EXTERNAL_HIGH_TEMP}",
+                                           f"Min Temp {EXTERNAL_LOW_TEMP}", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
+                                           f"Min Hum {EXTERNAL_LOW_HUMIDITY}"], 3, FAN_RUNNING, 'white', 1.0,
+                                          justification='left')
 
-    BONNETDisplay.display_rows_center(["Ambient Stats:", f"Max Temp {EXTERNAL_HIGH_TEMP}",
-                                       f"Min Temp {EXTERNAL_LOW_TEMP}", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
-                                       f"Min Hum {EXTERNAL_LOW_HUMIDITY}"], 3, FAN_RUNNING,'white',1.0, justification='left')
 
 def draw_fan_limit():
     global selected_option, current_page
@@ -548,6 +563,7 @@ if __name__ == "__main__":
     FAN_TOTAL_DURATION = configManager.get_duration_config('LOG', 'FAN_TOTAL_DURATION')
     FAN_MAX_RUNTIME = configManager.get_duration_config('LOG', 'FAN_MAX_RUNTIME')
     FAN_LIMIT = configManager.get_duration_config('DEFAULT', 'FAN_LIMIT')
+    UOM = configManager.get_config('UOM')
 
     # Display configuration
     DISPLAY_ENABLED = configManager.get_boolean_config('DISPLAY_ENABLED')
