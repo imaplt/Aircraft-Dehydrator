@@ -33,7 +33,7 @@ def celsius_to_fahrenheit(celsius):
 def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
-        INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page
+        INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP
 
     if fanController.fan_engaged and current_page == 1:
         FAN_RUNNING_TIME = timedelta(seconds=(int(time.time() -  fanController.start_time)))
@@ -116,10 +116,15 @@ def task_internal():
 
     def update_current_page():
         """Update the default page display if needed."""
+        # UOM = 'F' # Update this to get from config
+        # if UOM == 'F':
+        #     INTERNAL_TEMP = celsius_to_fahrenheit(INTERNAL_TEMP)
+        #     EXTERNAL_TEMP = celsius_to_fahrenheit(EXTERNAL_TEMP)
+
         if current_page == 0: # Default page
-            BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C",
+            BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {celsius_to_fahrenheit(INTERNAL_TEMP)}°F",
                                        x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
-            BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C",
+            BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {celsius_to_fahrenheit(EXTERNAL_TEMP)}°F",
                                        x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
         elif current_page == 1: # Fan Stats
             print("Fan running time:", FAN_RUNNING_TIME)
