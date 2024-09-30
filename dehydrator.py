@@ -202,6 +202,10 @@ def task_ambient():
 
     print("Ambient Sensor Reading:", externaloutput)
 
+def task_display_reset():
+    BONNETDisplay.reset_screen()
+    display_default_page()
+
 #  @print_elapsed_time
 def _cycle_fan():
     # TODO: How do we want to engage this?
@@ -246,6 +250,7 @@ def task_alternate_screens():
 def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1, display_interval=30):
     schedule.every(int_interval).seconds.do(task_internal)
     schedule.every(ext_interval).minutes.do(task_ambient)
+    schedule.every(5).minutes.do(task_display_reset)
     # schedule.every(fan_interval).minutes.do(task_fan)
     if DISPLAY_ENABLED:
         schedule.every(display_interval).seconds.do(task_alternate_screens)
@@ -329,7 +334,6 @@ def edit_humidity_set(button):
             display_set_humidity()
 
 def display_set_humidity():
-    BONNETDisplay.clear_screen()
     BONNETDisplay.display_text("Humidity Set", 10, 40)
     # Highlight selected values
     if humidity_selected == "max":
@@ -340,10 +344,10 @@ def display_set_humidity():
         min_color = "red" if humidity_blink_state or humidity_mode == "selection" else "black"
 
     # Display the values with corresponding highlighting
-    BONNETDisplay.display_text("Max:", 10, 80)
+    BONNETDisplay.display_text("Max:", 1, 80, color_name="white")
     BONNETDisplay.display_text(f"{MAX_HUMIDITY}%", 100, 80, color_name=max_color)
 
-    BONNETDisplay.display_text("Min:", 10, 120)
+    BONNETDisplay.display_text("Min:", 1, 120, color_name="white")
     BONNETDisplay.display_text(f"{MIN_HUMIDITY}%", 100, 120, color_name=min_color)
 
 def display_internal_stats():
@@ -464,7 +468,6 @@ def button_pressed_callback(button):
         
     if current_page == 4:
         edit_humidity_set(button)
-
 
 def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page
