@@ -295,7 +295,7 @@ def display_fan_stats():
                                            f"Total: {FAN_TOTAL_DURATION}", " " ], 1,FAN_RUNNING,'white',1.0, justification='left')
 
 def edit_humidity_set(button):
-    global MIN_HUMIDITY, MAX_HUMIDITY, humidity_mode, humidity_selected, humidity_blink_state
+    global MIN_HUMIDITY, MAX_HUMIDITY, humidity_mode, humidity_selected, humidity_blink_state, max_color, min_color
 
     print("Running Edit Humidity")
     print(button.pin.number)
@@ -303,38 +303,46 @@ def edit_humidity_set(button):
         # In selection mode: toggle between 'max' and 'min' with U and D buttons
         if button.pin.number == BTN_U_PIN or button.pin.number == BTN_D_PIN:
             humidity_selected = "min" if humidity_selected == "max" else "max"
-            display_set_humidity()
+            if humidity_selected == "max":
+                max_color = "red" if humidity_blink_state or humidity_mode == "selection" else "black"
+                min_color = "white"
+            else:
+                max_color = "white"
+                min_color = "red" if humidity_blink_state or humidity_mode == "selection" else "black"
+            BONNETDisplay.display_text(f"{MAX_HUMIDITY}%", 100, 80, color_name=max_color)
+            BONNETDisplay.display_text(f"{MIN_HUMIDITY}%", 100, 120, color_name=min_color)
 
         # Enter edit mode when 'A' button is pressed
         elif button.pin.number == BTN_A_PIN:
             humidity_mode = "edit"
             humidity_blink_state = True
-            display_set_humidity()
 
     elif humidity_mode == "edit":
         # In edit mode: adjust the selected humidity value with U and D buttons
         if button.pin.number == BTN_U_PIN:
             if humidity_selected == "max":
                 MAX_HUMIDITY = round(MAX_HUMIDITY + 1, 1)
+                BONNETDisplay.display_text(f"{MAX_HUMIDITY}%", 100, 80, color_name=max_color)
             else:
                 MIN_HUMIDITY = round(MIN_HUMIDITY + 1, 1)
-            display_set_humidity()
+                BONNETDisplay.display_text(f"{MIN_HUMIDITY}%", 100, 120, color_name=min_color)
 
         elif button.pin.number == BTN_D_PIN:
             if humidity_selected == "max":
                 MAX_HUMIDITY = round(MAX_HUMIDITY - 1, 1)
+                BONNETDisplay.display_text(f"{MAX_HUMIDITY}%", 100, 80, color_name=max_color)
             else:
                 MIN_HUMIDITY = round(MIN_HUMIDITY - 1, 1)
-            display_set_humidity()
+                BONNETDisplay.display_text(f"{MIN_HUMIDITY}%", 100, 120, color_name=min_color)
 
         # Save the value and exit edit mode when 'B' button is pressed
         elif button.pin.number == BTN_B_PIN:
             humidity_mode = "selection"
             humidity_blink_state = True
-            display_set_humidity()
 
 def display_set_humidity():
-    BONNETDisplay.display_text("Humidity Set", 10, 40)
+    BONNETDisplay.clear_screen()
+    BONNETDisplay.display_text("Humidity Set", 1, 40)
     # Highlight selected values
     if humidity_selected == "max":
         max_color = "red" if humidity_blink_state or humidity_mode == "selection" else "black"
