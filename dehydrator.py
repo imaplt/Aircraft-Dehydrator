@@ -298,7 +298,6 @@ def display_default_page():
 def display_running(frame):
     if current_page == 0:
         with lock:
-            print(frame)
             BONNETDisplay.display_text(text=frame, x_pos=90, y_pos=190, color_name="white", brightness_factor=1)
 
 def display_fan_stats():
@@ -708,8 +707,10 @@ if __name__ == "__main__":
         if DISPLAY_ENABLED:
             lcd_display(1)
 
-        run_scheduler()
         spinner_thread.start()
+        time.sleep(2)
+        run_scheduler()
+
 
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected!")
