@@ -34,10 +34,9 @@ def celsius_to_fahrenheit(celsius):
 
 def spinner():
     while running:
-        if current_page == 0:
-            for frame in spinner_frames:
-                display_running(frame)
-                time.sleep(0.2)  # Adjust speed of rotation (e.g., 0.2 seconds per frame)
+        for frame in spinner_frames:
+            display_running(frame)
+            time.sleep(0.2)  # Adjust speed of rotation (e.g., 0.2 seconds per frame)
 
 # @print_elapsed_time
 def task_internal():
