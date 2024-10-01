@@ -292,8 +292,10 @@ def display_default_page():
     BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", "Ambient Sensor:",
                                        f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "],0, FAN_RUNNING,'white', 1.0, justification='left')
 def display_running(frame):
-    BONNETDisplay.display_text(text=frame, x_pos=60, y_pos=190, color_name="white", brightness_factor=1)
-    print(frame)
+    if current_page == 0:
+        something = False
+        # BONNETDisplay.display_text(text=frame, x_pos=60, y_pos=190, color_name="white", brightness_factor=1)
+        # print(frame)
 
 
 def display_fan_stats():
