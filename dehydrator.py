@@ -673,6 +673,9 @@ if __name__ == "__main__":
         BONNET_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
         BONNETDisplay = BONNETDisplay(BONNET_display_config)
 
+        # Start the spinner in the background
+        spinner_thread.start()
+
         # Display centered text
         BONNETDisplay.display_text_center("Initializing...")
         time.sleep(2)
@@ -683,7 +686,6 @@ if __name__ == "__main__":
         # Initialize fan controller
         print('Initializing fan controller...')
         fanController = EMC2101()
-
         time.sleep(2)
         internalsensor = Sensor('SHT41_Internal', 0x44)
 
@@ -697,8 +699,6 @@ if __name__ == "__main__":
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}
 
-        print("Internal Mode: ", internalsensor.sensor_mode())  # TODO: Figure out what mode is...
-        time.sleep(2)
         schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL,
                        fan_interval=TASK_FAN, display_interval=TASK_DISPLAY_ROTATION)
 
@@ -709,8 +709,6 @@ if __name__ == "__main__":
 
         run_scheduler()
 
-        # Start the spinner in the background
-        spinner_thread.start()
 
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected!")
