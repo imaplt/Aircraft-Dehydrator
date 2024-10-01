@@ -643,6 +643,9 @@ if __name__ == "__main__":
     FAN_RUNNING = False
     FAN_RUNNING_TIME = 0
 
+    running = True
+    spinner_thread = threading.Thread(target=spinner)
+
     try:
         installed_devices = read_installed_devices(configManager)
         overall_status, statuses = system_status.query_i2c_devices(installed_devices)
@@ -706,8 +709,6 @@ if __name__ == "__main__":
 
         run_scheduler()
 
-        running = True
-        spinner_thread = threading.Thread(target=spinner)
         # Start the spinner in the background
         spinner_thread.start()
 
