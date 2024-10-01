@@ -39,7 +39,7 @@ def spinner():
     while running:
         for frame in spinner_frames:
             display_running(frame)
-            time.sleep(0.2)  # Adjust speed of rotation (e.g., 0.2 seconds per frame)
+            time.sleep(0.5)  # Adjust speed of rotation (e.g., 0.2 seconds per frame)
 
 # @print_elapsed_time
 def task_internal():
@@ -267,7 +267,7 @@ def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1, display_inter
 def run_scheduler():
     while True:
         schedule.run_pending()
-        time.sleep(1)
+        time.sleep(.2)
 
 def heat_sensor():
     # TODO: Add code to heat sensors when the humidity gets high. Only applies to SHT4X series sensors
