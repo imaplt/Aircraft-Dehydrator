@@ -299,7 +299,6 @@ def display_running(frame):
     if current_page == 0:
         with lock:
             BONNETDisplay.display_text(text=frame, x_pos=90, y_pos=190, color_name="white", brightness_factor=1)
-            print(frame)
 
 def display_fan_stats():
     if FAN_RUNNING_TIME == 0:
@@ -689,7 +688,6 @@ if __name__ == "__main__":
         time.sleep(2)
         internalsensor = Sensor('SHT41_Internal', 0x44)
 
-        spinner_thread.start()
 
         # sht30_sensor = Sensor('SHT30', 0x44)
         # print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
@@ -710,7 +708,7 @@ if __name__ == "__main__":
             lcd_display(1)
 
         run_scheduler()
-
+        spinner_thread.start()
 
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected!")
