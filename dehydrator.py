@@ -10,7 +10,10 @@ from display import BONNETDisplay, LCD2004Display, DisplayConfig
 from gpiozero import Button
 from sensor import Sensor
 from fan_controller import EMC2101
+import threading
 
+# Spinner frames to simulate rotation
+spinner_frames = ['|', '/', '-', '\\']
 
 # This decorator can be applied to any job function to log the elapsed time of each job
 # Use this to account for jobs taking longer than expected...
@@ -28,6 +31,13 @@ def print_elapsed_time(func):
 def celsius_to_fahrenheit(celsius):
     fahrenheit = (celsius * 9/5) + 32
     return round(fahrenheit, 1)
+
+def spinner():
+    while running:
+        if current_page == 0:
+            for frame in spinner_frames:
+                BONNETDisplay.display_text(frame,100,190,"white",brightness_factor=1)
+                time.sleep(0.2)  # Adjust speed of rotation (e.g., 0.2 seconds per frame)
 
 # @print_elapsed_time
 def task_internal():
@@ -132,9 +142,6 @@ def task_internal():
             print("Fan running time:", FAN_RUNNING_TIME)
             BONNETDisplay.display_text(text=f"Current: {FAN_RUNNING_TIME}",
                                        x_pos=0, y_pos=63, color_name="white", brightness_factor=1.0)
-            # BONNETDisplay.display_rows_center(["Fan Stats:", f"Current: {FAN_RUNNING_TIME}", f"Max: {FAN_MAX_RUNTIME}",
-            #                                    f"Total: {FAN_TOTAL_DURATION}", " "], 1, FAN_RUNNING, 'white', 1.0,
-            #                                   justification='left')
 
     # Main block to handle sensor change and fan control
     INTERNAL_HUMIDITY = internaloutput['humidity']
@@ -361,12 +368,12 @@ def display_set_humidity():
 def display_internal_stats():
     # BONNETDisplay.display_text_center(page_3_data, color_name="yellow", brightness_factor=1.0)
     if UOM == 'F':
-     BONNETDisplay.display_rows_center(["Internal Stats:", f"Max Temp {celsius_to_fahrenheit(INTERNAL_HIGH_TEMP)}",
-                                           f"Min Temp {celsius_to_fahrenheit(INTERNAL_LOW_TEMP)}", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
+     BONNETDisplay.display_rows_center(["Internal Stats:", f"Max Temp {celsius_to_fahrenheit(INTERNAL_HIGH_TEMP)}F",
+                                           f"Min Temp {celsius_to_fahrenheit(INTERNAL_LOW_TEMP)}F", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
                                            f"Min Hum {INTERNAL_LOW_HUMIDITY}"], 2, FAN_RUNNING,'white',1.0, justification='left')
     else:
-        BONNETDisplay.display_rows_center(["Internal Stats:", f"Max Temp {INTERNAL_HIGH_TEMP}",
-                                           f"Min Temp {INTERNAL_LOW_TEMP}", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
+        BONNETDisplay.display_rows_center(["Internal Stats:", f"Max Temp {INTERNAL_HIGH_TEMP}C",
+                                           f"Min Temp {INTERNAL_LOW_TEMP}C", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
                                            f"Min Hum {INTERNAL_LOW_HUMIDITY}"], 2, FAN_RUNNING, 'white', 1.0,
                                           justification='left')
 
@@ -422,6 +429,7 @@ def save_config():
     configManager.update_config('cycle_count', CYCLE_COUNT, 'LOG')
     configManager.set_duration_config('total_cycle_duration', FAN_TOTAL_DURATION, 'LOG')
     configManager.set_duration_config('MAX_FAN_RUNTIME', FAN_MAX_RUNTIME, 'LOG')
+    configManager.update_config('UOM', UOM)
 
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, \
@@ -501,7 +509,10 @@ def _fan_limit_exceeded():
 
 def cleanup():
     # Want to add code here to update display, update log with run time etc
+    global running
     print('Cleaning Up')
+    running = False
+    spinner_thread.join()  # Wait for the spinner to finish
     try:
         BONNETDisplay.display_text_center_with_border('Shutting down...')
         if isDeviceDetected(statuses, 'LCD2004'):
@@ -600,6 +611,8 @@ if __name__ == "__main__":
     current_page = 0
     total_pages = 5
     selected_option = 1
+    max_color = "white"
+    min_color = "white"
 
     # GPIO setup using gpiozero for input buttons
     btn_lt = Button(BTN_L_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
@@ -626,6 +639,13 @@ if __name__ == "__main__":
 
     FAN_RUNNING = False
     FAN_RUNNING_TIME = 0
+
+    running = True
+    spinner_thread = threading.Thread(target=spinner)
+
+    # Start the spinner in the background
+    spinner_thread.start()
+
     try:
         installed_devices = read_installed_devices(configManager)
         overall_status, statuses = system_status.query_i2c_devices(installed_devices)
