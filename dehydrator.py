@@ -36,7 +36,7 @@ def spinner():
     while running:
         if current_page == 0:
             for frame in spinner_frames:
-                BONNETDisplay.display_text(frame,100,190,"white",brightness_factor=1)
+                BONNETDisplay.display_text(text=frame,x_pos=100,y_pos=190,color_name="white",brightness_factor=1)
                 time.sleep(0.2)  # Adjust speed of rotation (e.g., 0.2 seconds per frame)
 
 # @print_elapsed_time
