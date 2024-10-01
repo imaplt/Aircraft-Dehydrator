@@ -293,8 +293,8 @@ def display_default_page():
     BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", "Ambient Sensor:",
                                        f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "],0, FAN_RUNNING,'white', 1.0, justification='left')
 def display_running(frame):
-    # BONNETDisplay.display_text(text=frame, x_pos=100, y_pos=190, color_name="white", brightness_factor=1)
-    print(frame)
+    BONNETDisplay.display_text(text=frame, x_pos=40, y_pos=190, color_name="white", brightness_factor=1)
+
 
 def display_fan_stats():
     if FAN_RUNNING_TIME == 0:
@@ -674,11 +674,6 @@ if __name__ == "__main__":
         BONNETDisplay.display_text_center("Initializing...")
         time.sleep(2)
 
-        running = True
-        spinner_thread = threading.Thread(target=spinner)
-        # Start the spinner in the background
-        spinner_thread.start()
-
         # Initialize to show the first page
         show_page(current_page)
 
@@ -710,6 +705,11 @@ if __name__ == "__main__":
             lcd_display(1)
 
         run_scheduler()
+
+        running = True
+        spinner_thread = threading.Thread(target=spinner)
+        # Start the spinner in the background
+        spinner_thread.start()
 
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected!")
