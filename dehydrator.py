@@ -265,6 +265,8 @@ def run_scheduler():
     while True:
         schedule.run_pending()
         time.sleep(1)
+        # Start the spinner in the background
+        spinner_thread.start()
 
 def heat_sensor():
     # TODO: Add code to heat sensors when the humidity gets high. Only applies to SHT4X series sensors
@@ -295,7 +297,7 @@ def display_default_page():
 def display_running(frame):
     if current_page == 0:
         something = False
-        BONNETDisplay.display_text(text=frame, x_pos=60, y_pos=190, color_name="white", brightness_factor=1)
+        BONNETDisplay.display_text(text=frame, x_pos=90, y_pos=190, color_name="white", brightness_factor=1)
         # print(frame)
 
 def display_fan_stats():
@@ -672,9 +674,6 @@ if __name__ == "__main__":
         print('Initializing Primary Display...')
         BONNET_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
         BONNETDisplay = BONNETDisplay(BONNET_display_config)
-
-        # Start the spinner in the background
-        spinner_thread.start()
 
         # Display centered text
         BONNETDisplay.display_text_center("Initializing...")
