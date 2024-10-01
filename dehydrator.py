@@ -37,7 +37,6 @@ def spinner():
         if current_page == 0:
             for frame in spinner_frames:
                 display_running(frame)
-                # BONNETDisplay.display_text(text=frame,x_pos=100,y_pos=190,color_name="white",brightness_factor=1)
                 time.sleep(0.2)  # Adjust speed of rotation (e.g., 0.2 seconds per frame)
 
 # @print_elapsed_time
@@ -294,7 +293,8 @@ def display_default_page():
     BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", "Ambient Sensor:",
                                        f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "],0, FAN_RUNNING,'white', 1.0, justification='left')
 def display_running(frame):
-    BONNETDisplay.display_text(text=frame, x_pos=100, y_pos=190, color_name="white", brightness_factor=1)
+    # BONNETDisplay.display_text(text=frame, x_pos=100, y_pos=190, color_name="white", brightness_factor=1)
+    print(frame)
 
 def display_fan_stats():
     if FAN_RUNNING_TIME == 0:
