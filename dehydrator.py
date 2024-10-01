@@ -265,8 +265,6 @@ def run_scheduler():
     while True:
         schedule.run_pending()
         time.sleep(1)
-        # Start the spinner in the background
-        spinner_thread.start()
 
 def heat_sensor():
     # TODO: Add code to heat sensors when the humidity gets high. Only applies to SHT4X series sensors
