@@ -39,7 +39,7 @@ def spinner():
     while running:
         for frame in spinner_frames:
             display_running(frame)
-            time.sleep(0.5)  # Adjust speed of rotation (e.g., 0.2 seconds per frame)
+            time.sleep(0.2)  # Adjust speed of rotation (e.g., 0.2 seconds per frame)
 
 # @print_elapsed_time
 def task_internal():
