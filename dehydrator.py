@@ -15,6 +15,9 @@ import threading
 # Spinner frames to simulate rotation
 spinner_frames = ['|', '/', '-', '\\']
 
+# Initialize the lock
+lock = threading.Lock()
+
 # This decorator can be applied to any job function to log the elapsed time of each job
 # Use this to account for jobs taking longer than expected...
 def print_elapsed_time(func):
@@ -294,8 +297,8 @@ def display_default_page():
 
 def display_running(frame):
     if current_page == 0:
-        something = False
-        BONNETDisplay.display_text(text=frame, x_pos=90, y_pos=190, color_name="white", brightness_factor=1)
+        with lock:
+            BONNETDisplay.display_text(text=frame, x_pos=90, y_pos=190, color_name="white", brightness_factor=1)
         # print(frame)
 
 def display_fan_stats():
