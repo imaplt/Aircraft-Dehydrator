@@ -689,6 +689,8 @@ if __name__ == "__main__":
         time.sleep(2)
         internalsensor = Sensor('SHT41_Internal', 0x44)
 
+        spinner_thread.start()
+
         # sht30_sensor = Sensor('SHT30', 0x44)
         # print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
 
