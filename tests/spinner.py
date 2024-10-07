@@ -2,7 +2,7 @@ import time
 import board
 from digitalio import DigitalInOut
 from PIL import Image, ImageDraw, ImageFont
-import adafruit_st7789 as st7789
+from adafruit_rgb_display import st7789
 
 class SpinnerDisplay:
     def __init__(self):
