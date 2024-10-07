@@ -91,13 +91,13 @@ class SpinnerDisplay:
 # Example usage
 if __name__ == "__main__":
     # Initialize the display with a larger font size and custom color
-    font_size = 32  # Set font size here
+    font_size = 48  # Set font size here
     text_color = (0, 255, 0)  # Set text color (green in this case)
 
     spinner_display = SpinnerDisplay(font_size=font_size, text_color=text_color)
 
     # Define the spinner characters
-    spinner_chars = ['|', '/', '-', '\\']
+    spinner_chars = ['|', '/', '--', '\\']
 
     # Start the spinner animation
     spinner_display.display_spinner(spinner_chars, delay=0.1)
