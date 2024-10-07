@@ -4,8 +4,9 @@ from digitalio import DigitalInOut
 from PIL import Image, ImageDraw, ImageFont
 from adafruit_rgb_display import st7789
 
+
 class SpinnerDisplay:
-    def __init__(self):
+    def __init__(self, font_size=30, text_color=(255, 255, 255)):
         # Create the display
         self.cs_pin = DigitalInOut(board.CE0)
         self.dc_pin = DigitalInOut(board.D25)
@@ -38,12 +39,19 @@ class SpinnerDisplay:
         self.image = Image.new('RGB', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
 
-        # Set default font
-        self.set_default_font()
+        # Set font and text color
+        self.set_font(font_size)
+        self.text_color = text_color
 
-    def set_default_font(self):
-        """Set the default font for displaying text."""
-        self.font = ImageFont.load_default()
+    def set_font(self, font_size):
+        """Set the font for displaying text with a specified size."""
+        try:
+            # Try loading a built-in font (e.g., DejaVuSans)
+            self.font = ImageFont.truetype("DejaVuSans-Bold.ttf", font_size)
+        except IOError:
+            # If the font is not available, fall back to the default PIL font
+            print("DejaVuSans-Bold.ttf not found, using default font.")
+            self.font = ImageFont.load_default()
 
     def clear_display(self):
         """Clears the display by filling it with a black rectangle."""
@@ -71,7 +79,7 @@ class SpinnerDisplay:
                 text_y = center_y - text_height // 2
 
                 # Draw the spinner character at the center of the screen
-                self.draw.text((text_x, text_y), char, font=self.font, fill=(255, 255, 255))
+                self.draw.text((text_x, text_y), char, font=self.font, fill=self.text_color)
 
                 # Update the display
                 self.update_display()
@@ -79,13 +87,17 @@ class SpinnerDisplay:
                 # Pause for a short time to create animation effect
                 time.sleep(delay)
 
+
 # Example usage
 if __name__ == "__main__":
-    # Initialize the display
-    spinner_display = SpinnerDisplay()
+    # Initialize the display with a larger font size and custom color
+    font_size = 32  # Set font size here
+    text_color = (0, 255, 0)  # Set text color (green in this case)
+
+    spinner_display = SpinnerDisplay(font_size=font_size, text_color=text_color)
 
     # Define the spinner characters
     spinner_chars = ['|', '/', '-', '\\']
 
     # Start the spinner animation
-    spinner_display.display_spinner(spinner_chars)
+    spinner_display.display_spinner(spinner_chars, delay=0.1)
