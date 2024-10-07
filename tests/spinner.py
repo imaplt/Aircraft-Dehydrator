@@ -63,10 +63,14 @@ class SpinnerDisplay:
                 # Clear the display
                 self.clear_display()
 
+                # Calculate the bounding box of the text (spinner character)
+                bbox = self.draw.textbbox((0, 0), char, font=self.font)
+                text_width = bbox[2] - bbox[0]
+                text_height = bbox[3] - bbox[1]
+                text_x = center_x - text_width // 2
+                text_y = center_y - text_height // 2
+
                 # Draw the spinner character at the center of the screen
-                text_size = self.draw.textsize(char, font=self.font)
-                text_x = center_x - text_size[0] // 2
-                text_y = center_y - text_size[1] // 2
                 self.draw.text((text_x, text_y), char, font=self.font, fill=(255, 255, 255))
 
                 # Update the display
