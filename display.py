@@ -235,10 +235,10 @@ class BONNETDisplay:
         color = self.set_brightness(color_name, brightness_factor)
         position = (x_pos, y_pos)
         bbox = self.draw.textbbox((0, 0), text, font=self.font)
-        text_width = bbox[2] - bbox[0] + 1
-        text_height = bbox[3] - bbox[1] + 1
+        text_width = bbox[2] - bbox[0] + 3
+        text_height = bbox[3] - bbox[1] + 3
         # Clear only the specific area for the line (based on text height)
-        self.draw.rectangle((x_pos - 1, y_pos - 1, x_pos + text_width, y_pos + text_height), outline=0, fill=(0,0,0))
+        self.draw.rectangle((x_pos - 2, y_pos - 2, x_pos + text_width, y_pos + text_height), outline=0, fill=(0,0,0))
         self.draw.text(position, text, font=self.font, fill=color)
         self.disp.image(self.image)
 
