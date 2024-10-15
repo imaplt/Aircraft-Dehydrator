@@ -13,7 +13,7 @@ from fan_controller import EMC2101
 import threading
 
 # Spinner frames to simulate rotation
-spinner_frames = ['|', '/', '-', '\\']
+spinner_frames = ['▖', '▘', '▝', '▗']
 
 # Initialize the lock
 lock = threading.Lock()
@@ -265,7 +265,7 @@ def display_running(frame):
     if current_page == 0:
         with lock:
             something = 0
-            BONNETDisplay.display_text(text=frame, x_pos=90, y_pos=190, color_name="white", brightness_factor=1)
+            BONNETDisplay.display_text(text=frame, x_pos=120, y_pos=190, color_name="white", brightness_factor=1)
 
 def display_fan_stats():
     if FAN_RUNNING_TIME == 0:
