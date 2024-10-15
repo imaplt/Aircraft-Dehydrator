@@ -150,7 +150,7 @@ def task_internal():
     INTERNAL_TEMP = internaloutput['temperature']
 
     # Display the updated information on the current page if applicable
-    update_current_page()
+    # update_current_page()
 
     # Handle fan start logic based on humidity thresholds
     if internaloutput['humidity'] > MAX_HUMIDITY:
