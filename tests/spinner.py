@@ -97,12 +97,12 @@ if __name__ == "__main__":
     spinner_display = SpinnerDisplay(font_size=font_size, text_color=text_color)
 
     # Define the spinner characters
-    #spinner_chars = ['|', '/', '—', '\\']
-    spinner_chars = ['◐', '◓', '◑', '◒']
+    # spinner_chars = ['|', '/', '—', '\\']
+    # spinner_chars = ['◐', '◓', '◑', '◒']
     # spinner_chars = ['⬢', '⬡']
     # spinner_chars = ['010', '011', '001', '101', '110', '111']
     # spinner_chars = ['🕛', '🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚']
-    # spinner_chars = ['▖', '▘', '▝', '▗']
+    spinner_chars = ['▖', '▘', '▝', '▗']
     # spinner_chars = ['*', '+', 'x', 'o']
     # spinner_chars = ['←', '↑', '→', '↓']
     # spinner_chars = ['.  ', '.. ', '...']
