@@ -517,9 +517,6 @@ if __name__ == "__main__":
     TASK_FAN = configManager.get_int_config('TASK_FAN')
     TASK_INTERNAL = configManager.get_int_config('TASK_INTERNAL')
     TASK_EXTERNAL = configManager.get_int_config('TASK_EXTERNAL')
-    TASK_DISPLAY_ROTATION = configManager.get_int_config('TASK_DISPLAY_ROTATION')
-    LCD_ROTATION = configManager.get_int_config('LCD_ROTATION')
-    OLED_ROTATION = configManager.get_int_config('OLED_ROTATION')
 
     # Get button pin info
     BTN_L_PIN = configManager.get_int_config('BTN_L_PIN')
@@ -649,7 +646,7 @@ if __name__ == "__main__":
         internalprevious_output = {'temperature': 0, 'humidity': 0}
 
         schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL,
-                       fan_interval=TASK_FAN, display_interval=TASK_DISPLAY_ROTATION)
+                       fan_interval=TASK_FAN)
 
         # Need to run the External once to update the values
         task_ambient()
