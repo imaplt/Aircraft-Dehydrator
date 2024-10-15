@@ -111,7 +111,6 @@ class BONNETDisplay:
         backlight.value = True
         self._clear_image()
 
-
     def clear_screen(self):
         self.disp.fill(0)
         self._clear_image()
@@ -239,7 +238,7 @@ class BONNETDisplay:
         text_width = bbox[2] - bbox[0] + 3
         text_height = bbox[3] - bbox[1] + 3
         # Clear only the specific area for the line (based on text height)
-        self.draw.rectangle((0, y_pos, text_width, y_pos + text_height), outline=0, fill=(0,0,0))
+        self.draw.rectangle((x_pos, y_pos, text_width, text_height), outline=0, fill=(0,0,0))
         self.draw.text(position, text, font=self.font, fill=color)
         self.disp.image(self.image)
 
@@ -278,7 +277,7 @@ class BONNETDisplay:
             # Display the fan icon with the appropriate color based on fan status
         if current_page == 0:
             # Load the fan icon with transparency
-            fan_icon = Image.open("fan_icon.png").convert("RGBA").resize((48, 48))  # Ensure icon is in RGBA mode
+            fan_icon = Image.open("fan_icon.png").convert("RGBA").resize((32, 32))  # Ensure icon is in RGBA mode
             if fan_running:
                 fan_color = (0, 255, 0, 255)  # Green (RGBA)
             else:
