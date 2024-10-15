@@ -266,7 +266,7 @@ def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1, display_inter
 def run_scheduler():
     while True:
         schedule.run_pending()
-        time.sleep(.2)
+        time.sleep(.1)
 
 def heat_sensor():
     # TODO: Add code to heat sensors when the humidity gets high. Only applies to SHT4X series sensors
