@@ -408,56 +408,57 @@ def save_config():
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, \
         humidity_mode, FAN_LIMIT, selected_option
-    print("Current starting page:", current_page)
-    if button.pin.number == BTN_L_PIN:
-        print("Button L pressed")
-        if current_page == 5:
-            selected_option = 1
-            draw_fan_limit()
+    with lock:
+        print("Current starting page:", current_page)
+        if button.pin.number == BTN_L_PIN:
+            print("Button L pressed")
+            if current_page == 5:
+                selected_option = 1
+                draw_fan_limit()
+            else:
+                current_page -= 1
+                if current_page < 0:
+                    # Wrap around to the last page accounting for config page
+                    current_page = total_pages - 1
+                humidity_mode = "selection"  # Reset humidity mode when changing page
+        elif button.pin.number == BTN_R_PIN:
+            print("Button R Pressed")
+            if current_page == 5:
+                selected_option = 2
+                draw_fan_limit()
+            else:
+                current_page += 1
+                if current_page >= total_pages:
+                    current_page = 0  # Wrap around to the first page
+                humidity_mode = "selection"  # Reset humidity mode when changing pages
+        elif button.pin.number == BTN_U_PIN:
+            print("Up button pressed")
+        elif button.pin.number == BTN_D_PIN:
+            print("Down button pressed")
+        elif button.pin.number == BTN_C_PIN:
+            print("Center button pressed")
+        elif button.pin.number == BTN_A_PIN:
+            print("A button pressed")
+            if current_page == 5:
+                if selected_option == 1: # OK Selected
+                    schedule.clear()
+                    cleanup()
+                    exit()
+                elif selected_option == 2: # CLEAR Selected
+                    FAN_LIMIT *= 2  # Double the fan limit
+                    current_page = 0  # Return to page 0
+                    schedule_tasks()
+        elif button.pin.number == BTN_B_PIN:
+             print("B button pressed")
         else:
-            current_page -= 1
-            if current_page < 0:
-                # Wrap around to the last page accounting for config page
-                current_page = total_pages - 1
-            humidity_mode = "selection"  # Reset humidity mode when changing page
-    elif button.pin.number == BTN_R_PIN:
-        print("Button R Pressed")
-        if current_page == 5:
-            selected_option = 2
-            draw_fan_limit()
-        else:
-            current_page += 1
-            if current_page >= total_pages:
-                current_page = 0  # Wrap around to the first page
-            humidity_mode = "selection"  # Reset humidity mode when changing pages
-    elif button.pin.number == BTN_U_PIN:
-        print("Up button pressed")
-    elif button.pin.number == BTN_D_PIN:
-        print("Down button pressed")
-    elif button.pin.number == BTN_C_PIN:
-        print("Center button pressed")
-    elif button.pin.number == BTN_A_PIN:
-        print("A button pressed")
-        if current_page == 5:
-            if selected_option == 1: # OK Selected
-                schedule.clear()
-                cleanup()
-                exit()
-            elif selected_option == 2: # CLEAR Selected
-                FAN_LIMIT *= 2  # Double the fan limit
-                current_page = 0  # Return to page 0
-                schedule_tasks()
-    elif button.pin.number == BTN_B_PIN:
-         print("B button pressed")
-    else:
-        print("Unknown button")
+            print("Unknown button")
 
-    print("Selected page: ", current_page)
-    if current_page < 5:
-        show_page(current_page)
-        
-    if current_page == 4:
-        edit_humidity_set(button)
+        print("Selected page: ", current_page)
+        if current_page < 5:
+            show_page(current_page)
+
+        if current_page == 4:
+            edit_humidity_set(button)
 
 def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page
