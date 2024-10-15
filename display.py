@@ -234,6 +234,7 @@ class BONNETDisplay:
         # Get color with brightness applied
         color = self.set_brightness(color_name, brightness_factor)
         position = (x_pos, y_pos)
+        # TODO: Need to add more around spinner
         bbox = self.draw.textbbox((0, 0), text, font=self.font)
         text_width = bbox[2] - bbox[0] + 5
         text_height = bbox[3] - bbox[1] + 5

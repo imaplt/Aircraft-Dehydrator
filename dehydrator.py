@@ -150,7 +150,7 @@ def task_internal():
     INTERNAL_TEMP = internaloutput['temperature']
 
     # Display the updated information on the current page if applicable
-    # update_current_page()
+    update_current_page()
 
     # Handle fan start logic based on humidity thresholds
     if internaloutput['humidity'] > MAX_HUMIDITY:
@@ -265,6 +265,7 @@ def display_running(frame):
     if current_page == 0:
         with lock:
             something = 0
+            # TODO: Need to use a customn display for the spinner to account for size difference.
             BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
 
 def display_fan_stats():
