@@ -480,7 +480,7 @@ def cleanup():
     global running
     print('Cleaning Up')
     running = False
-    spinner_thread.join()  # Wait for the spinner to finish
+    # spinner_thread.join()  # Wait for the spinner to finish
     try:
         BONNETDisplay.display_text_center_with_border('Shutting down...')
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
