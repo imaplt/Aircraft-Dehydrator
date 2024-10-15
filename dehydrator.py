@@ -480,7 +480,7 @@ def cleanup():
     global running
     print('Cleaning Up')
     running = False
-    # spinner_thread.join()  # Wait for the spinner to finish
+    spinner_thread.join()  # Wait for the spinner to finish
     try:
         BONNETDisplay.display_text_center_with_border('Shutting down...')
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
@@ -650,7 +650,7 @@ if __name__ == "__main__":
 
         # Need to run the External once to update the values
         task_ambient()
-        spinner_thread.start()
+        # spinner_thread.start()
         time.sleep(2)
         run_scheduler()
 
