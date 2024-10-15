@@ -150,7 +150,7 @@ def task_internal():
     INTERNAL_TEMP = internaloutput['temperature']
 
     # Display the updated information on the current page if applicable
-    # update_current_page()
+    update_current_page()
 
     # Handle fan start logic based on humidity thresholds
     if internaloutput['humidity'] > MAX_HUMIDITY:
@@ -450,9 +450,9 @@ def button_pressed_callback(button):
     else:
         print("Unknown button")
 
-    print("Selected page: ", current_page)
-    if current_page < 5:
-        show_page(current_page)
+    # print("Selected page: ", current_page)
+    # if current_page < 5:
+    #     show_page(current_page)
         
     if current_page == 4:
         edit_humidity_set(button)
