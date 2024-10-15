@@ -450,9 +450,9 @@ def button_pressed_callback(button):
     else:
         print("Unknown button")
 
-    # print("Selected page: ", current_page)
-    # if current_page < 5:
-    #     show_page(current_page)
+    print("Selected page: ", current_page)
+    if current_page < 5:
+        show_page(current_page)
         
     if current_page == 4:
         edit_humidity_set(button)
