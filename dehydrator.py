@@ -129,16 +129,17 @@ def task_internal():
     def update_current_page():
         """Update the default page display if needed."""
         if current_page == 0: # Default page
-            if UOM == 'F':
-                BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {celsius_to_fahrenheit(INTERNAL_TEMP)}°F",
-                                           x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
-                BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {celsius_to_fahrenheit(EXTERNAL_TEMP)}°F",
-                                           x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
-            else:
-                BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C",
-                                           x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
-                BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C",
-                                           x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
+            with lock:
+                if UOM == 'F':
+                    BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {celsius_to_fahrenheit(INTERNAL_TEMP)}°F",
+                                               x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
+                    BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {celsius_to_fahrenheit(EXTERNAL_TEMP)}°F",
+                                               x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
+                else:
+                    BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C",
+                                               x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
+                    BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C",
+                                               x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
 
         elif current_page == 1: # Fan Stats
             print("Fan running time:", FAN_RUNNING_TIME)
