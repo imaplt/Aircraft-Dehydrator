@@ -650,7 +650,7 @@ if __name__ == "__main__":
 
         # Need to run the External once to update the values
         task_ambient()
-        # spinner_thread.start()
+        spinner_thread.start()
         time.sleep(2)
         run_scheduler()
 
