@@ -265,7 +265,7 @@ def display_running(frame):
     if current_page == 0:
         with lock:
             something = 0
-            BONNETDisplay.display_text(text=frame, x_pos=120, y_pos=190, color_name="white", brightness_factor=1)
+            BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
 
 def display_fan_stats():
     if FAN_RUNNING_TIME == 0:
