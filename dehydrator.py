@@ -6,11 +6,12 @@ from datetime import timedelta
 from config_manager import ConfigManager
 from logger import Logger as Log
 import system_status
-from display import BONNETDisplay, LCD2004Display, DisplayConfig
+from display import BONNETDisplay, DisplayConfig
 from gpiozero import Button
 from sensor import Sensor
 from fan_controller import EMC2101
 import threading
+from oled_display_manager import OLEDDisplayManager
 
 # Spinner frames to simulate rotation
 spinner_frames = ['|', '/', '-', '\\']
@@ -225,69 +226,21 @@ def _cycle_fan():
     time.sleep(FAN_DURATION)
     fanController.set_fan_speed(0)
 
-def lcd_display(screen_no):
-    global lcd_lines
-    if screen_no == 1:
-        lcd_lines[0] = f"Int Max:{INTERNAL_HIGH_TEMP}C {INTERNAL_HIGH_HUMIDITY}%"
-        lcd_lines[1] = f"Int Min:{INTERNAL_LOW_TEMP}C {INTERNAL_LOW_HUMIDITY}%"
-        lcd_lines[2] = f"Ext Max:{EXTERNAL_HIGH_TEMP}C {EXTERNAL_HIGH_HUMIDITY}%"
-        lcd_lines[3] = f"Ext Min:{EXTERNAL_LOW_TEMP}C {EXTERNAL_LOW_HUMIDITY}%"
-        lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
-    else:
-        lcd_lines[0] = "Fan Stats..."
-        lcd_lines[1] = f"Cycles: {CYCLE_COUNT}"
-        lcd_lines[2] = f"Duration: {FAN_TOTAL_DURATION}s"
-        lcd_lines[3] = f"Running - {str(FAN_RUNNING)}"
-        lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
 
-def oled_display():
-    global lcd_lines
-    lcd_lines[0] = f"Int Max:{INTERNAL_HIGH_TEMP}C {INTERNAL_HIGH_HUMIDITY}%"
-    lcd_lines[1] = f"Int Min:{INTERNAL_LOW_TEMP}C {INTERNAL_LOW_HUMIDITY}%"
-    lcd_lines[2] = f"Ext Max:{EXTERNAL_HIGH_TEMP}C {EXTERNAL_HIGH_HUMIDITY}%"
-    lcd_lines[3] = f"Ext Min:{EXTERNAL_LOW_TEMP}C {EXTERNAL_LOW_HUMIDITY}%"
-    lcd2004Display.display_four_rows_center(lcd_lines, justification='left')
-
-def task_alternate_screens():
-    if task_alternate_screens.current_screen == 1:
-        lcd_display(1)
-        task_alternate_screens.current_screen = 2
-    else:
-        lcd_display(2)
-        task_alternate_screens.current_screen = 1
-
-def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1, display_interval=30):
+def schedule_tasks(int_interval=1, ext_interval=5):
     schedule.every(int_interval).seconds.do(task_internal)
-    schedule.every(ext_interval).minutes.do(task_ambient)
+    # schedule.every(ext_interval).minutes.do(task_ambient)
     # schedule.every(fan_interval).minutes.do(task_fan)
-    if DISPLAY_ENABLED:
-        schedule.every(display_interval).seconds.do(task_alternate_screens)
 
 def run_scheduler():
     while True:
         schedule.run_pending()
         time.sleep(.2)
 
-def heat_sensor():
-    # TODO: Add code to heat sensors when the humidity gets high. Only applies to SHT4X series sensors
-    print("Heating External sensor...")
-    externalsensor.heat_sensor()
-    logger.log(timestamp, 'INFO', 'SYSTEM', 'EXTERNAL', "Heating External sensor...")
-
-    print("Heating Internal sensor...")
-    internalsensor.heat_sensor()
-    logger.log(timestamp, 'INFO', 'SYSTEM', 'INTERNAL', "Heating Internal sensor...")
-
 def read_installed_devices(config):
     devices = config.get_config('installed_devices').split(',')
     devices = [device.strip() for device in devices]  # Remove any extra whitespace
     return devices
-
-def display_min_humidity(value):
-    print(f"Min Humidity: {value}%")
-
-def display_max_humidity(value):
-    print(f"Max Humidity: {value}%")
 
 def display_default_page():
     # Render static data from global variables
@@ -405,6 +358,7 @@ def show_page(page_index):
     global last_page_changed
     last_page_changed = time.time()
     if page_index == 0:
+        display_manager.switch_image(0)
         display_default_page()
     elif page_index == 1:
         display_fan_stats()
@@ -504,10 +458,6 @@ def _fan_limit_exceeded():
     current_page = 5
     BONNETDisplay.display_text_center_with_border('FAN LIMIT EXCEEDED')
     time.sleep(3)
-    if isDeviceDetected(statuses, 'LCD2004'):
-        lcd2004Display = LCD2004Display()
-        lcd2004Display.clear()
-        lcd2004Display.display_text_with_border(['FAN LIMIT EXCEEDED'])
     draw_fan_limit()
     fanController.set_fan_speed(0)
     save_config()
@@ -520,9 +470,6 @@ def cleanup():
     spinner_thread.join()  # Wait for the spinner to finish
     try:
         BONNETDisplay.display_text_center_with_border('Shutting down...')
-        if isDeviceDetected(statuses, 'LCD2004'):
-            lcd2004Display.display_text_with_border(['Shutting down...'])
-            lcd2004Display.clear()
 
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
                    'System', 'System', "Shutting down...")
@@ -558,9 +505,6 @@ if __name__ == "__main__":
     TASK_FAN = configManager.get_int_config('TASK_FAN')
     TASK_INTERNAL = configManager.get_int_config('TASK_INTERNAL')
     TASK_EXTERNAL = configManager.get_int_config('TASK_EXTERNAL')
-    TASK_DISPLAY_ROTATION = configManager.get_int_config('TASK_DISPLAY_ROTATION')
-    LCD_ROTATION = configManager.get_int_config('LCD_ROTATION')
-    OLED_ROTATION = configManager.get_int_config('OLED_ROTATION')
 
     # Get button pin info
     BTN_L_PIN = configManager.get_int_config('BTN_L_PIN')
@@ -593,10 +537,7 @@ if __name__ == "__main__":
     UOM = configManager.get_config('UOM')
 
     # Display configuration
-    DISPLAY_ENABLED = configManager.get_boolean_config('DISPLAY_ENABLED')
-
-    # Initialize current screen
-    task_alternate_screens.current_screen = 1
+    display_manager = OLEDDisplayManager(240,240)
 
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}
@@ -640,7 +581,6 @@ if __name__ == "__main__":
 
     # Initialize lines
     oled_lines = [""] * 5  # For five line bonnet display...
-    lcd_lines = [""] * 4  # For four line ssd1306_display...
 
     FAN_RUNNING = False
     FAN_RUNNING_TIME = 0
@@ -663,12 +603,6 @@ if __name__ == "__main__":
             print("Overall Status: Fail")
             # raise ValueError("Overall Status Failed")
 
-        print ('Initializing LCD Display...')
-        if isDeviceDetected(statuses, 'LCD2004'):
-            lcd2004Display = LCD2004Display()
-            lcd2004Display.clear()
-            lcd2004Display.display_text_with_border(['Initializing...'])
-
         # Initialize displays...
         # Need to do this first so if there is an error cleanup can still work...
         print('Initializing Primary Display...')
@@ -689,9 +623,6 @@ if __name__ == "__main__":
         internalsensor = Sensor('SHT41_Internal', 0x44)
 
 
-        # sht30_sensor = Sensor('SHT30', 0x44)
-        # print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
-
         if isDeviceDetected(statuses, 'SHTC3'):
             externalsensor = Sensor('SHTC3', 0x70)
             externalprevious_output = {'temperature': 0, 'humidity': 0}
@@ -699,13 +630,10 @@ if __name__ == "__main__":
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}
 
-        schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL,
-                       fan_interval=TASK_FAN, display_interval=TASK_DISPLAY_ROTATION)
+        schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL)
 
         # Need to run the External once to update the values
         task_ambient()
-        if DISPLAY_ENABLED:
-            lcd_display(1)
 
         spinner_thread.start()
         time.sleep(2)
