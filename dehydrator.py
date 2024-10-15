@@ -225,7 +225,7 @@ def _cycle_fan():
     time.sleep(FAN_DURATION)
     fanController.set_fan_speed(0)
 
-def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1, display_interval=30):
+def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1):
     schedule.every(int_interval).seconds.do(task_internal)
     schedule.every(ext_interval).minutes.do(task_ambient)
     # schedule.every(fan_interval).minutes.do(task_fan)
@@ -265,7 +265,7 @@ def display_running(frame):
     if current_page == 0:
         with lock:
             something = 0
-           # BONNETDisplay.display_text(text=frame, x_pos=90, y_pos=190, color_name="white", brightness_factor=1)
+           BONNETDisplay.display_text(text=frame, x_pos=90, y_pos=190, color_name="white", brightness_factor=1)
 
 def display_fan_stats():
     if FAN_RUNNING_TIME == 0:
