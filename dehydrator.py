@@ -15,7 +15,6 @@ import threading
 # Spinner frames to simulate rotation
 spinner_frames = ['▖', '▘', '▝', '▗']
 
-
 def get_next_frame():
     global current_frame_index
     # Get the current frame
@@ -28,19 +27,6 @@ def get_next_frame():
 
 # Initialize the lock
 lock = threading.Lock()
-
-# This decorator can be applied to any job function to log the elapsed time of each job
-# Use this to account for jobs taking longer than expected...
-def print_elapsed_time(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        start_timestamp = time.time()
-        result = func(*args, **kwargs)
-        if time.time() - start_timestamp > 0:
-            print('LOG: Running job "%s"' % func.__name__)
-            print('LOG: Job "%s" completed in %d seconds' % (func.__name__, time.time() - start_timestamp))
-        return result
-    return wrapper
 
 def celsius_to_fahrenheit(celsius):
     fahrenheit = (celsius * 9/5) + 32
@@ -88,12 +74,10 @@ def sensor():
 
         time.sleep(0.5)
 
-# @print_elapsed_time
 def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
         INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP, page_changed
-    print("Selected page: ", current_page)
     if page_changed and current_page < 5:
         page_changed = False
         show_page(current_page)
@@ -189,7 +173,6 @@ def task_internal():
         current_page = 0
         show_page(current_page)
 
-# @print_elapsed_time
 def task_ambient():
     global EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY, EXTERNAL_TEMP, EXTERNAL_HUMIDITY
 
@@ -236,7 +219,6 @@ def task_display_reset():
     BONNETDisplay.reset_screen()
     display_default_page()
 
-#  @print_elapsed_time
 def _cycle_fan():
     # TODO: How do we want to engage this?
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
@@ -490,14 +472,14 @@ def cleanup():
     global running
     print('Cleaning Up')
     running = False
-    # spinner_thread.join()  # Wait for the spinner to finish
+    sensor_thread.join()  # Wait for the sensor thread to finish
     try:
         BONNETDisplay.display_text_center_with_border('Shutting down...')
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
                    'System', 'System', "Shutting down...")
         # make sure fan is off
         fanController.set_fan_speed(0)
-        time.sleep(1)
+        time.sleep(3)
         BONNETDisplay.clear_screen()
     except NameError:
         print('LCD Not Defined')
