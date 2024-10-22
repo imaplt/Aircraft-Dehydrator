@@ -271,23 +271,10 @@ def read_installed_devices(config):
     devices = [device.strip() for device in devices]  # Remove any extra whitespace
     return devices
 
-def display_min_humidity(value):
-    print(f"Min Humidity: {value}%")
-
-def display_max_humidity(value):
-    print(f"Max Humidity: {value}%")
-
 def display_default_page():
     # Render static data from global variables
     BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", "Ambient Sensor:",
                                        f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "],0, FAN_RUNNING,'white', 1.0, justification='left')
-
-def display_running(frame):
-    if current_page == 0:
-        with lock:
-            something = 0
-            # TODO: Need to use a customn display for the spinner to account for size difference.
-            BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
 
 def display_fan_stats():
     if FAN_RUNNING_TIME == 0:
@@ -428,7 +415,6 @@ def save_config():
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, \
         humidity_mode, FAN_LIMIT, selected_option, page_changed
-    print("Current starting page:", current_page)
     if button.pin.number == BTN_L_PIN:
         print("Button L pressed")
         if current_page == 5:

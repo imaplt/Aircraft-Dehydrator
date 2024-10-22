@@ -131,7 +131,6 @@ class BONNETDisplay:
         self.draw = ImageDraw.Draw(self.image)
 
     def set_font(self, font_path=None, font_size=16):
-        print(font_path, font_size)
         if font_path:
             self.font = ImageFont.truetype(font_path, font_size)
         else:
@@ -274,7 +273,6 @@ class BONNETDisplay:
 
             position = (x_position, i * line_height + (line_height - text_height) // 2)
             self.draw.text(position, text, font=self.font, fill=color)
-            print(text, position)
             # Display the fan icon with the appropriate color based on fan status
         if current_page == 0:
             # Load the fan icon with transparency
