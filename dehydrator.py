@@ -46,11 +46,47 @@ def celsius_to_fahrenheit(celsius):
     fahrenheit = (celsius * 9/5) + 32
     return round(fahrenheit, 1)
 
-def spinner():
+def sensor():
+    global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
+        CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
+        INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP
+
     while running:
-        for frame in spinner_frames:
-            display_running(frame)
-            time.sleep(0.2)  # Adjust speed of rotation (e.g., 0.2 seconds per frame)
+        internaloutput = internalsensor.read_sensor()
+
+        # Main block to handle sensor change and fan control
+        INTERNAL_HUMIDITY = internaloutput['humidity']
+        INTERNAL_TEMP = internaloutput['temperature']
+
+        """Log internal sensor reading and update previous output values."""
+        logger.log(timestamp, 'INFO', 'SENSORS', 'INTERNAL',
+                   f"Temperature: {internaloutput['temperature']}C, Humidity: {internaloutput['humidity']}%")
+        print("Internal Sensor Reading:", internaloutput)
+
+        # Update the config file with stats
+        new_high_humidity = max(INTERNAL_HIGH_HUMIDITY, internaloutput['humidity'])
+        new_low_humidity = min(INTERNAL_LOW_HUMIDITY, internaloutput['humidity'])
+
+        new_high_temp = max(INTERNAL_HIGH_TEMP, internaloutput['temperature'])
+        new_low_temp = min(INTERNAL_LOW_TEMP, internaloutput['temperature'])
+
+        # Check if any of the values changed
+        log_changed = (
+                new_high_humidity != INTERNAL_HIGH_HUMIDITY or
+                new_low_humidity != INTERNAL_LOW_HUMIDITY or
+                new_high_temp != INTERNAL_HIGH_TEMP or
+                new_low_temp != INTERNAL_LOW_TEMP
+        )
+
+        # Update the variables if they changed
+        if log_changed:
+            INTERNAL_HIGH_HUMIDITY = new_high_humidity
+            INTERNAL_LOW_HUMIDITY = new_low_humidity
+            INTERNAL_HIGH_TEMP = new_high_temp
+            INTERNAL_LOW_TEMP = new_low_temp
+            # save_config()
+
+        time.sleep(0.5)
 
 # @print_elapsed_time
 def task_internal():
@@ -70,30 +106,6 @@ def task_internal():
         # display_fan_stats()
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    internaloutput = internalsensor.read_sensor()
-
-    # Update the config file with stats
-    new_high_humidity = max(INTERNAL_HIGH_HUMIDITY, internaloutput['humidity'])
-    new_low_humidity = min(INTERNAL_LOW_HUMIDITY, internaloutput['humidity'])
-
-    new_high_temp = max(INTERNAL_HIGH_TEMP, internaloutput['temperature'])
-    new_low_temp = min(INTERNAL_LOW_TEMP, internaloutput['temperature'])
-
-    # Check if any of the values changed
-    log_changed = (
-            new_high_humidity != INTERNAL_HIGH_HUMIDITY or
-            new_low_humidity != INTERNAL_LOW_HUMIDITY or
-            new_high_temp != INTERNAL_HIGH_TEMP or
-            new_low_temp != INTERNAL_LOW_TEMP
-    )
-
-    # Update the variables if they changed
-    if log_changed:
-        INTERNAL_HIGH_HUMIDITY = new_high_humidity
-        INTERNAL_LOW_HUMIDITY = new_low_humidity
-        INTERNAL_HIGH_TEMP = new_high_temp
-        INTERNAL_LOW_TEMP = new_low_temp
-        save_config()
 
     def handle_fan_operation(started, stopped, run_time, action):
         global FAN_RUNNING, FAN_TOTAL_DURATION, CYCLE_COUNT  # Explicitly declare global variables
@@ -135,14 +147,6 @@ def task_internal():
             logger.log(timestamp, 'WARN', 'SYSTEM', 'FAN', f"Fan time limit exceeded: {FAN_LIMIT}")
             _fan_limit_exceeded()
 
-    def update_internal_output_and_log():
-        """Log internal sensor reading and update previous output values."""
-        logger.log(timestamp, 'INFO', 'SENSORS', 'INTERNAL',
-                   f"Temperature: {internaloutput['temperature']}C, Humidity: {internaloutput['humidity']}%")
-        print("Internal Sensor Reading:", internaloutput)
-        internalprevious_output['temperature'] = internaloutput['temperature']
-        internalprevious_output['humidity'] = internaloutput['humidity']
-
     def update_current_page():
         """Update the default page display if needed."""
         if current_page == 0: # Default page
@@ -165,24 +169,20 @@ def task_internal():
             BONNETDisplay.display_text(text=f"Current: {FAN_RUNNING_TIME}",
                                        x_pos=0, y_pos=63, color_name="white", brightness_factor=1.0)
 
-    # Main block to handle sensor change and fan control
-    INTERNAL_HUMIDITY = internaloutput['humidity']
-    INTERNAL_TEMP = internaloutput['temperature']
-
     # Display the updated information on the current page if applicable
     update_current_page()
 
     # Handle fan start logic based on humidity thresholds
-    if internaloutput['humidity'] > MAX_HUMIDITY:
+    if INTERNAL_HUMIDITY > MAX_HUMIDITY:
         started, run_time = fanController.set_fan_speed(100)
         handle_fan_operation(started, False, run_time, "start")
-    elif internaloutput['humidity'] < MIN_HUMIDITY:
+    elif INTERNAL_HUMIDITY < MIN_HUMIDITY:
         stopped, run_time = fanController.set_fan_speed(0)
         handle_fan_operation(False, stopped, run_time, "stop")
 
-    if abs(internaloutput['humidity'] - internalprevious_output['humidity']) > 0.2:
-        # Update log and internal values
-        update_internal_output_and_log()
+    # if abs(internaloutput['humidity'] - internalprevious_output['humidity']) > 0.2:
+    #     # Update log and internal values
+    #     update_internal_output_and_log()
 
     if time.time() - last_page_changed  > 8 and (0 < current_page < 4):
         current_page = 0
@@ -618,7 +618,7 @@ if __name__ == "__main__":
     FAN_RUNNING_TIME = 0
 
     running = True
-    # spinner_thread = threading.Thread(target=spinner)
+    sensor_thread = threading.Thread(target=sensor)
 
     try:
         installed_devices = read_installed_devices(configManager)
