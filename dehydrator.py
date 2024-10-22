@@ -474,7 +474,8 @@ def cleanup():
     running = False
     sensor_thread.join()  # Wait for the sensor thread to finish
     try:
-        BONNETDisplay.display_text_center_with_border('Shutting down...')
+        display_manager.switch_image(Screen.SHUTDOWN)
+        display_manager.display_current_image(BONNETDisplay.disp)
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
                    'System', 'System', "Shutting down...")
         # make sure fan is off
@@ -618,9 +619,7 @@ if __name__ == "__main__":
 
         display_manager.switch_image(Screen.INITIAL)
         display_manager.display_current_image(BONNETDisplay.disp)
-        # Display centered text
-        # BONNETDisplay.display_text_center("Initializing...")
-        time.sleep(2)
+        time.sleep(3)
 
         # Initialize to show the first page
         show_page(current_page)
