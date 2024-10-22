@@ -2,6 +2,16 @@ from PIL import Image, ImageDraw
 from enum import Enum
 from display import COLORS
 
+def set_brightness(color_name, brightness_factor):
+    """ Adjust brightness of the named color. """
+    if color_name not in COLORS:
+        raise ValueError(f"Color '{color_name}' not found!")
+
+    color = COLORS[color_name]
+    return tuple(int(c * brightness_factor) for c in color)
+
+
+
 class Screen(Enum):
     DEFAULT = (0, "Internal Sensor Screen")
     FAN = (1, "Fan Status Screen")
@@ -15,15 +25,6 @@ class Screen(Enum):
     def __init__(self, index, title):
         self.index = index                  # The screen index (for switching)
         self.title = title                  # The screen title
-
-
-def set_brightness(color_name, brightness_factor):
-    """ Adjust brightness of the named color. """
-    if color_name not in COLORS:
-        raise ValueError(f"Color '{color_name}' not found!")
-
-    color = COLORS[color_name]
-    return tuple(int(c * brightness_factor) for c in color)
 
 
 class OLEDDisplayManager:
