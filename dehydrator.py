@@ -92,9 +92,10 @@ def sensor():
 def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
-        INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP
+        INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP, page_changed
     print("Selected page: ", current_page)
-    if current_page < 5:
+    if current_page and page_changed < 5:
+        page_changed = False
         show_page(current_page)
 
     # if current_page == 4:
@@ -426,7 +427,7 @@ def save_config():
 
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, \
-        humidity_mode, FAN_LIMIT, selected_option
+        humidity_mode, FAN_LIMIT, selected_option, page_changed
     print("Current starting page:", current_page)
     if button.pin.number == BTN_L_PIN:
         print("Button L pressed")
@@ -438,6 +439,7 @@ def button_pressed_callback(button):
             if current_page < 0:
                 # Wrap around to the last page accounting for config page
                 current_page = total_pages - 1
+            page_changed = True
             humidity_mode = "selection"  # Reset humidity mode when changing page
     elif button.pin.number == BTN_R_PIN:
         print("Button R Pressed")
@@ -448,6 +450,7 @@ def button_pressed_callback(button):
             current_page += 1
             if current_page >= total_pages:
                 current_page = 0  # Wrap around to the first page
+            page_changed = True
             humidity_mode = "selection"  # Reset humidity mode when changing pages
     elif button.pin.number == BTN_U_PIN:
         print("Up button pressed")
@@ -590,6 +593,7 @@ if __name__ == "__main__":
     max_color = "white"
     min_color = "white"
     current_frame_index = 0
+    page_changed = False
 
     # GPIO setup using gpiozero for input buttons
     btn_lt = Button(BTN_L_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
@@ -673,7 +677,7 @@ if __name__ == "__main__":
         # Need to run the External once to update the values
         task_ambient()
         sensor_thread.start()
-        time.sleep(2)
+        # time.sleep(2)
         run_scheduler()
 
 
