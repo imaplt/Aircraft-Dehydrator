@@ -94,7 +94,7 @@ def task_internal():
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
         INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP, page_changed
     print("Selected page: ", current_page)
-    if current_page and page_changed < 5:
+    if page_changed and current_page < 5:
         page_changed = False
         show_page(current_page)
 
