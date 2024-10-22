@@ -57,6 +57,12 @@ def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
         INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP
+    print("Selected page: ", current_page)
+    if current_page < 5:
+        show_page(current_page)
+
+    # if current_page == 4:
+    #     edit_humidity_set(button)
 
     if fanController.fan_engaged and current_page == 1:
         FAN_RUNNING_TIME = timedelta(seconds=(int(time.time() -  fanController.start_time)))
@@ -465,12 +471,12 @@ def button_pressed_callback(button):
     else:
         print("Unknown button")
 
-    print("Selected page: ", current_page)
-    if current_page < 5:
-        show_page(current_page)
-
-    if current_page == 4:
-        edit_humidity_set(button)
+    # print("Selected page: ", current_page)
+    # if current_page < 5:
+    #     show_page(current_page)
+    #
+    # if current_page == 4:
+    #     edit_humidity_set(button)
 
 def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page
