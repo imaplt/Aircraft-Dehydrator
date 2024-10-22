@@ -15,6 +15,17 @@ import threading
 # Spinner frames to simulate rotation
 spinner_frames = ['▖', '▘', '▝', '▗']
 
+
+def get_next_frame():
+    global current_frame_index
+    # Get the current frame
+    frame = spinner_frames[current_frame_index]
+
+    # Increment the index to get the next frame on the next call
+    current_frame_index = (current_frame_index + 1) % len(spinner_frames)
+
+    return frame
+
 # Initialize the lock
 lock = threading.Lock()
 
@@ -140,8 +151,9 @@ def task_internal():
                                                x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
                     BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C",
                                                x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
-                for frame in spinner_frames:
-                    BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
+
+                frame = get_next_frame()
+                BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
         elif current_page == 1: # Fan Stats
             print("Fan running time:", FAN_RUNNING_TIME)
             BONNETDisplay.display_text(text=f"Current: {FAN_RUNNING_TIME}",
@@ -571,6 +583,7 @@ if __name__ == "__main__":
     selected_option = 1
     max_color = "white"
     min_color = "white"
+    current_frame_index = 0
 
     # GPIO setup using gpiozero for input buttons
     btn_lt = Button(BTN_L_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
