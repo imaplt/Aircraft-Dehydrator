@@ -1,8 +1,6 @@
 from PIL import Image, ImageDraw
 from enum import Enum
 from display import COLORS
-from tests.btest import WHITE
-
 
 class Screen(Enum):
     DEFAULT = (0, "Internal Sensor Screen")
@@ -100,7 +98,7 @@ class OLEDDisplayManager:
         self.draw.text((10, 30), custom_text, fill=color)
 
     def initial_screen(self):
-        color_name = WHITE
+        color_name = "white"
         brightness_factor = 1.0
         text="Initializing..."
         # Get color with brightness applied
@@ -116,7 +114,7 @@ class OLEDDisplayManager:
 
     def shutdown_screen(self):
         text = "Shutting down..."
-        color_name = WHITE
+        color_name = "white"
         brightness_factor = 1.0
         # Get color with brightness applied
         color = set_brightness(color_name, brightness_factor)
