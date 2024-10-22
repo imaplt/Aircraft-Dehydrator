@@ -1,13 +1,41 @@
 from PIL import Image, ImageDraw
+from enum import Enum
+from display import COLORS
+from tests.btest import WHITE
+
+
+class Screen(Enum):
+    DEFAULT = (0, "Internal Sensor Screen")
+    FAN = (1, "Fan Status Screen")
+    INTERNAL = (2, "Internal Stats Screen")
+    AMBIENT = (3, "Ambient Stats")
+    HUMIDITY = (4, "Humidity Set Screen")
+    FAN_LIMIT = (5, "Fan Limit")
+    SHUTDOWN = (6, "Shutdown")
+    INITIAL = (7, "Initial")
+
+    def __init__(self, index, title):
+        self.index = index                  # The screen index (for switching)
+        self.title = title                  # The screen title
+
+
+def set_brightness(color_name, brightness_factor):
+    """ Adjust brightness of the named color. """
+    if color_name not in COLORS:
+        raise ValueError(f"Color '{color_name}' not found!")
+
+    color = COLORS[color_name]
+    return tuple(int(c * brightness_factor) for c in color)
 
 
 class OLEDDisplayManager:
-    def __init__(self, width, height):
+    def __init__(self, width, height, font):
         self.width = width
         self.height = height
+        self.font = font
 
         # Initialize 5 different image buffers for the OLED
-        self.images = [Image.new('RGB', (self.width, self.height), "black") for _ in range(5)]
+        self.images = [Image.new('RGB', (self.width, self.height), "black") for _ in range(8)]
 
         # Initialize a list of drawing objects for each image buffer
         self.draws = [ImageDraw.Draw(img) for img in self.images]
@@ -17,6 +45,11 @@ class OLEDDisplayManager:
         self.image = self.images[self.current_image_index]
         self.draw = self.draws[self.current_image_index]
 
+        # Dictionary mapping screen indexes to update methods
+        self.screen_update_methods = {
+            7: self.initial_screen,
+            6: self.shutdown_screen,
+        }
 
     def switch_image(self, index):
         """ Switch to a different image by index (0 to 4) """
@@ -24,6 +57,9 @@ class OLEDDisplayManager:
             self.current_image_index = index
             self.image = self.images[self.current_image_index]
             self.draw = self.draws[self.current_image_index]
+            # Call the corresponding update method to refresh the image content
+            if index in self.screen_update_methods:
+                self.screen_update_methods[index]()
         else:
             raise IndexError("Image index out of range")
 
@@ -62,3 +98,33 @@ class OLEDDisplayManager:
         """ Update logic for screen 4 (e.g., custom message screen) """
         self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
         self.draw.text((10, 30), custom_text, fill=color)
+
+    def initial_screen(self):
+        color_name = WHITE
+        brightness_factor = 1.0
+        text="Initializing..."
+        # Get color with brightness applied
+        color = set_brightness(color_name, brightness_factor)
+        bbox = self.draw.textbbox((0, 0), text, font=self.font)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+        x_position = (self.width - text_width) // 2
+
+        position = (x_position, (self.height - text_height) // 2)
+        self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
+        self.draw.text(position, text, font=self.font, fill=color)
+
+    def shutdown_screen(self):
+        text = "Shutting down..."
+        color_name = WHITE
+        brightness_factor = 1.0
+        # Get color with brightness applied
+        color = set_brightness(color_name, brightness_factor)
+        bbox = self.draw.textbbox((0, 0), text, font=self.font)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+        x_position = (self.width - text_width) // 2
+
+        position = (x_position, (self.height - text_height) // 2)
+        self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
+        self.draw.text(position, text, font=self.font, fill=color)

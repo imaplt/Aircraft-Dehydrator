@@ -1,12 +1,12 @@
 
 import schedule
 import time
-import functools
 from datetime import timedelta
 from config_manager import ConfigManager
 from logger import Logger as Log
 import system_status
 from display import BONNETDisplay, DisplayConfig
+from oled_display_manager import OLEDDisplayManager, Screen
 from gpiozero import Button
 from sensor import Sensor
 from fan_controller import EMC2101
@@ -35,7 +35,7 @@ def celsius_to_fahrenheit(celsius):
 def sensor():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
-        INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP
+        INTERNAL_TEMP, INTERNAL_HUMIDITY, INTERNAL_PREVIOUS_HUMIDITY, current_page, EXTERNAL_TEMP
 
     while running:
         internaloutput = internalsensor.read_sensor()
@@ -44,9 +44,13 @@ def sensor():
         INTERNAL_HUMIDITY = internaloutput['humidity']
         INTERNAL_TEMP = internaloutput['temperature']
 
-        """Log internal sensor reading and update previous output values."""
-        logger.log(timestamp, 'INFO', 'SENSORS', 'INTERNAL',
-                   f"Temperature: {internaloutput['temperature']}C, Humidity: {internaloutput['humidity']}%")
+        if abs(INTERNAL_HUMIDITY - INTERNAL_PREVIOUS_HUMIDITY) > 0.2:
+            """Log internal sensor reading and update previous output values."""
+            logger.log(timestamp, 'INFO', 'SENSORS', 'INTERNAL',
+                       f"Temperature: {internaloutput['temperature']}C, Humidity: {internaloutput['humidity']}%")
+            INTERNAL_PREVIOUS_HUMIDITY = INTERNAL_HUMIDITY
+            print("Log File Updated")
+
         print("Internal Sensor Reading:", internaloutput)
 
         # Update the config file with stats
@@ -70,7 +74,7 @@ def sensor():
             INTERNAL_LOW_HUMIDITY = new_low_humidity
             INTERNAL_HIGH_TEMP = new_high_temp
             INTERNAL_LOW_TEMP = new_low_temp
-            # save_config()
+            save_config()
 
         time.sleep(0.5)
 
@@ -214,10 +218,6 @@ def task_ambient():
     EXTERNAL_HUMIDITY = externaloutput['humidity']
 
     print("Ambient Sensor Reading:", externaloutput)
-
-def task_display_reset():
-    BONNETDisplay.reset_screen()
-    display_default_page()
 
 def _cycle_fan():
     # TODO: How do we want to engage this?
@@ -399,7 +399,7 @@ def button_pressed_callback(button):
         humidity_mode, FAN_LIMIT, selected_option, page_changed
     if button.pin.number == BTN_L_PIN:
         print("Button L pressed")
-        if current_page == 5:
+        if current_page == Screen.FAN_LIMIT:
             selected_option = 1
             draw_fan_limit()
         else:
@@ -411,13 +411,13 @@ def button_pressed_callback(button):
             humidity_mode = "selection"  # Reset humidity mode when changing page
     elif button.pin.number == BTN_R_PIN:
         print("Button R Pressed")
-        if current_page == 5:
+        if current_page == Screen.FAN_LIMIT:
             selected_option = 2
             draw_fan_limit()
         else:
             current_page += 1
             if current_page >= total_pages:
-                current_page = 0  # Wrap around to the first page
+                current_page = Screen.DEFAULT  # Wrap around to the first page
             page_changed = True
             humidity_mode = "selection"  # Reset humidity mode when changing pages
     elif button.pin.number == BTN_U_PIN:
@@ -428,7 +428,7 @@ def button_pressed_callback(button):
         print("Center button pressed")
     elif button.pin.number == BTN_A_PIN:
         print("A button pressed")
-        if current_page == 5:
+        if current_page == Screen.FAN_LIMIT :
             if selected_option == 1: # OK Selected
                 schedule.clear()
                 cleanup()
@@ -614,9 +614,12 @@ if __name__ == "__main__":
         print('Initializing Primary Display...')
         BONNET_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
         BONNETDisplay = BONNETDisplay(BONNET_display_config)
+        display_manager = OLEDDisplayManager(240,240, font=FONT)
 
+        display_manager.switch_image(Screen.INITIAL)
+        display_manager.display_current_image(BONNETDisplay.disp)
         # Display centered text
-        BONNETDisplay.display_text_center("Initializing...")
+        # BONNETDisplay.display_text_center("Initializing...")
         time.sleep(2)
 
         # Initialize to show the first page
@@ -638,6 +641,7 @@ if __name__ == "__main__":
 
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}
+        INTERNAL_PREVIOUS_HUMIDITY = 0
 
         schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL,
                        fan_interval=TASK_FAN)
