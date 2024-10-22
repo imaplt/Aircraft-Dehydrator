@@ -10,8 +10,6 @@ def set_brightness(color_name, brightness_factor):
     color = COLORS[color_name]
     return tuple(int(c * brightness_factor) for c in color)
 
-
-
 class Screen(Enum):
     DEFAULT = (0, "Internal Sensor Screen")
     FAN = (1, "Fan Status Screen")
@@ -33,7 +31,7 @@ class OLEDDisplayManager:
         self.height = height
         self.font = font
 
-        # Initialize 5 different image buffers for the OLED
+        # Initialize 8 different image buffers for the OLED
         self.images = [Image.new('RGB', (self.width, self.height), "black") for _ in range(8)]
 
         # Initialize a list of drawing objects for each image buffer
@@ -50,8 +48,9 @@ class OLEDDisplayManager:
             6: self.shutdown_screen,
         }
 
-    def switch_image(self, index):
-        """ Switch to a different image by index (0 to 4) """
+    def switch_image(self, screen):
+        """ Switch to a different image by index (0 to 7) """
+        index = screen.index
         if 0 <= index < len(self.images):
             self.current_image_index = index
             self.image = self.images[self.current_image_index]
