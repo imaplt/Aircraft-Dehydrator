@@ -140,7 +140,8 @@ def task_internal():
                                                x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
                     BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°C",
                                                x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
-
+                for frame in spinner_frames:
+                    BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
         elif current_page == 1: # Fan Stats
             print("Fan running time:", FAN_RUNNING_TIME)
             BONNETDisplay.display_text(text=f"Current: {FAN_RUNNING_TIME}",
@@ -482,7 +483,7 @@ def cleanup():
     global running
     print('Cleaning Up')
     running = False
-    spinner_thread.join()  # Wait for the spinner to finish
+    # spinner_thread.join()  # Wait for the spinner to finish
     try:
         BONNETDisplay.display_text_center_with_border('Shutting down...')
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
@@ -598,7 +599,7 @@ if __name__ == "__main__":
     FAN_RUNNING_TIME = 0
 
     running = True
-    spinner_thread = threading.Thread(target=spinner)
+    # spinner_thread = threading.Thread(target=spinner)
 
     try:
         installed_devices = read_installed_devices(configManager)
@@ -652,7 +653,7 @@ if __name__ == "__main__":
 
         # Need to run the External once to update the values
         task_ambient()
-        spinner_thread.start()
+        # spinner_thread.start()
         time.sleep(2)
         run_scheduler()
 
