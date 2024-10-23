@@ -609,7 +609,7 @@ if __name__ == "__main__":
         print('Initializing Primary Display...')
         BONNET_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
         BONNETDisplay = BONNETDisplay(BONNET_display_config)
-        display_manager = OLEDDisplayManager(240,240, font=BONNETDisplay.font)
+        display_manager = OLEDDisplayManager(BONNET_display_config,240,240, font=BONNETDisplay.font)
 
         display_manager.switch_image(Screen.INITIAL)
         display_manager.display_current_image(BONNETDisplay.disp)

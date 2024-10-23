@@ -15,6 +15,10 @@ def splash_screen(self, text):
     brightness_factor = 1.0
     # Get color with brightness applied
     color = set_brightness(color_name, brightness_factor)
+    border_size = self.config_manager.get_border_size()
+    # Draw border
+    self.draw.rectangle((border_size, border_size, self.width - border_size - 1, self.height - border_size - 1),
+                        outline=color, fill=0)
     bbox = self.draw.textbbox((0, 0), text, font=self.font)
     text_width = bbox[2] - bbox[0]
     text_height = bbox[3] - bbox[1]
@@ -40,7 +44,8 @@ class Screen(Enum):
 
 
 class OLEDDisplayManager:
-    def __init__(self, width, height, font):
+    def __init__(self,configuration, width, height, font):
+        self.config_manager = configuration
         self.width = width
         self.height = height
         self.font = font
