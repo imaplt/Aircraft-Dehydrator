@@ -356,11 +356,11 @@ def show_page(page_index):
         display_default_page()
     elif page_index == 1:
         display_fan_stats()
-    elif page_index == Screen.INTERNAL:
+    elif page_index == Screen.INTERNAL.index:
         display_manager.switch_image(Screen.INTERNAL)
         display_manager.display_current_image(BONNETDisplay.disp)
         print("Internal Screen", Screen.INTERNAL)
-    elif page_index == Screen.AMBIENT:
+    elif page_index == Screen.AMBIENT.index:
         display_manager.switch_image(Screen.AMBIENT)
         display_manager.display_current_image(BONNETDisplay.disp)
         print("Ambient Screen", Screen.AMBIENT)
