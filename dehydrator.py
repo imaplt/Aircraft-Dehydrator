@@ -37,6 +37,8 @@ def sensor():
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
         INTERNAL_TEMP, INTERNAL_HUMIDITY, INTERNAL_PREVIOUS_HUMIDITY, current_page, EXTERNAL_TEMP
 
+    internal_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
     while running:
         internaloutput = internalsensor.read_sensor()
 
@@ -51,7 +53,7 @@ def sensor():
             INTERNAL_PREVIOUS_HUMIDITY = INTERNAL_HUMIDITY
             print("Log File Updated")
 
-        print("Internal Sensor Reading:", internaloutput)
+        print(f"{internal_timestamp} Internal: {internaloutput}")
 
         # Update the config file with stats
         new_high_humidity = max(INTERNAL_HIGH_HUMIDITY, internaloutput['humidity'])
@@ -93,8 +95,6 @@ def task_internal():
         FAN_RUNNING_TIME = timedelta(seconds=(int(time.time() -  fanController.start_time)))
         # TODO: Update only the current time line...
         # display_fan_stats()
-
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
     def handle_fan_operation(started, stopped, run_time, action):
         global FAN_RUNNING, FAN_TOTAL_DURATION, CYCLE_COUNT  # Explicitly declare global variables
@@ -211,7 +211,7 @@ def task_ambient():
     EXTERNAL_TEMP = externaloutput['temperature']
     EXTERNAL_HUMIDITY = externaloutput['humidity']
 
-    print("Ambient:", externaloutput)
+    print(f"{ambient_timestamp} Ambient: {externaloutput}")
 
 def _cycle_fan():
     # TODO: How do we want to engage this?
@@ -387,6 +387,8 @@ def save_config():
     configManager.set_duration_config('total_cycle_duration', FAN_TOTAL_DURATION, 'LOG')
     configManager.set_duration_config('MAX_FAN_RUNTIME', FAN_MAX_RUNTIME, 'LOG')
     configManager.update_config('UOM', UOM)
+    logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'CONFIG',
+                "Config File Updated")
 
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, \
@@ -436,10 +438,6 @@ def button_pressed_callback(button):
     else:
         print("Unknown button")
 
-    # print("Selected page: ", current_page)
-    # if current_page < 5:
-    #     show_page(current_page)
-    #
     # if current_page == 4:
     #     edit_humidity_set(button)
 
