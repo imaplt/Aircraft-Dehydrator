@@ -169,10 +169,6 @@ def task_internal():
         stopped, run_time = fanController.set_fan_speed(0)
         handle_fan_operation(False, stopped, run_time, "stop")
 
-    # if abs(internaloutput['humidity'] - internalprevious_output['humidity']) > 0.2:
-    #     # Update log and internal values
-    #     update_internal_output_and_log()
-
     if time.time() - last_page_changed  > 8 and (0 < current_page < 4):
         current_page = 0
         show_page(current_page)
