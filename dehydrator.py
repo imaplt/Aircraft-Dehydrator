@@ -359,11 +359,9 @@ def show_page(page_index):
     elif page_index == Screen.INTERNAL.index:
         display_manager.switch_image(Screen.INTERNAL)
         display_manager.display_current_image(BONNETDisplay.disp)
-        print("Internal Screen", Screen.INTERNAL)
     elif page_index == Screen.AMBIENT.index:
         display_manager.switch_image(Screen.AMBIENT)
         display_manager.display_current_image(BONNETDisplay.disp)
-        print("Ambient Screen", Screen.AMBIENT)
     elif page_index == 4:
         display_set_humidity()
 
@@ -532,6 +530,9 @@ if __name__ == "__main__":
     FAN_MAX_RUNTIME = configManager.get_duration_config('LOG', 'FAN_MAX_RUNTIME')
     FAN_LIMIT = configManager.get_duration_config('DEFAULT', 'FAN_LIMIT')
     UOM = configManager.get_config('UOM')
+
+    logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'SYSTEM',
+                "System Starting Up...")
 
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}

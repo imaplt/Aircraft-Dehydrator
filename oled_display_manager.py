@@ -123,13 +123,13 @@ class OLEDDisplayManager:
         self.current_image_index = Screen.INTERNAL.index
         self.image = self.images[self.current_image_index]
         self.draw = self.draws[self.current_image_index]
-        display_rows(self, texts)
+        display_rows(self, texts, justification='left')
 
     def update_ambient_screen(self, texts):
         self.current_image_index = Screen.AMBIENT.index
         self.image = self.images[self.current_image_index]
         self.draw = self.draws[self.current_image_index]
-        display_rows(self, texts)
+        display_rows(self, texts, justification='left')
 
     def update_fan_screen(self, log_lines):
         """ Update logic for screen 3 (e.g., displaying logs) """
