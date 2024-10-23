@@ -120,9 +120,15 @@ class OLEDDisplayManager:
         self.draw.text((10, 30), status_message, fill="white")
 
     def update_internal_screen(self, texts):
+        self.current_image_index = Screen.INTERNAL.index
+        self.image = self.images[self.current_image_index]
+        self.draw = self.draws[self.current_image_index]
         display_rows(self, texts)
 
     def update_ambient_screen(self, texts):
+        self.current_image_index = Screen.INTERNAL.index
+        self.image = self.images[self.current_image_index]
+        self.draw = self.draws[self.current_image_index]
         display_rows(self, texts)
 
     def update_fan_screen(self, log_lines):
