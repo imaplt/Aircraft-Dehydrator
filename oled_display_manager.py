@@ -26,6 +26,7 @@ def splash_screen(self, text):
     self.draw.rectangle((border_size, border_size, self.width - border_size - 1, self.height - border_size - 1),
                         outline=color, fill=0)
     self.draw.text(position, text, font=self.font, fill=color)
+    print("Splash screen")
 
 class Screen(Enum):
     DEFAULT = (0, "Internal Sensor Screen")
