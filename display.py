@@ -1,9 +1,6 @@
 import board
-import busio
 import time
-import smbus2 as smbus
-from PIL import Image, ImageDraw, ImageFont, ImageOps
-import adafruit_ssd1306
+from PIL import Image, ImageDraw, ImageFont
 from digitalio import DigitalInOut
 from adafruit_rgb_display import st7789
 

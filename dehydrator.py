@@ -335,11 +335,11 @@ def update_stats():
         internal_min_temp = INTERNAL_HIGH_TEMP
         ambient_min_temp = EXTERNAL_HIGH_TEMP
 
-    OLEDDisplayManager.update_internal_screen(texts=["Internal Stats:", f"Max Temp {internal_max_temp}F",
+    display_manager.update_internal_screen(texts=["Internal Stats:", f"Max Temp {internal_max_temp}F",
                                            f"Min Temp {internal_min_temp}F", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
                                            f"Min Hum {INTERNAL_LOW_HUMIDITY}"])
 
-    OLEDDisplayManager.update_ambient_screen(texts=["Internal Stats:", f"Max Temp {ambient_max_temp}F",
+    display_manager.update_ambient_screen(texts=["Internal Stats:", f"Max Temp {ambient_max_temp}F",
                                            f"Min Temp {ambient_min_temp}F", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
                                            f"Min Hum {INTERNAL_LOW_HUMIDITY}"])
 

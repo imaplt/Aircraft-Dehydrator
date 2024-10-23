@@ -33,7 +33,7 @@ def display_rows(self, texts, color_name="white",
     line_height = self.height // num_lines
 
     # Get color with brightness applied
-    color = self.set_brightness(color_name, brightness_factor)
+    color = set_brightness(color_name, brightness_factor)
 
     for i in range(num_lines):
         text = texts[i]
@@ -92,6 +92,8 @@ class OLEDDisplayManager:
             6: self.shutdown_screen,
             5: self.fan_limit_screen,
         }
+        # Initialize lines
+        self.oled_lines = [""] * 5
 
     def switch_image(self, screen):
         """ Switch to a different image by index (0 to 7) """
@@ -118,10 +120,10 @@ class OLEDDisplayManager:
         self.draw.text((10, 30), status_message, fill="white")
 
     def update_internal_screen(self, texts):
-        display_rows(texts)
+        display_rows(self, texts)
 
     def update_ambient_screen(self, texts):
-        display_rows(texts)
+        display_rows(self, texts)
 
     def update_fan_screen(self, log_lines):
         """ Update logic for screen 3 (e.g., displaying logs) """
