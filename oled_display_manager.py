@@ -10,6 +10,20 @@ def set_brightness(color_name, brightness_factor):
     color = COLORS[color_name]
     return tuple(int(c * brightness_factor) for c in color)
 
+def splash_screen(self, text):
+    color_name = "white"
+    brightness_factor = 1.0
+    # Get color with brightness applied
+    color = set_brightness(color_name, brightness_factor)
+    bbox = self.draw.textbbox((0, 0), text, font=self.font)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
+    x_position = (self.width - text_width) // 2
+
+    position = (x_position, (self.height - text_height) // 2)
+    self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
+    self.draw.text(position, text, font=self.font, fill=color)
+
 class Screen(Enum):
     DEFAULT = (0, "Internal Sensor Screen")
     FAN = (1, "Fan Status Screen")
@@ -46,6 +60,7 @@ class OLEDDisplayManager:
         self.screen_update_methods = {
             7: self.initial_screen,
             6: self.shutdown_screen,
+            5: self.fan_limit_screen,
         }
 
     def switch_image(self, screen):
@@ -98,31 +113,13 @@ class OLEDDisplayManager:
         self.draw.text((10, 30), custom_text, fill=color)
 
     def initial_screen(self):
-        color_name = "white"
-        brightness_factor = 1.0
         text="Initializing..."
-        # Get color with brightness applied
-        color = set_brightness(color_name, brightness_factor)
-        bbox = self.draw.textbbox((0, 0), text, font=self.font)
-        text_width = bbox[2] - bbox[0]
-        text_height = bbox[3] - bbox[1]
-        x_position = (self.width - text_width) // 2
-
-        position = (x_position, (self.height - text_height) // 2)
-        self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
-        self.draw.text(position, text, font=self.font, fill=color)
+        splash_screen(self,text)
 
     def shutdown_screen(self):
         text = "Shutting down..."
-        color_name = "white"
-        brightness_factor = 1.0
-        # Get color with brightness applied
-        color = set_brightness(color_name, brightness_factor)
-        bbox = self.draw.textbbox((0, 0), text, font=self.font)
-        text_width = bbox[2] - bbox[0]
-        text_height = bbox[3] - bbox[1]
-        x_position = (self.width - text_width) // 2
+        splash_screen(self, text)
 
-        position = (x_position, (self.height - text_height) // 2)
-        self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
-        self.draw.text(position, text, font=self.font, fill=color)
+    def fan_limit_screen(self):
+        text = "Fan Limit..."
+        splash_screen(self, text)
