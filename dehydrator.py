@@ -46,7 +46,7 @@ def sensor():
 
         if abs(INTERNAL_HUMIDITY - INTERNAL_PREVIOUS_HUMIDITY) > 0.2:
             """Log internal sensor reading and update previous output values."""
-            logger.log(timestamp, 'INFO', 'SENSORS', 'INTERNAL',
+            logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SENSORS', 'INTERNAL',
                        f"Temperature: {internaloutput['temperature']}C, Humidity: {internaloutput['humidity']}%")
             INTERNAL_PREVIOUS_HUMIDITY = INTERNAL_HUMIDITY
             print("Log File Updated")
@@ -180,7 +180,7 @@ def task_internal():
 def task_ambient():
     global EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY, EXTERNAL_TEMP, EXTERNAL_HUMIDITY
 
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    ambient_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     externaloutput = externalsensor.read_sensor()
 
     # Calculate new high and low values
@@ -207,17 +207,15 @@ def task_ambient():
         save_config()
 
     # Log the sensor data every X seconds
-    logger.log(timestamp, 'INFO', 'SENSORS', 'EXTERNAL',
+    logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'EXTERNAL',
                f"Temperature: {externaloutput['temperature']}C,"
                f" Humidity: {externaloutput['humidity']}%")
 
     # Update the global variables and print the reading
-    externalprevious_output['temperature'] = externaloutput['temperature']
-    externalprevious_output['humidity'] = externaloutput['humidity']
     EXTERNAL_TEMP = externaloutput['temperature']
     EXTERNAL_HUMIDITY = externaloutput['humidity']
 
-    print("Ambient Sensor Reading:", externaloutput)
+    print("Ambient:", externaloutput)
 
 def _cycle_fan():
     # TODO: How do we want to engage this?
