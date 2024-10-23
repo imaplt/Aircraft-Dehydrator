@@ -37,10 +37,9 @@ def sensor():
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
         INTERNAL_TEMP, INTERNAL_HUMIDITY, INTERNAL_PREVIOUS_HUMIDITY, current_page, EXTERNAL_TEMP
 
-    internal_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
     while running:
         internaloutput = internalsensor.read_sensor()
+        internal_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
         # Main block to handle sensor change and fan control
         INTERNAL_HUMIDITY = internaloutput['humidity']
