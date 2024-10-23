@@ -26,7 +26,32 @@ def splash_screen(self, text):
     self.draw.rectangle((border_size, border_size, self.width - border_size - 1, self.height - border_size - 1),
                         outline=color, fill=0)
     self.draw.text(position, text, font=self.font, fill=color)
-    print("Splash screen")
+
+def display_rows(self, texts, color_name="white",
+                        brightness_factor=1.0, justification='center'):
+    num_lines = min(5, len(texts))
+    line_height = self.height // num_lines
+
+    # Get color with brightness applied
+    color = self.set_brightness(color_name, brightness_factor)
+
+    for i in range(num_lines):
+        text = texts[i]
+        self.oled_lines[i] = text
+        bbox = self.draw.textbbox((0, 0), text, font=self.font)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+
+        # Calculate horizontal position based on justification
+        if justification == 'left':
+            x_position = 0
+        elif justification == 'right':
+            x_position = self.width - text_width
+        else:  # default to center
+            x_position = (self.width - text_width) // 2
+
+        position = (x_position, i * line_height + (line_height - text_height) // 2)
+        self.draw.text(position, text, font=self.font, fill=color)
 
 class Screen(Enum):
     DEFAULT = (0, "Internal Sensor Screen")
@@ -92,17 +117,12 @@ class OLEDDisplayManager:
         self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
         self.draw.text((10, 30), status_message, fill="white")
 
-    def update_internal_screen(self, temperature, humidity):
+    def update_internal_screen(self, texts):
         """ Update logic for screen 1 (e.g., showing temperature and humidity) """
-        self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
-        self.draw.text((10, 20), f"Temp: {temperature}C", fill="green")
-        self.draw.text((10, 40), f"Humidity: {humidity}%", fill="green")
+        display_rows(self, texts)
 
-    def update_ambient_screen(self, system_status, uptime):
-        """ Update logic for screen 2 (e.g., System status) """
-        self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
-        self.draw.text((10, 20), f"System: {system_status}", fill="yellow")
-        self.draw.text((10, 40), f"Uptime: {uptime}", fill="yellow")
+    def update_ambient_screen(self, texts):
+        display_rows(self, texts)
 
     def update_fan_screen(self, log_lines):
         """ Update logic for screen 3 (e.g., displaying logs) """

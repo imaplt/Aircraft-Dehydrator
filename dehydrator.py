@@ -323,28 +323,26 @@ def display_set_humidity():
     BONNETDisplay.display_text("Min:", 1, 120, color_name="white")
     BONNETDisplay.display_text(f"{MIN_HUMIDITY}%", 100, 120, color_name=min_color)
 
-def display_internal_stats():
-    # BONNETDisplay.display_text_center(page_3_data, color_name="yellow", brightness_factor=1.0)
-    if UOM == 'F':
-     BONNETDisplay.display_rows_center(["Internal Stats:", f"Max Temp {celsius_to_fahrenheit(INTERNAL_HIGH_TEMP)}F",
-                                           f"Min Temp {celsius_to_fahrenheit(INTERNAL_LOW_TEMP)}F", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
-                                           f"Min Hum {INTERNAL_LOW_HUMIDITY}"], 2, FAN_RUNNING,'white',1.0, justification='left')
-    else:
-        BONNETDisplay.display_rows_center(["Internal Stats:", f"Max Temp {INTERNAL_HIGH_TEMP}C",
-                                           f"Min Temp {INTERNAL_LOW_TEMP}C", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
-                                           f"Min Hum {INTERNAL_LOW_HUMIDITY}"], 2, FAN_RUNNING, 'white', 1.0,
-                                          justification='left')
+def update_stats():
 
-def display_external_stats():
     if UOM == 'F':
-        BONNETDisplay.display_rows_center(["Ambient Stats:", f"Max Temp {celsius_to_fahrenheit(EXTERNAL_HIGH_TEMP)}",
-                                           f"Min Temp {celsius_to_fahrenheit(EXTERNAL_LOW_TEMP)}", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
-                                           f"Min Hum {EXTERNAL_LOW_HUMIDITY}"], 3, FAN_RUNNING,'white',1.0, justification='left')
+        internal_max_temp = celsius_to_fahrenheit(INTERNAL_HIGH_TEMP)
+        ambient_max_temp = celsius_to_fahrenheit(EXTERNAL_HIGH_TEMP)
+        internal_min_temp = celsius_to_fahrenheit(INTERNAL_HIGH_TEMP)
+        ambient_min_temp = celsius_to_fahrenheit(EXTERNAL_HIGH_TEMP)
     else:
-        BONNETDisplay.display_rows_center(["Ambient Stats:", f"Max Temp {EXTERNAL_HIGH_TEMP}",
-                                           f"Min Temp {EXTERNAL_LOW_TEMP}", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
-                                           f"Min Hum {EXTERNAL_LOW_HUMIDITY}"], 3, FAN_RUNNING, 'white', 1.0,
-                                          justification='left')
+        internal_max_temp = INTERNAL_HIGH_TEMP
+        ambient_max_temp = EXTERNAL_HIGH_TEMP
+        internal_min_temp = INTERNAL_HIGH_TEMP
+        ambient_min_temp = EXTERNAL_HIGH_TEMP
+
+    OLEDDisplayManager.update_internal_screen(texts=["Internal Stats:", f"Max Temp {internal_max_temp}F",
+                                           f"Min Temp {internal_min_temp}F", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
+                                           f"Min Hum {INTERNAL_LOW_HUMIDITY}"])
+
+    OLEDDisplayManager.update_ambient_screen(texts=["Internal Stats:", f"Max Temp {ambient_max_temp}F",
+                                           f"Min Temp {ambient_min_temp}F", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
+                                           f"Min Hum {INTERNAL_LOW_HUMIDITY}"])
 
 def draw_fan_limit():
     global selected_option, current_page
@@ -359,10 +357,12 @@ def show_page(page_index):
         display_default_page()
     elif page_index == 1:
         display_fan_stats()
-    elif page_index == 2:
-        display_internal_stats()
-    elif page_index == 3:
-        display_external_stats()
+    elif page_index == Screen.INTERNAL:
+        display_manager.switch_image(Screen.INTERNAL)
+        display_manager.display_current_image(BONNETDisplay.disp)
+    elif page_index == Screen.AMBIENT:
+        display_manager.switch_image(Screen.AMBIENT)
+        display_manager.display_current_image(BONNETDisplay.disp)
     elif page_index == 4:
         display_set_humidity()
 
@@ -611,6 +611,9 @@ if __name__ == "__main__":
         display_manager.switch_image(Screen.INITIAL)
         display_manager.display_current_image(BONNETDisplay.disp)
         time.sleep(3)
+
+        # Initialize the stats screens
+        update_stats()
 
         # Initialize to show the first page
         show_page(current_page)
