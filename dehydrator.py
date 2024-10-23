@@ -324,7 +324,6 @@ def display_set_humidity():
     BONNETDisplay.display_text(f"{MIN_HUMIDITY}%", 100, 120, color_name=min_color)
 
 def update_stats():
-
     if UOM == 'F':
         internal_max_temp = celsius_to_fahrenheit(INTERNAL_HIGH_TEMP)
         ambient_max_temp = celsius_to_fahrenheit(EXTERNAL_HIGH_TEMP)

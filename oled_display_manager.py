@@ -118,11 +118,10 @@ class OLEDDisplayManager:
         self.draw.text((10, 30), status_message, fill="white")
 
     def update_internal_screen(self, texts):
-        """ Update logic for screen 1 (e.g., showing temperature and humidity) """
-        display_rows(self, texts)
+        display_rows(texts)
 
     def update_ambient_screen(self, texts):
-        display_rows(self, texts)
+        display_rows(texts)
 
     def update_fan_screen(self, log_lines):
         """ Update logic for screen 3 (e.g., displaying logs) """
