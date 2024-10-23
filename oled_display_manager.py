@@ -57,7 +57,7 @@ class Screen(Enum):
     DEFAULT = (0, "Internal Sensor Screen")
     FAN = (1, "Fan Status Screen")
     INTERNAL = (2, "Internal Stats Screen")
-    AMBIENT = (3, "Ambient Stats")
+    AMBIENT = (3, "Ambient Stats Screen")
     HUMIDITY = (4, "Humidity Set Screen")
     FAN_LIMIT = (5, "Fan Limit")
     SHUTDOWN = (6, "Shutdown")
@@ -126,7 +126,7 @@ class OLEDDisplayManager:
         display_rows(self, texts)
 
     def update_ambient_screen(self, texts):
-        self.current_image_index = Screen.INTERNAL.index
+        self.current_image_index = Screen.AMBIENT.index
         self.image = self.images[self.current_image_index]
         self.draw = self.draws[self.current_image_index]
         display_rows(self, texts)

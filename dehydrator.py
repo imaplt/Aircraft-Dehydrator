@@ -339,9 +339,9 @@ def update_stats():
                                            f"Min Temp {internal_min_temp}F", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
                                            f"Min Hum {INTERNAL_LOW_HUMIDITY}"])
 
-    display_manager.update_ambient_screen(texts=["Internal Stats:", f"Max Temp {ambient_max_temp}F",
-                                           f"Min Temp {ambient_min_temp}F", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
-                                           f"Min Hum {INTERNAL_LOW_HUMIDITY}"])
+    display_manager.update_ambient_screen(texts=["Ambient Stats:", f"Max Temp {ambient_max_temp}F",
+                                           f"Min Temp {ambient_min_temp}F", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
+                                           f"Min Hum {EXTERNAL_LOW_HUMIDITY}"])
 
 def draw_fan_limit():
     global selected_option, current_page
@@ -359,9 +359,11 @@ def show_page(page_index):
     elif page_index == Screen.INTERNAL:
         display_manager.switch_image(Screen.INTERNAL)
         display_manager.display_current_image(BONNETDisplay.disp)
+        print("Internal Screen", Screen.INTERNAL)
     elif page_index == Screen.AMBIENT:
         display_manager.switch_image(Screen.AMBIENT)
         display_manager.display_current_image(BONNETDisplay.disp)
+        print("Ambient Screen", Screen.AMBIENT)
     elif page_index == 4:
         display_set_humidity()
 
