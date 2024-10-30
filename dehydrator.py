@@ -202,7 +202,7 @@ def task_ambient():
         save_config()
 
     # Log the sensor data every X seconds
-    logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'EXTERNAL',
+    logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'AMBIENT',
                f"Temperature: {externaloutput['temperature']}C,"
                f" Humidity: {externaloutput['humidity']}%")
 
@@ -235,7 +235,7 @@ def heat_sensor():
     # TODO: Add code to heat sensors when the humidity gets high. Only applies to SHT4X series sensors
     print("Heating External sensor...")
     externalsensor.heat_sensor()
-    logger.log(timestamp, 'INFO', 'SYSTEM', 'EXTERNAL', "Heating External sensor...")
+    logger.log(timestamp, 'INFO', 'SYSTEM', 'AMBIENT', "Heating External sensor...")
 
     print("Heating Internal sensor...")
     internalsensor.heat_sensor()
@@ -393,7 +393,7 @@ def button_pressed_callback(button):
         humidity_mode, FAN_LIMIT, selected_option, page_changed
     if button.pin.number == BTN_L_PIN:
         print("Button L pressed")
-        if current_page == Screen.FAN_LIMIT:
+        if current_page == Screen.FAN_LIMIT.index:
             selected_option = 1
             draw_fan_limit()
         else:
@@ -405,13 +405,13 @@ def button_pressed_callback(button):
             humidity_mode = "selection"  # Reset humidity mode when changing page
     elif button.pin.number == BTN_R_PIN:
         print("Button R Pressed")
-        if current_page == Screen.FAN_LIMIT:
+        if current_page == Screen.FAN_LIMIT.index:
             selected_option = 2
             draw_fan_limit()
         else:
             current_page += 1
             if current_page >= total_pages:
-                current_page = Screen.DEFAULT  # Wrap around to the first page
+                current_page = Screen.DEFAULT.index  # Wrap around to the first page
             page_changed = True
             humidity_mode = "selection"  # Reset humidity mode when changing pages
     elif button.pin.number == BTN_U_PIN:
@@ -422,7 +422,7 @@ def button_pressed_callback(button):
         print("Center button pressed")
     elif button.pin.number == BTN_A_PIN:
         print("A button pressed")
-        if current_page == Screen.FAN_LIMIT :
+        if current_page == Screen.FAN_LIMIT.index :
             if selected_option == 1: # OK Selected
                 schedule.clear()
                 cleanup()
