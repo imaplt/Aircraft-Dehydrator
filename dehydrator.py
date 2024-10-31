@@ -139,7 +139,7 @@ def task_internal():
 
     def update_current_page():
         """Update the default page display if needed."""
-        if current_page == 0: # Default page
+        if current_page == Screen.DEFAULT.index:
             with lock:
                 if UOM == 'F':
                     BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {celsius_to_fahrenheit(INTERNAL_TEMP)}°F",
@@ -156,8 +156,8 @@ def task_internal():
                 BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
         elif current_page == 1: # Fan Stats
             print("Fan running time:", FAN_RUNNING_TIME)
-            BONNETDisplay.display_text(text=f"Current: {FAN_RUNNING_TIME}",
-                                       x_pos=0, y_pos=63, color_name="white", brightness_factor=1.0)
+            # BONNETDisplay.display_text(text=f"Current: {FAN_RUNNING_TIME}",
+            #                            x_pos=0, y_pos=63, color_name="white", brightness_factor=1.0)
 
     # Display the updated information on the current page if applicable
     update_current_page()
@@ -171,7 +171,7 @@ def task_internal():
         handle_fan_operation(False, stopped, run_time, "stop")
 
     if time.time() - last_page_changed  > 8 and (0 < current_page < 4):
-        current_page = 0
+        current_page = Screen.DEFAULT.index
         show_page(current_page)
 
 def task_ambient():
@@ -253,13 +253,6 @@ def display_default_page():
     BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", "Ambient Sensor:",
                                        f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "],0, FAN_RUNNING,'white', 1.0, justification='left')
 
-def display_fan_stats():
-    if FAN_RUNNING_TIME == 0:
-        BONNETDisplay.display_rows_center(["Fan Stats:", "Current: N/A", f"Max: {FAN_MAX_RUNTIME}",
-                                           f"Total: {FAN_TOTAL_DURATION}", " "], 1, FAN_RUNNING,'white', 1.0, justification='left')
-    else:
-        BONNETDisplay.display_rows_center(["Fan Stats:", f"Current: {FAN_RUNNING_TIME}",f"Max: {FAN_MAX_RUNTIME}",
-                                           f"Total: {FAN_TOTAL_DURATION}", " " ], 1,FAN_RUNNING,'white',1.0, justification='left')
 
 def edit_humidity_set(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, humidity_mode, humidity_selected, humidity_blink_state, max_color, min_color
@@ -357,7 +350,7 @@ def draw_fan_limit():
 def show_page(page_index):
     global last_page_changed
     last_page_changed = time.time()
-    if page_index == 0:
+    if page_index == Screen.DEFAULT.index:
         display_default_page()
     elif page_index == Screen.FAN.index:
         display_manager.switch_image(Screen.FAN)
