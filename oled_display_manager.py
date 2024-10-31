@@ -62,6 +62,8 @@ class Screen(Enum):
     FAN_LIMIT = (5, "Fan Limit")
     SHUTDOWN = (6, "Shutdown")
     INITIAL = (7, "Initial")
+    FAN_START = (8, "Fan Start")
+    FAN_STOP = (9, "Fan Stop")
 
     def __init__(self, index, title):
         self.index = index                  # The screen index (for switching)
@@ -91,6 +93,8 @@ class OLEDDisplayManager:
             7: self.initial_screen,
             6: self.shutdown_screen,
             5: self.fan_limit_screen,
+            8: self.fan_start_screen,
+            9: self.fan_stop_screen,
         }
         # Initialize lines
         self.oled_lines = [""] * 5
@@ -131,13 +135,13 @@ class OLEDDisplayManager:
         self.draw = self.draws[self.current_image_index]
         display_rows(self, texts, justification='left')
 
-    def update_fan_screen(self, log_lines):
+    def update_fan_screen(self, texts):
         """ Update logic for screen 3 (e.g., displaying logs) """
-        self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
-        y_pos = 10
-        for log in log_lines[:5]:  # Display up to 5 log lines
-            self.draw.text((10, y_pos), log, fill="cyan")
-            y_pos += 12
+        self.current_image_index = Screen.FAN.index
+        self.image = self.images[self.current_image_index]
+        self.draw = self.draws[self.current_image_index]
+        display_rows(self, texts, justification='left')
+
 
     def update_humidity_screen(self, custom_text, color):
         """ Update logic for screen 4 (e.g., custom message screen) """
@@ -154,4 +158,12 @@ class OLEDDisplayManager:
 
     def fan_limit_screen(self):
         text = "Fan Limit..."
+        splash_screen(self, text)
+
+    def fan_start_screen(self):
+        text = "Fan Started..."
+        splash_screen(self, text)
+
+    def fan_stop_screen(self):
+        text = "Fan Stopped..."
         splash_screen(self, text)

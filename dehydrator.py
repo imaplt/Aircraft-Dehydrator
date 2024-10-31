@@ -102,7 +102,8 @@ def task_internal():
             fanController.start_time = time.time()
             logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan started, exceeded MAX humidity of {MAX_HUMIDITY}%")
             print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
-            BONNETDisplay.display_text_center_with_border('Fan Started...')
+            display_manager.switch_image(Screen.FAN_START)
+            display_manager.display_current_image(BONNETDisplay.disp)
             time.sleep(2)
             FAN_RUNNING = True
             show_page(current_page)
@@ -113,7 +114,8 @@ def task_internal():
             FAN_TOTAL_DURATION += timedelta(seconds=run_time)
             CYCLE_COUNT += 1
             FAN_RUNNING = False
-            BONNETDisplay.display_text_center_with_border('Fan Stopped...')
+            display_manager.switch_image(Screen.FAN_STOP)
+            display_manager.display_current_image(BONNETDisplay.disp)
             time.sleep(2)
             show_page(current_page)
 
@@ -342,6 +344,9 @@ def update_stats():
     display_manager.update_ambient_screen(texts=["Ambient Stats:", f"Max Temp {ambient_max_temp}F",
                                            f"Min Temp {ambient_min_temp}F", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
                                            f"Min Hum {EXTERNAL_LOW_HUMIDITY}"])
+
+    display_manager.update_fan_screen(texts=["Fan Stats:", f"Current: {FAN_RUNNING_TIME}", f"Max: {FAN_MAX_RUNTIME}",
+                                             f"Total: {FAN_TOTAL_DURATION}", f"Cycles: {CYCLE_COUNT} "])
 
 def draw_fan_limit():
     global selected_option, current_page
