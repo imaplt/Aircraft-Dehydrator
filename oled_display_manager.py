@@ -116,7 +116,6 @@ class OLEDDisplayManager:
         """ Display the currently selected image on the OLED """
         disp.image(self.image)
 
-        # Different update methods for each screen, using dynamic variables
 
     def update_default_screen(self, status_message):
         """ Update logic for screen 0 (e.g., Welcome screen) """
@@ -127,18 +126,21 @@ class OLEDDisplayManager:
         self.current_image_index = Screen.INTERNAL.index
         self.image = self.images[self.current_image_index]
         self.draw = self.draws[self.current_image_index]
+        self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
         display_rows(self, texts, justification='left')
 
     def update_ambient_screen(self, texts):
         self.current_image_index = Screen.AMBIENT.index
         self.image = self.images[self.current_image_index]
         self.draw = self.draws[self.current_image_index]
+        self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
         display_rows(self, texts, justification='left')
 
     def update_fan_screen(self, texts):
         self.current_image_index = Screen.FAN.index
         self.image = self.images[self.current_image_index]
         self.draw = self.draws[self.current_image_index]
+        self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
         display_rows(self, texts, justification='left')
 
     def update_humidity_screen(self, custom_text, color):

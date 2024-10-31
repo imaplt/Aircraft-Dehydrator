@@ -121,6 +121,7 @@ def task_internal():
             show_page(current_page)
         elif action == "running" and started:
             FAN_RUNNING_TIME = timedelta(seconds=(int(time.time() - run_time)))
+            print(f"Fan running time: {FAN_RUNNING_TIME}")
             update_stats()
 
         # Update maximum runtime and check limits
