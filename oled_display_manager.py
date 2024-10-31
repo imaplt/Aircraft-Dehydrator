@@ -136,12 +136,10 @@ class OLEDDisplayManager:
         display_rows(self, texts, justification='left')
 
     def update_fan_screen(self, texts):
-        """ Update logic for screen 3 (e.g., displaying logs) """
         self.current_image_index = Screen.FAN.index
         self.image = self.images[self.current_image_index]
         self.draw = self.draws[self.current_image_index]
         display_rows(self, texts, justification='left')
-
 
     def update_humidity_screen(self, custom_text, color):
         """ Update logic for screen 4 (e.g., custom message screen) """
