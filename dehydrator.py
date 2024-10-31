@@ -350,6 +350,7 @@ def draw_fan_limit():
 def show_page(page_index):
     global last_page_changed
     last_page_changed = time.time()
+    print(page_index)
     if page_index == Screen.DEFAULT.index:
         display_default_page()
     elif page_index == Screen.FAN.index:
