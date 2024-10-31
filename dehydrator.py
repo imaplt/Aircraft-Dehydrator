@@ -33,9 +33,8 @@ def celsius_to_fahrenheit(celsius):
     return round(fahrenheit, 1)
 
 def sensor():
-    global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
-        CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
-        INTERNAL_TEMP, INTERNAL_HUMIDITY, INTERNAL_PREVIOUS_HUMIDITY, current_page, EXTERNAL_TEMP
+    global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY,\
+     INTERNAL_TEMP, INTERNAL_HUMIDITY, INTERNAL_PREVIOUS_HUMIDITY, EXTERNAL_TEMP
 
     while running:
         internaloutput = internalsensor.read_sensor()
@@ -96,7 +95,7 @@ def task_internal():
         # display_fan_stats()
 
     def handle_fan_operation(started, stopped, run_time, action):
-        global FAN_RUNNING, FAN_TOTAL_DURATION, CYCLE_COUNT  # Explicitly declare global variables
+        global FAN_RUNNING, FAN_RUNNING_TIME, FAN_TOTAL_DURATION, CYCLE_COUNT  # Explicitly declare global variables
         """Handle fan start/stop operations, including logging, display updates, and timing."""
         if action == "start" and started:
             fanController.start_time = time.time()
@@ -120,6 +119,9 @@ def task_internal():
             update_stats()
             time.sleep(2)
             show_page(current_page)
+        elif action == "running" and started:
+            FAN_RUNNING_TIME = timedelta(seconds=(int(time.time() - run_time)))
+            update_stats()
 
         # Update maximum runtime and check limits
         fan_runtime_exceeded(run_time)
@@ -167,6 +169,10 @@ def task_internal():
     elif INTERNAL_HUMIDITY < MIN_HUMIDITY:
         stopped, run_time = fanController.set_fan_speed(0)
         handle_fan_operation(False, stopped, run_time, "stop")
+    elif MIN_HUMIDITY < INTERNAL_HUMIDITY < MAX_HUMIDITY:
+        run_time = time.time() - fanController.start_time
+        handle_fan_operation(True, False, run_time, "running")
+
 
     if time.time() - last_page_changed  > 8 and (0 < current_page < 4):
         current_page = Screen.DEFAULT.index
@@ -250,7 +256,6 @@ def display_default_page():
     # Render static data from global variables
     BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", "Ambient Sensor:",
                                        f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "],0, FAN_RUNNING,'white', 1.0, justification='left')
-
 
 def edit_humidity_set(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, humidity_mode, humidity_selected, humidity_blink_state, max_color, min_color
