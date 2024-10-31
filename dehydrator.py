@@ -104,18 +104,20 @@ def task_internal():
             print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
             display_manager.switch_image(Screen.FAN_START)
             display_manager.display_current_image(BONNETDisplay.disp)
-            time.sleep(2)
             FAN_RUNNING = True
+            CYCLE_COUNT += 1
+            update_stats()
+            time.sleep(2)
             show_page(current_page)
         elif action == "stop" and stopped:
             print(f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
             logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
             logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan run time: {str(timedelta(seconds=run_time))}")
             FAN_TOTAL_DURATION += timedelta(seconds=run_time)
-            CYCLE_COUNT += 1
             FAN_RUNNING = False
             display_manager.switch_image(Screen.FAN_STOP)
             display_manager.display_current_image(BONNETDisplay.disp)
+            update_stats()
             time.sleep(2)
             show_page(current_page)
 
