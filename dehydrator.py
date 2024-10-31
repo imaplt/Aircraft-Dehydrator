@@ -90,7 +90,7 @@ def task_internal():
     # if current_page == 4:
     #     edit_humidity_set(button)
 
-    if fanController.fan_engaged and current_page == 1:
+    if fanController.fan_engaged:
         FAN_RUNNING_TIME = timedelta(seconds=(int(time.time() -  fanController.start_time)))
         # TODO: Update only the current time line...
         # display_fan_stats()
@@ -113,7 +113,7 @@ def task_internal():
             print(f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
             logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
             logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan run time: {str(timedelta(seconds=run_time))}")
-            FAN_TOTAL_DURATION += timedelta(seconds=run_time)
+            FAN_TOTAL_DURATION += timedelta(seconds=int(run_time))
             FAN_RUNNING = False
             display_manager.switch_image(Screen.FAN_STOP)
             display_manager.display_current_image(BONNETDisplay.disp)
@@ -156,10 +156,6 @@ def task_internal():
 
                 frame = get_next_frame()
                 BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
-        elif current_page == 1: # Fan Stats
-            print("Fan running time:", FAN_RUNNING_TIME)
-            # BONNETDisplay.display_text(text=f"Current: {FAN_RUNNING_TIME}",
-            #                            x_pos=0, y_pos=63, color_name="white", brightness_factor=1.0)
 
     # Display the updated information on the current page if applicable
     update_current_page()
