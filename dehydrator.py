@@ -360,7 +360,8 @@ def show_page(page_index):
     if page_index == 0:
         display_default_page()
     elif page_index == 1:
-        display_fan_stats()
+        display_manager.switch_image(Screen.FAN)
+        display_manager.display_current_image(BONNETDisplay.disp)
     elif page_index == Screen.INTERNAL.index:
         display_manager.switch_image(Screen.INTERNAL)
         display_manager.display_current_image(BONNETDisplay.disp)

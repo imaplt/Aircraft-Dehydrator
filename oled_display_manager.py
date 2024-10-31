@@ -78,7 +78,7 @@ class OLEDDisplayManager:
         self.font = font
 
         # Initialize 8 different image buffers for the OLED
-        self.images = [Image.new('RGB', (self.width, self.height), "black") for _ in range(8)]
+        self.images = [Image.new('RGB', (self.width, self.height), "black") for _ in range(10)]
 
         # Initialize a list of drawing objects for each image buffer
         self.draws = [ImageDraw.Draw(img) for img in self.images]
@@ -100,7 +100,7 @@ class OLEDDisplayManager:
         self.oled_lines = [""] * 5
 
     def switch_image(self, screen):
-        """ Switch to a different image by index (0 to 7) """
+        """ Switch to a different image by index (0 to 9) """
         index = screen.index
         if 0 <= index < len(self.images):
             self.current_image_index = index
