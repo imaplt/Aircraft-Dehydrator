@@ -91,6 +91,8 @@ def task_internal():
 
     if fanController.fan_engaged:
         FAN_RUNNING_TIME = timedelta(seconds=(int(time.time() -  fanController.start_time)))
+        print(f"Fan running time: {FAN_RUNNING_TIME}")
+        update_stats()
         # TODO: Update only the current time line...
         # display_fan_stats()
 
@@ -119,10 +121,6 @@ def task_internal():
             update_stats()
             time.sleep(2)
             show_page(current_page)
-        elif action == "running" and started:
-            FAN_RUNNING_TIME = timedelta(seconds=(int(time.time() - run_time)))
-            print(f"Fan running time: {FAN_RUNNING_TIME}")
-            update_stats()
 
         # Update maximum runtime and check limits
         fan_runtime_exceeded(run_time)
@@ -170,10 +168,6 @@ def task_internal():
     elif INTERNAL_HUMIDITY < MIN_HUMIDITY:
         stopped, run_time = fanController.set_fan_speed(0)
         handle_fan_operation(False, stopped, run_time, "stop")
-    elif MIN_HUMIDITY < INTERNAL_HUMIDITY < MAX_HUMIDITY:
-        run_time = time.time() - fanController.start_time
-        handle_fan_operation(True, False, run_time, "running")
-
 
     if time.time() - last_page_changed  > 8 and (0 < current_page < 4):
         current_page = Screen.DEFAULT.index
