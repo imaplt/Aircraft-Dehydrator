@@ -359,7 +359,7 @@ def show_page(page_index):
     last_page_changed = time.time()
     if page_index == 0:
         display_default_page()
-    elif page_index == 1:
+    elif page_index == Screen.FAN.index:
         display_manager.switch_image(Screen.FAN)
         display_manager.display_current_image(BONNETDisplay.disp)
     elif page_index == Screen.INTERNAL.index:
