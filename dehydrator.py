@@ -419,10 +419,10 @@ def button_pressed_callback(button):
             if selected_option == 1: # OK Selected
                 schedule.clear()
                 cleanup()
-                exit(0)
+                raise SystemExit
             elif selected_option == 2: # CLEAR Selected
                 FAN_LIMIT *= 2  # Double the fan limit
-                current_page = 0  # Return to page 0
+                current_page = Screen.DEFAULT.index  # Return to page 0
                 schedule_tasks()
     elif button.pin.number == BTN_B_PIN:
          print("B button pressed")
