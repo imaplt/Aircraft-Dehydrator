@@ -82,19 +82,6 @@ def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
         INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP, page_changed
-    if page_changed and current_page < 5:
-        page_changed = False
-        show_page(current_page)
-
-    # if current_page == 4:
-    #     edit_humidity_set(button)
-
-    if fanController.fan_engaged:
-        FAN_RUNNING_TIME = timedelta(seconds=(int(time.time() -  fanController.start_time)))
-        print(f"Fan running time: {FAN_RUNNING_TIME}")
-        update_stats()
-        # TODO: Update only the current time line...
-        # display_fan_stats()
 
     def handle_fan_operation(started, stopped, run_time, action):
         global FAN_RUNNING, FAN_RUNNING_TIME, FAN_TOTAL_DURATION, CYCLE_COUNT  # Explicitly declare global variables
@@ -121,9 +108,6 @@ def task_internal():
             update_stats()
             time.sleep(2)
             show_page(current_page)
-
-        # Update maximum runtime and check limits
-        fan_runtime_exceeded(run_time)
 
     def fan_runtime_exceeded(run_time):
         """Check if the fan runtime exceeds set limits and handle warnings."""
@@ -158,9 +142,6 @@ def task_internal():
                 frame = get_next_frame()
                 BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
 
-    # Display the updated information on the current page if applicable
-    update_current_page()
-
     # Handle fan start logic based on humidity thresholds
     if INTERNAL_HUMIDITY > MAX_HUMIDITY:
         started, run_time = fanController.set_fan_speed(100)
@@ -168,6 +149,20 @@ def task_internal():
     elif INTERNAL_HUMIDITY < MIN_HUMIDITY:
         stopped, run_time = fanController.set_fan_speed(0)
         handle_fan_operation(False, stopped, run_time, "stop")
+
+    if fanController.fan_engaged:
+        fan_runtime_exceeded(int(time.time() -  fanController.start_time))
+        update_stats()
+
+    if page_changed and current_page < 5:
+        page_changed = False
+        show_page(current_page)
+
+    # if current_page == 4:
+    #     edit_humidity_set(button)
+
+    # Display the updated information on the current page if applicable
+    update_current_page()
 
     if time.time() - last_page_changed  > 8 and (0 < current_page < 4):
         current_page = Screen.DEFAULT.index
@@ -424,7 +419,7 @@ def button_pressed_callback(button):
             if selected_option == 1: # OK Selected
                 schedule.clear()
                 cleanup()
-                exit()
+                exit(0)
             elif selected_option == 2: # CLEAR Selected
                 FAN_LIMIT *= 2  # Double the fan limit
                 current_page = 0  # Return to page 0
