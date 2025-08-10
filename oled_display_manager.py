@@ -157,7 +157,7 @@ class OLEDDisplayManager:
         splash_screen(self, text)
 
     def fan_limit_screen(self):
-        text = "Fan Limit..."
+        text = "Fan Limit Exceeded"
         splash_screen(self, text)
 
     def fan_start_screen(self):

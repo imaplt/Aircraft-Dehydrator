@@ -444,7 +444,8 @@ def _fan_limit_exceeded():
     global current_page
     schedule.clear()
     current_page = 5
-    BONNETDisplay.display_text_center_with_border('FAN LIMIT EXCEEDED')
+    display_manager.switch_image(Screen.FAN_LIMIT)
+    display_manager.display_current_image(BONNETDisplay.disp)
     time.sleep(3)
     draw_fan_limit()
     fanController.set_fan_speed(0)
