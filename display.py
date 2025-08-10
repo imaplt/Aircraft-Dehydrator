@@ -64,7 +64,6 @@ class BONNETDisplay:
         self.config_manager = configuration
 
         # Create the display
-        self.cs_pin = DigitalInOut(board.CE0)
         self.dc_pin = DigitalInOut(board.D25)
         self.reset_pin = DigitalInOut(board.D24)
         self.width = 240
@@ -79,7 +78,7 @@ class BONNETDisplay:
             height=240,
             y_offset=80,
             rotation=180,
-            cs=self.cs_pin,
+            cs=board.CE0,  # pass pin reference, not DigitalInOut object
             dc=self.dc_pin,
             rst=self.reset_pin,
             baudrate=self.BAUDRATE,
