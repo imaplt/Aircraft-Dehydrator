@@ -61,14 +61,16 @@ def tint_icon(icon, color):
 
 
 class BONNETDisplay:
-    def __init__(self, configuration):
+    def __init__(self, configuration, baudrate=24000000, rotation=90):
         self.config_manager = configuration
+        # SPI bus
+        self.spi = board.SPI()
 
         # Pin setup from board constants
-        self.cs_pin = board.CE0
-        self.dc_pin = board.D25
-        self.reset_pin = board.D24
-        self.baudrate = 24000000
+        # Pin configuration for 1.3"/1.54" 240x240 SPI TFT Bonnet
+        self.cs_pin = digitalio.DigitalInOut(board.CE0)
+        self.dc_pin = digitalio.DigitalInOut(board.D25)
+        self.reset_pin = digitalio.DigitalInOut(board.D24)
 
         # Initialize SPI and pins
         self.spi = board.SPI()
@@ -77,15 +79,17 @@ class BONNETDisplay:
         self.reset = digitalio.DigitalInOut(self.reset_pin)
 
         # Initialize display
-        self.disp = st7789.ST7789(
+        self.display = st7789.ST7789(
             self.spi,
+            cs=self.cs_pin,
+            dc=self.dc_pin,
+            rst=self.reset_pin,
+            baudrate=baudrate,
+            rotation=rotation,
+            width=240,
             height=240,
-            y_offset=80,
-            rotation=180,
-            cs=self.cs,
-            dc=self.dc,
-            rst=self.reset,
-            baudrate=self.baudrate,
+            x_offset=0,
+            y_offset=80
         )
 
         # Turn on the Backlight
