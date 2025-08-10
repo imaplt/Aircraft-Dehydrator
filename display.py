@@ -61,31 +61,31 @@ def tint_icon(icon, color):
 
 
 class BONNETDisplay:
-    def __init__(self, cs_pin=board.CE0, dc_pin=board.D25, reset_pin=board.D24, baudrate=64000000):
-        """Initialize the SPI display."""
-        # Save parameters
-        self.cs_pin = cs_pin
-        self.dc_pin = dc_pin
-        self.reset_pin = reset_pin
-        self.baudrate = baudrate
+    def __init__(self, configuration):
+        self.config_manager = configuration
 
-        # Initialize SPI bus and DigitalInOut pins
+        # Pin setup from board constants
+        self.cs_pin = board.CE0
+        self.dc_pin = board.D25
+        self.reset_pin = board.D24
+        self.baudrate = 24000000
+
+        # Initialize SPI and pins
         self.spi = board.SPI()
         self.cs = digitalio.DigitalInOut(self.cs_pin)
         self.dc = digitalio.DigitalInOut(self.dc_pin)
         self.reset = digitalio.DigitalInOut(self.reset_pin)
 
-        # Create display object
-        self.display = st7789.ST7789(
+        # Initialize display
+        self.disp = st7789.ST7789(
             self.spi,
+            height=240,
+            y_offset=80,
+            rotation=180,
             cs=self.cs,
             dc=self.dc,
             rst=self.reset,
             baudrate=self.baudrate,
-            width=240,
-            height=240,
-            x_offset=0,
-            y_offset=80,
         )
 
         # Turn on the Backlight
@@ -103,6 +103,12 @@ class BONNETDisplay:
 
         # Initialize lines
         self.oled_lines = [""] * 5
+
+    def release(self):
+        """Release display and SPI for other use."""
+        self.display = None
+        self.spi.deinit()
+        self.spi = None
 
     def reset_screen(self):
         # Turn on the Backlight
@@ -458,3 +464,8 @@ class BONNETDisplay:
         # Display the image
         self.disp.image(self.image)
 
+    def close(self):
+        self.spi.deinit()
+        self.cs.deinit()
+        self.dc.deinit()
+        self.reset.deinit()
