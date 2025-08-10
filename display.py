@@ -2,6 +2,7 @@ import board
 import time
 from PIL import Image, ImageDraw, ImageFont
 from digitalio import DigitalInOut
+import digitalio
 from adafruit_rgb_display import st7789
 
 # Color definitions as RGB tuples
@@ -60,28 +61,31 @@ def tint_icon(icon, color):
 
 
 class BONNETDisplay:
-    def __init__(self, configuration):
-        self.config_manager = configuration
+    def __init__(self, cs_pin=board.CE0, dc_pin=board.D25, reset_pin=board.D24, baudrate=64000000):
+        """Initialize the SPI display."""
+        # Save parameters
+        self.cs_pin = cs_pin
+        self.dc_pin = dc_pin
+        self.reset_pin = reset_pin
+        self.baudrate = baudrate
 
-        # Create the display
-        self.dc_pin = DigitalInOut(board.D25)
-        self.reset_pin = DigitalInOut(board.D24)
-        self.width = 240
-        self.height = 240
-        self.BAUDRATE = 24000000
+        # Initialize SPI bus and DigitalInOut pins
+        self.spi = board.SPI()
+        self.cs = digitalio.DigitalInOut(self.cs_pin)
+        self.dc = digitalio.DigitalInOut(self.dc_pin)
+        self.reset = digitalio.DigitalInOut(self.reset_pin)
 
-        # Initialize the interface
-        spi = board.SPI()
-        # Initialize display.
-        self.disp = st7789.ST7789(
-            spi,
+        # Create display object
+        self.display = st7789.ST7789(
+            self.spi,
+            cs=self.cs,
+            dc=self.dc,
+            rst=self.reset,
+            baudrate=self.baudrate,
+            width=240,
             height=240,
+            x_offset=0,
             y_offset=80,
-            rotation=180,
-            cs=board.CE0,  # pass pin reference, not DigitalInOut object
-            dc=self.dc_pin,
-            rst=self.reset_pin,
-            baudrate=self.BAUDRATE,
         )
 
         # Turn on the Backlight
