@@ -127,7 +127,7 @@ def query_i2c_devices(installed_devices):
             # cs_pin = DigitalInOut(board.CE0)
             # dc_pin = DigitalInOut(board.D25)
             # reset_pin = DigitalInOut(board.D24)
-            # BAUDRATE = 24000000
+            BAUDRATE = 24000000
             # disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180, cs=cs_pin, dc=dc_pin, rst=reset_pin, baudrate=BAUDRATE,)
             # devices["BONNET"]["status"] = "Detected"
             # disp = None
