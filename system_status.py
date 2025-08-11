@@ -8,6 +8,7 @@ import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import adafruit_ssd1306
 import adafruit_bitbangio
 import digitalio
+from adafruit_bus_device.spi_device import SPIDevice
 from fan_controller import EMC2101
 from adafruit_rgb_display import st7789
 
@@ -124,7 +125,7 @@ def query_i2c_devices(installed_devices):
 
     if "BONNET" in installed_devices:
         try:
-            spi = busio.SPI(board.SCK, MOSI=board.MOSI)
+            spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
             cs_pin = digitalio.DigitalInOut(board.CE0)
             dc_pin = digitalio.DigitalInOut(board.D25)
             reset_pin = digitalio.DigitalInOut(board.D24)
