@@ -1,5 +1,3 @@
-import sys
-
 import board
 import busio
 import adafruit_sht31d
@@ -9,20 +7,12 @@ import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import adafruit_ssd1306
 import adafruit_bitbangio
 import digitalio
-from adafruit_bus_device.spi_device import SPIDevice
-from fan_controller import EMC2101
 from adafruit_rgb_display import st7789
 import schedule
 import time
-from datetime import timedelta
 from config_manager import ConfigManager
-from logger import Logger as Log
 from display import BONNETDisplay, DisplayConfig
-from oled_display_manager import OLEDDisplayManager, Screen
-from gpiozero import Button
-from sensor import Sensor
 from fan_controller import EMC2101
-import threading
 
 # Spinner frames to simulate rotation
 spinner_frames = ['▖', '▘', '▝', '▗']
