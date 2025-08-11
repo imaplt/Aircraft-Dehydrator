@@ -59,7 +59,7 @@ def tint_icon(icon, color):
     return colored_icon
 
 class BONNETDisplay:
-    def __init__(self, configuration,  baudrate=24000000, rotation=90):
+    def __init__(self, configuration):
         self.config_manager = configuration
         # SPI bus
         self.spi = board.SPI()
@@ -69,6 +69,9 @@ class BONNETDisplay:
         self.cs_pin = digitalio.DigitalInOut(board.CE0)
         self.dc_pin = digitalio.DigitalInOut(board.D25)
         self.reset_pin = digitalio.DigitalInOut(board.D24)
+        self.width = 240
+        self.height = 240
+        self.BAUDRATE = 24000000
 
         # Initialize display
         self.display = st7789.ST7789(
@@ -76,8 +79,8 @@ class BONNETDisplay:
             cs=self.cs_pin,
             dc=self.dc_pin,
             rst=self.reset_pin,
-            baudrate=baudrate,
-            rotation=rotation,
+            baudrate=self.BAUDRATE,
+            rotation=180,
             width=240,
             height=240,
             x_offset=0,
