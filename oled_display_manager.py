@@ -115,7 +115,6 @@ class OLEDDisplayManager:
         """ Display the currently selected image on the OLED """
         disp.image(self.image)
 
-
     def update_default_screen(self, status_message):
         """ Update logic for screen 0 (e.g., Welcome screen) """
         self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
