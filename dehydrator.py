@@ -595,8 +595,6 @@ if __name__ == "__main__":
             print("Overall Status: Fail")
             # raise ValueError("Overall Status Failed")
 
-
-
         # Initialize displays...
         # Need to do this first so if there is an error cleanup can still work...
         print('Initializing Primary Display...')
