@@ -124,18 +124,21 @@ def query_i2c_devices(installed_devices):
     if "BONNET" in installed_devices:
         try:
             spi = board.SPI()
-            cs_pin = DigitalInOut(board.CE0)
-            dc_pin = DigitalInOut(board.D25)
-            reset_pin = DigitalInOut(board.D24)
-            BAUDRATE = 24000000
-            disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180, cs=cs_pin, dc=dc_pin, rst=reset_pin, baudrate=BAUDRATE,)
-            devices["BONNET"]["status"] = "Detected"
-            disp = None
-            spi.deinit()
-            cs_pin.deinit()
-            dc_pin.deinit()
-            reset_pin.deinit()
-            spi = None
+            if not spi.try_lock():
+                devices["BONNET"]["status"] = "Busy"
+            else:
+                cs_pin = DigitalInOut(board.CE0)
+                dc_pin = DigitalInOut(board.D25)
+                reset_pin = DigitalInOut(board.D24)
+                BAUDRATE = 24000000
+                disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180,
+                                     cs=cs_pin, dc=dc_pin, rst=reset_pin, baudrate=BAUDRATE)
+                devices["BONNET"]["status"] = "Detected"
+                disp = None
+                spi.unlock()  # Important!
+                cs_pin.deinit()
+                dc_pin.deinit()
+                reset_pin.deinit()
         except Exception as e:
             devices["BONNET"]["status"] = f"Error: {str(e)}"
             overall_status = "bad"
