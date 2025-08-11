@@ -756,7 +756,7 @@ if __name__ == "__main__":
         BONNETDisplay.release()
         display_manager = OLEDDisplayManager(BONNET_display_config,240,240, font=BONNETDisplay.font)
         display_manager.switch_image(Screen.INITIAL)
-        display_manager.display_current_image(BONNETDisplay.disp)
+        display_manager.display_current_image(BONNETDisplay.display)
         time.sleep(3)
 
         # Initialize the stats screens
