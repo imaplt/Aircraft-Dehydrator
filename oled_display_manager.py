@@ -99,6 +99,7 @@ class OLEDDisplayManager:
         self.oled_lines = [""] * 5
 
     def switch_image(self, screen):
+
         """ Switch to a different image by index (0 to 9) """
         index = screen.index
         if 0 <= index < len(self.images):
