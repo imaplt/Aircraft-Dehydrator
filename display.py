@@ -74,7 +74,7 @@ class BONNETDisplay:
         self.BAUDRATE = 24000000
 
         # Initialize display
-        self.display = st7789.ST7789(
+        self.disp = st7789.ST7789(
             self.spi,
             cs=self.cs_pin,
             dc=self.dc_pin,
