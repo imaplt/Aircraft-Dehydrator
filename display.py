@@ -70,12 +70,6 @@ class BONNETDisplay:
         self.dc_pin = digitalio.DigitalInOut(board.D25)
         self.reset_pin = digitalio.DigitalInOut(board.D24)
 
-        # Initialize SPI and pins
-        self.spi = board.SPI()
-        self.cs = digitalio.DigitalInOut(self.cs_pin)
-        self.dc = digitalio.DigitalInOut(self.dc_pin)
-        self.reset = digitalio.DigitalInOut(self.reset_pin)
-
         # Initialize display
         self.display = st7789.ST7789(
             self.spi,
