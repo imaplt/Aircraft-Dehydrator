@@ -1,22 +1,10 @@
-import sys
 
-import board
-import busio
-import adafruit_sht31d
-import adafruit_sht4x
-import adafruit_shtc3
-import adafruit_character_lcd.character_lcd_i2c as character_lcd
-import adafruit_ssd1306
-import adafruit_bitbangio
-import digitalio
-from adafruit_bus_device.spi_device import SPIDevice
-from fan_controller import EMC2101
-from adafruit_rgb_display import st7789
 import schedule
 import time
 from datetime import timedelta
 from config_manager import ConfigManager
 from logger import Logger as Log
+import system_status
 from display import BONNETDisplay, DisplayConfig
 from oled_display_manager import OLEDDisplayManager, Screen
 from gpiozero import Button
@@ -478,7 +466,6 @@ def cleanup():
         fanController.set_fan_speed(0)
         time.sleep(3)
         BONNETDisplay.clear_screen()
-        BONNETDisplay.reset_screen()
     except NameError:
         print('LCD Not Defined')
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'FATAL',
@@ -493,145 +480,6 @@ def isDeviceDetected(statuses, device):
         if device in status and 'Detected' in status:
             return True
     return False
-
-def query_i2c_devices(installed_devices):
-    devices = {
-        "SHT30": {"address": 0x44, "status": "Not detected"},
-        "SHTC3": {"address": 0x70, "status": "Not detected"},
-        "SHT41_Internal": {"address": 0x44, "status": "Not detected"},
-        "SHT41_External": {"address": 0x44, "status": "Not detected"},
-        "LCD2004": {"address": 0x27, "status": "Not detected"},
-        "LCD1602": {"address": 0x27, "status": "Not detected"},
-        "BONNET": {"address": 0x00, "status": "Not detected"},
-        "EMC2101": {"address": 0x4C, "status": "Not detected"},
-        "FAN": {"address": 0x3C, "status": "Not detected"},
-        "SSD1306": {"address": 0x3C, "status": "Not detected"}
-    }
-    overall_status = "good"
-    statuses = []
-
-    if "SHT30" in installed_devices:
-        try:
-            # The SHT30 uses a non-standard I2C interface
-            i2c = adafruit_bitbangio.I2C(board.D27, board.D22)
-            sensor = adafruit_sht31d.SHT31D(i2c, 0x44)
-            devices["SHT30"]["status"] = ("Detected, temperature: {:.2f} C,"
-                                          " humidity: {:.2f} %").format(sensor.temperature, sensor.relative_humidity)
-        except Exception as e:
-            devices["SHT30"]["status"] = f"Error: {str(e)}"
-            overall_status = "bad"
-
-    if "SHTC3" in installed_devices:
-        try:
-            i2c = busio.I2C(board.SCL, board.SDA)
-            shtc3 = adafruit_shtc3.SHTC3(i2c)
-            devices["SHTC3"]["status"] = ("Detected, temperature: {:.2f} C,"
-                                          " humidity: {:.2f} %").format(shtc3.temperature, shtc3.relative_humidity)
-        except Exception as e:
-            devices["SHT41_Internal"]["status"] = f"Error: {str(e)}"
-            overall_status = "bad"
-
-    if "SHT41_Internal" in installed_devices:
-        try:
-            i2c = busio.I2C(board.SCL, board.SDA)
-            sht41 = adafruit_sht4x.SHT4x(i2c)
-            devices["SHT41_Internal"]["status"] = ("Detected, temperature: {:.2f} C,"
-                                            " humidity: {:.2f} %").format(sht41.temperature, sht41.relative_humidity)
-        except Exception as e:
-            devices["SHT41_Internal"]["status"] = f"Error: {str(e)}"
-            overall_status = "bad"
-
-    if "SHT41_External" in installed_devices:
-        try:
-            i2c = busio.I2C(board.D27, board.D22)
-            sht41 = adafruit_sht4x.SHT4x(i2c)
-            devices["SHT41_External"]["status"] = ("Detected, temperature: {:.2f} C,"
-                                               " humidity: {:.2f} %").format(sht41.temperature, sht41.relative_humidity)
-        except Exception as e:
-            devices["SHT41_External"]["status"] = f"Error: {str(e)}"
-            overall_status = "bad"
-
-    if "LCD2004" in installed_devices:
-        try:
-            i2c = busio.I2C(board.SCL, board.SDA)
-            lcd2004 = character_lcd.Character_LCD_I2C(i2c, 20, 4, devices["LCD2004"]["address"])
-            devices["LCD2004"]["status"] = "Detected"
-        except Exception as e:
-            devices["LCD2004"]["status"] = f"Error: {str(e)}"
-            overall_status = "bad"
-
-    if "LCD1602" in installed_devices:
-        try:
-            i2c = busio.I2C(board.SCL, board.SDA)
-            lcd1602 = character_lcd.Character_LCD_I2C(i2c, 16, 2, devices["LCD1602"]["address"])
-            devices["LCD1602"]["status"] = "Detected"
-        except Exception as e:
-            devices["LCD1602"]["status"] = f"Error: {str(e)}"
-            overall_status = "bad"
-
-    if "EMC2101" in installed_devices:
-        try:
-            emc2101 = EMC2101()
-            status = emc2101.read_status()
-            devices["EMC2101"]["status"] = f"Detected, Status: {status}"
-        except Exception as e:
-            devices["EMC2101"]["status"] = f"Error: {str(e)}"
-            overall_status = "bad"
-
-    if "FAN" in installed_devices:
-        try:
-            fan = EMC2101()
-            fan.set_fan_speed(100)
-            rpm = fan.read_fan_speed()
-            temp = fan.read_internal_temp()
-            fan.set_fan_speed(0)
-            if rpm >= 4000:
-                devices["FAN"]["status"] = f"Detected, RPM: {rpm}, Internal Temp: {temp}"
-                overall_status = "good"
-            else:
-                devices["FAN"]["status"] = f"Not Detected, RPM: {rpm}; Should be > 4000"
-                overall_status = "bad"
-        except Exception as e:
-            devices["FAN"]["status"] = f"Error: {str(e)}"
-            overall_status = "bad"
-
-    if "SSD1306" in installed_devices:
-        try:
-            i2c = busio.I2C(board.SCL, board.SDA)
-            oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)
-            devices["SSD1306"]["status"] = "Detected"
-        except Exception as e:
-            devices["SSD1306"]["status"] = f"Error: {str(e)}"
-            overall_status = "bad"
-
-    if "BONNET" in installed_devices:
-        try:
-            spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
-            cs_pin = digitalio.DigitalInOut(board.CE0)
-            dc_pin = digitalio.DigitalInOut(board.D25)
-            reset_pin = digitalio.DigitalInOut(board.D24)
-            backlight = digitalio.DigitalInOut(board.D26)
-            backlight.switch_to_output()
-            backlight.value = True  # Turn on backlight
-            BAUDRATE = 24000000
-            disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180,
-                                 cs=cs_pin, dc=dc_pin, rst=reset_pin, baudrate=BAUDRATE)
-            devices["BONNET"]["status"] = "Detected"
-            disp = None
-            spi.deinit()
-            spi = None
-            cs_pin.deinit()
-            dc_pin.deinit()
-            reset_pin.deinit()
-        except Exception as e:
-            devices["BONNET"]["status"] = f"Error: {str(e)}"
-            overall_status = "bad"
-
-
-    for device in installed_devices:
-        statuses.append(f"{device}: {devices[device]['status']}")
-
-    return overall_status, statuses
 
 if __name__ == "__main__":
     # Get configuration items
@@ -679,20 +527,6 @@ if __name__ == "__main__":
 
     logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'SYSTEM',
                 "System Starting Up...")
-
-    installed_devices = read_installed_devices(configManager)
-    overall_status, statuses = query_i2c_devices(installed_devices)
-
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    for status in statuses:
-        print(status)
-        logger.log(timestamp, 'INFO', 'SYSTEM', 'STATUS', status)
-
-    if overall_status == 'bad':
-        logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
-        print("Overall Status: Fail")
-        # raise ValueError("Overall Status Failed")
-
 
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}
@@ -747,14 +581,29 @@ if __name__ == "__main__":
     sensor_thread = threading.Thread(target=sensor)
 
     try:
+        installed_devices = read_installed_devices(configManager)
+        overall_status, statuses = system_status.query_i2c_devices(installed_devices)
+        print(f"Overall status: {overall_status}")
+
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        for status in statuses:
+            print(status)
+            logger.log(timestamp, 'INFO', 'SYSTEM', 'STATUS', status)
+
+        if overall_status == 'bad':
+            logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
+            print("Overall Status: Fail")
+            # raise ValueError("Overall Status Failed")
+
+
 
         # Initialize displays...
         # Need to do this first so if there is an error cleanup can still work...
         print('Initializing Primary Display...')
         BONNET_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
         BONNETDisplay = BONNETDisplay(BONNET_display_config)
-        BONNETDisplay.release()
         display_manager = OLEDDisplayManager(BONNET_display_config,240,240, font=BONNETDisplay.font)
+
         display_manager.switch_image(Screen.INITIAL)
         display_manager.display_current_image(BONNETDisplay.disp)
         time.sleep(3)
