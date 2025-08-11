@@ -13,8 +13,6 @@ from adafruit_rgb_display import st7789
 
 
 def query_i2c_devices(installed_devices):
-    i2c = busio.I2C(board.SCL, board.SDA)
-
     devices = {
         "SHT30": {"address": 0x44, "status": "Not detected"},
         "SHTC3": {"address": 0x70, "status": "Not detected"},
@@ -73,6 +71,7 @@ def query_i2c_devices(installed_devices):
 
     if "LCD2004" in installed_devices:
         try:
+            i2c = busio.I2C(board.SCL, board.SDA)
             lcd2004 = character_lcd.Character_LCD_I2C(i2c, 20, 4, devices["LCD2004"]["address"])
             devices["LCD2004"]["status"] = "Detected"
         except Exception as e:
@@ -81,6 +80,7 @@ def query_i2c_devices(installed_devices):
 
     if "LCD1602" in installed_devices:
         try:
+            i2c = busio.I2C(board.SCL, board.SDA)
             lcd1602 = character_lcd.Character_LCD_I2C(i2c, 16, 2, devices["LCD1602"]["address"])
             devices["LCD1602"]["status"] = "Detected"
         except Exception as e:
@@ -115,6 +115,7 @@ def query_i2c_devices(installed_devices):
 
     if "SSD1306" in installed_devices:
         try:
+            i2c = busio.I2C(board.SCL, board.SDA)
             oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)
             devices["SSD1306"]["status"] = "Detected"
         except Exception as e:
@@ -123,26 +124,24 @@ def query_i2c_devices(installed_devices):
 
     if "BONNET" in installed_devices:
         try:
-            board.SPI().unlock()
-            spi = board.SPI()
-            if not spi.try_lock():
-                devices["BONNET"]["status"] = "Busy"
-            else:
-                cs_pin = digitalio.DigitalInOut(board.CE0)
-                dc_pin = digitalio.DigitalInOut(board.D25)
-                reset_pin = digitalio.DigitalInOut(board.D24)
-                BAUDRATE = 24000000
-                disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180,
-                                     cs=cs_pin, dc=dc_pin, rst=reset_pin, baudrate=BAUDRATE)
-                devices["BONNET"]["status"] = "Detected"
-                disp = None
-                spi.unlock()  # Important!
-                cs_pin.deinit()
-                dc_pin.deinit()
-                reset_pin.deinit()
+            spi = busio.SPI(board.SCK, MOSI=board.MOSI)
+            cs_pin = digitalio.DigitalInOut(board.CE0)
+            dc_pin = digitalio.DigitalInOut(board.D25)
+            reset_pin = digitalio.DigitalInOut(board.D24)
+            BAUDRATE = 24000000
+            disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180,
+                                 cs=cs_pin, dc=dc_pin, rst=reset_pin, baudrate=BAUDRATE)
+            devices["BONNET"]["status"] = "Detected"
+            disp = None
+            spi.deinit()
+            spi = None
+            cs_pin.deinit()
+            dc_pin.deinit()
+            reset_pin.deinit()
         except Exception as e:
             devices["BONNET"]["status"] = f"Error: {str(e)}"
             overall_status = "bad"
+
 
     for device in installed_devices:
         statuses.append(f"{device}: {devices[device]['status']}")
