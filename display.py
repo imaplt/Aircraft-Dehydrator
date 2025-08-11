@@ -59,7 +59,7 @@ def tint_icon(icon, color):
     return colored_icon
 
 class BONNETDisplay:
-    def __init__(self, configuration, width=240, height=240, baudrate=24000000, rotation=90):
+    def __init__(self, configuration,  baudrate=24000000, rotation=90):
         self.config_manager = configuration
         # SPI bus
         self.spi = board.SPI()
