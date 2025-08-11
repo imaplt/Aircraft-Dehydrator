@@ -529,22 +529,19 @@ if __name__ == "__main__":
 
     logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'SYSTEM',
                 "System Starting Up...")
-    try:
-        installed_devices = read_installed_devices(configManager)
-        overall_status, statuses = system_status.query_i2c_devices(installed_devices)
-        print(f"Overall status: {overall_status}")
 
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        for status in statuses:
-            print(status)
-            logger.log(timestamp, 'INFO', 'SYSTEM', 'STATUS', status)
+    installed_devices = read_installed_devices(configManager)
+    overall_status, statuses = system_status.query_i2c_devices(installed_devices)
 
-        if overall_status == 'bad':
-            logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
-            print("Overall Status: Fail")
-            # raise ValueError("Overall Status Failed")
-    finally:
-        cleanup()
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    for status in statuses:
+        print(status)
+        logger.log(timestamp, 'INFO', 'SYSTEM', 'STATUS', status)
+
+    if overall_status == 'bad':
+        logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
+        print("Overall Status: Fail")
+        # raise ValueError("Overall Status Failed")
 
 
     # Variables to manage button state and humidity values
