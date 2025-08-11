@@ -466,6 +466,7 @@ def cleanup():
         fanController.set_fan_speed(0)
         time.sleep(3)
         BONNETDisplay.clear_screen()
+        BONNETDisplay.reset_screen()
     except NameError:
         print('LCD Not Defined')
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'FATAL',
