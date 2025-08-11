@@ -1,3 +1,4 @@
+import sys
 
 import schedule
 import time
@@ -528,6 +529,23 @@ if __name__ == "__main__":
 
     logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'SYSTEM',
                 "System Starting Up...")
+    try:
+        installed_devices = read_installed_devices(configManager)
+        overall_status, statuses = system_status.query_i2c_devices(installed_devices)
+        print(f"Overall status: {overall_status}")
+
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        for status in statuses:
+            print(status)
+            logger.log(timestamp, 'INFO', 'SYSTEM', 'STATUS', status)
+
+        if overall_status == 'bad':
+            logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
+            print("Overall Status: Fail")
+            # raise ValueError("Overall Status Failed")
+    finally:
+        cleanup()
+
 
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}
@@ -582,19 +600,6 @@ if __name__ == "__main__":
     sensor_thread = threading.Thread(target=sensor)
 
     try:
-        installed_devices = read_installed_devices(configManager)
-        overall_status, statuses = system_status.query_i2c_devices(installed_devices)
-        print(f"Overall status: {overall_status}")
-
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        for status in statuses:
-            print(status)
-            logger.log(timestamp, 'INFO', 'SYSTEM', 'STATUS', status)
-
-        if overall_status == 'bad':
-            logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
-            print("Overall Status: Fail")
-            # raise ValueError("Overall Status Failed")
 
         # Initialize displays...
         # Need to do this first so if there is an error cleanup can still work...
