@@ -610,6 +610,9 @@ def query_i2c_devices(installed_devices):
             cs_pin = digitalio.DigitalInOut(board.CE0)
             dc_pin = digitalio.DigitalInOut(board.D25)
             reset_pin = digitalio.DigitalInOut(board.D24)
+            backlight = digitalio.DigitalInOut(board.D26)
+            backlight.switch_to_output()
+            backlight.value = True  # Turn on backlight
             BAUDRATE = 24000000
             disp = st7789.ST7789(spi, height=240, y_offset=80, rotation=180,
                                  cs=cs_pin, dc=dc_pin, rst=reset_pin, baudrate=BAUDRATE)
@@ -677,18 +680,18 @@ if __name__ == "__main__":
     logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'SYSTEM',
                 "System Starting Up...")
 
-    installed_devices = read_installed_devices(configManager)
-    overall_status, statuses = query_i2c_devices(installed_devices)
-
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    for status in statuses:
-        print(status)
-        logger.log(timestamp, 'INFO', 'SYSTEM', 'STATUS', status)
-
-    if overall_status == 'bad':
-        logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
-        print("Overall Status: Fail")
-        raise ValueError("Overall Status Failed")
+    # installed_devices = read_installed_devices(configManager)
+    # overall_status, statuses = query_i2c_devices(installed_devices)
+    #
+    # timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    # for status in statuses:
+    #     print(status)
+    #     logger.log(timestamp, 'INFO', 'SYSTEM', 'STATUS', status)
+    #
+    # if overall_status == 'bad':
+    #     logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
+    #     print("Overall Status: Fail")
+    #     raise ValueError("Overall Status Failed")
 
 
     # Variables to manage button state and humidity values
