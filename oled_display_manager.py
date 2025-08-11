@@ -69,7 +69,6 @@ class Screen(Enum):
         self.index = index                  # The screen index (for switching)
         self.title = title                  # The screen title
 
-
 class OLEDDisplayManager:
     def __init__(self,configuration, width, height, font):
         self.config_manager = configuration

@@ -41,7 +41,6 @@ class DisplayConfig:
     def get_border_size(self):
         return self.border_size
 
-
 # Function to tint the fan icon based on status and preserve transparency
 def tint_icon(icon, color):
     # Separate the RGB and alpha channels
