@@ -83,13 +83,13 @@ def detect_sht41_internal(devices, overall_status_var=None):
     try:
         i2c = board.I2C()  # uses board.SCL and board.SDA
         # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
-        sht = adafruit_sht4x.SHT4x(i2c)
-        print("Found SHT4x with serial number", hex(sht.serial_number))
+        sht41 = adafruit_sht4x.SHT4x(i2c)
+        print("Found SHT4x with serial number", hex(sht41.serial_number))
 
         # sht.mode = adafruit_sht4x.Mode.NOHEAT_HIGHPRECISION
         # Can also set the mode to enable heater
-        # sht.mode = adafruit_sht4x.Mode.LOWHEAT_100MS
-        print("Current mode is: ", adafruit_sht4x.Mode.string[sht.mode])
+        sht41.mode = adafruit_sht4x.Mode.LOWHEAT_100MS
+        print("Current mode is: ", adafruit_sht4x.Mode.string[sht41.mode])
 
         devices["SHT41_Internal"]["status"] = (
             "Detected, temperature: {:.2f} C, humidity: {:.2f} %"
