@@ -1,3 +1,4 @@
+import sys
 
 import schedule
 import time
@@ -487,6 +488,23 @@ if __name__ == "__main__":
     LOGFILE = configManager.get_config('logfile')
     MAX_LOG_SIZE = configManager.get_int_config('max_log_size')
     MAX_ARCHIVE_SIZE = configManager.get_int_config('max_archive_size')
+    logger = Log(LOGFILE, MAX_LOG_SIZE, MAX_ARCHIVE_SIZE)
+
+    # First check for the installed devices.
+    installed_devices = read_installed_devices(configManager)
+    overall_status, statuses = system_status.query_i2c_devices(installed_devices)
+    print(f"Overall status: {overall_status}")
+
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    for status in statuses:
+        print(status)
+        logger.log(timestamp, 'INFO', 'SYSTEM', 'STATUS', status)
+
+    if overall_status == 'bad':
+        logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
+        print("Overall Status: Fail")
+        # raise ValueError("Overall Status Failed")
+
     MIN_HUMIDITY = configManager.get_int_config('min_humidity')
     MAX_HUMIDITY = configManager.get_int_config('max_humidity')
     FAN_DURATION = configManager.get_int_config('fan_duration')
@@ -581,22 +599,6 @@ if __name__ == "__main__":
     sensor_thread = threading.Thread(target=sensor)
 
     try:
-        installed_devices = read_installed_devices(configManager)
-        overall_status, statuses = system_status.query_i2c_devices(installed_devices)
-        print(f"Overall status: {overall_status}")
-
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        for status in statuses:
-            print(status)
-            logger.log(timestamp, 'INFO', 'SYSTEM', 'STATUS', status)
-
-        if overall_status == 'bad':
-            logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
-            print("Overall Status: Fail")
-            # raise ValueError("Overall Status Failed")
-
-
-
         # Initialize displays...
         # Need to do this first so if there is an error cleanup can still work...
         print('Initializing Primary Display...')
