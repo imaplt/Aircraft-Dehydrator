@@ -88,7 +88,9 @@ def detect_sht41_internal(devices, overall_status_var=None):
 
         # sht.mode = adafruit_sht4x.Mode.NOHEAT_HIGHPRECISION
         # Can also set the mode to enable heater
-        sht41.mode = adafruit_sht4x.Mode.LOWHEAT_100MS
+        # sht41.mode = adafruit_sht4x.Mode.LOWHEAT_100MS
+
+        sht41.mode = 0x15
         print("Current mode is: ", adafruit_sht4x.Mode.string[sht41.mode])
 
         devices["SHT41_Internal"]["status"] = (
