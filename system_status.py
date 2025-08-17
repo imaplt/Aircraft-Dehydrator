@@ -90,12 +90,14 @@ def detect_sht41_internal(devices, overall_status_var=None):
         # Can also set the mode to enable heater
         # sht41.mode = adafruit_sht4x.Mode.LOWHEAT_100MS
 
-        sht41.mode = 0x15
+        sht41.mode = 0x39
         print("Current mode is: ", adafruit_sht4x.Mode.string[sht41.mode])
-
         devices["SHT41_Internal"]["status"] = (
             "Detected, temperature: {:.2f} C, humidity: {:.2f} %"
         ).format(sht41.temperature, sht41.relative_humidity)
+        sht41.mode = 0xFD
+        print("Current mode is: ", adafruit_sht4x.Mode.string[sht41.mode])
+
     except OSError as e:
         devices["SHT41_Internal"]["status"] = f"Error: {e}"
         if overall_status_var is not None:
