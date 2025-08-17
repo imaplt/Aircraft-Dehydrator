@@ -10,9 +10,11 @@ import adafruit_shtc3
 i2c = busio.I2C(board.SCL, board.SDA)
 
 sht40 = adafruit_sht4x.SHT4x(i2c)
+sht40.mode = 0xFD
 shtc3 = adafruit_shtc3.SHTC3(i2c)
 
 print("Found SHT40 with serial:", sht40.serial_number)
+print("Current mode is: ", adafruit_sht4x.Mode.string[sht40.mode])
 print("Found SHTC3")
 
 # -------------------------
@@ -40,7 +42,8 @@ read_sensors("Baseline")
 print("\nStarting SHT40 1s heater cycle (60 iterations)...")
 for i in range(60):
     # Use SHT40 1s heater mode
-    t40, rh40 = sht40._measure(adafruit_sht4x.Mode.HEAT_1S)
+    sht40.mode =  0x39
+    t40, rh40 = sht40.measurements
 
     # Normal reading from SHTC3
     t3, rh3 = shtc3.measurements
@@ -55,6 +58,7 @@ for i in range(60):
 # -------------------------
 # 3. Heater off, immediate reading
 # -------------------------
+sht40.mode = 0xFD
 print("\nHeater OFF reading:")
 read_sensors("Post-heater")
 
