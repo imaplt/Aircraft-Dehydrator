@@ -40,20 +40,10 @@ i2c = qwiic_i2c.getI2CDriver()
 while True:
     print("\n--- Enabling Channels 0 and 1 ---")
     myTca.disable_all()  # Disable all channels first
-    myTca.enable_channels([0, 1]) # Enable specific channels
+    myTca.enable_channels([0, 1, 7]) # Enable specific channels
     myTca.list_channels() # List current channel status
 
-    print("Checking for I2C devices on ports 0 and 1:")
-    devices = i2c.scan()
-    print("Devices found:", devices)
-    time.sleep(2)
-
-    print("\n--- Enabling Channels 2 and 3 ---")
-    myTca.disable_all()
-    myTca.enable_channels([2, 3])
-    myTca.list_channels()
-
-    print("Checking for I2C devices on ports 2 and 3:")
+    print("Checking for I2C devices on ports 0, 1 and 7:")
     devices = i2c.scan()
     print("Devices found:", devices)
     time.sleep(2)
