@@ -58,13 +58,12 @@ devices["MUX"]["status"] = "Detected"
 
 # Internal sensor
 sht4X_internal = adafruit_sht4x.SHT4x(mux[0])
-devices["SHT45_Internal"]["status"] = (
+print(
     f"Detected, temperature: {sht4X_internal.temperature:.2f} C, humidity: {sht4X_internal.relative_humidity:.2f} %")
 
 # External sensor
 sht4X_external = adafruit_sht4x.SHT4x(mux[1])
-devices["SHT45_External"]["status"] = (
+print(
     f"Detected, temperature: {sht4X_external.temperature:.2f} C, humidity: {sht4X_external.relative_humidity:.2f} %")
 
-i2c.deinit()
 
