@@ -53,7 +53,7 @@ print("Devices found:", devices)
 # i2c = busio.I2C(I2C_SCL, I2C_SDA)
 # Get the I2C driver
 i2c = qwiic_i2c.getI2CDriver()
-mux = adafruit_tca9548a.TCA9548A(i2c)
+mux = qwiic_tca9548a.QwiicTCA9548A()
 
 # Internal sensor
 sht4X_internal = adafruit_sht4x.SHT4x(mux[0])
