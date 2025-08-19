@@ -54,7 +54,6 @@ print("Devices found:", devices)
 # Get the I2C driver
 i2c = qwiic_i2c.getI2CDriver()
 mux = adafruit_tca9548a.TCA9548A(i2c)
-devices["MUX"]["status"] = "Detected"
 
 # Internal sensor
 sht4X_internal = adafruit_sht4x.SHT4x(mux[0])
