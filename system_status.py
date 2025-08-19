@@ -1,6 +1,7 @@
 import board
 import busio
 import adafruit_sht31d
+import adafruit_tca9548a
 import adafruit_sht4x
 import adafruit_shtc3
 import adafruit_character_lcd.character_lcd_i2c as character_lcd
@@ -10,21 +11,41 @@ import digitalio
 from fan_controller import EMC2101
 from adafruit_rgb_display import st7789
 
-# Define constants
+# Constants
+I2C_SCL = board.SCL
+I2C_SDA = board.SDA
+MUX_SCL = board.SCL
+MUX_SDA = board.SDA
+EXTERNAL_SCL = board.D27
+EXTERNAL_SDA = board.D22
+
+# Mux address
+MUX_ADDR = 0x70  # Default address for TCA9548A multiplexer
+
+# Sensor Ports on Multiplexer
+INTERNAL_SENSOR_PORT = 0
+EXTERNAL_SENSOR_PORT = 1
+
+# SHT4X Constants
 SHT4X_NOHEAT_HIGHPRECISION = 0xFD  # High precision measurement, no heater
 SHT4X_NOHEAT_MEDPRECISION = 0xF6  # Medium precision measurement, no heater
 SHT4X_NOHEAT_LOWPRECISION = 0xE0  # Low precision measurement, no heater
-
 SHT4X_HIGHHEAT_1S = 0x39  # High precision measurement, high heat for 1 sec
 SHT4X_HIGHHEAT_100MS = 0x32  # High precision measurement, high heat for 0.1 sec
 SHT4X_MEDHEAT_1S = 0x2F  # High precision measurement, med heat for 1 sec
 SHT4X_MEDHEAT_100MS = 0x24  # High precision measurement, med heat for 0.1 sec
 SHT4X_LOWHEAT_1S = 0x1E  # High precision measurement, low heat for 1 sec
 SHT4X_LOWHEAT_100MS = 0x15  # High precision measurement, low heat for 0.1 sec
-
 SHT4X_READSERIAL = 0x89  # Read Out of Serial Register
 SHT4X_SOFTRESET = 0x94  # Soft Reset
 
+def _init_i2c(scl=I2C_SCL, sda=I2C_SDA):
+    """Initialize and return an I2C bus object."""
+    return busio.I2C(scl, sda)
+
+def _format_status(temp, humidity):
+    """Return formatted status string for temperature + humidity."""
+    return "Detected, temperature: {:.2f} C, humidity: {:.2f} %".format(temp, humidity)
 
 # Helper: Safe cleanup
 def safe_deinit(*resources):
@@ -36,6 +57,34 @@ def safe_deinit(*resources):
             except Exception:
                 pass
 
+def detect_mux_and_sht4X(devices, overall_status_var=None):
+    i2c = sensor = None
+    try:
+        i2c = board.I2C()
+        mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
+        devices["MUX"]["status"] = "Detected"
+
+        # Internal sensor
+        if INTERNAL_SENSOR_PORT < len(mux):
+            sht4X_internal = adafruit_sht4x.SHT4x(mux[INTERNAL_SENSOR_PORT])
+            devices["SHT45_Internal"]["status"] = (
+                f"Detected, temperature: {sht4X_internal.temperature:.2f} C, humidity: {sht4X_internal.relative_humidity:.2f} %"
+            )
+
+        # External sensor
+        if EXTERNAL_SENSOR_PORT < len(mux):
+            sht4X_external = adafruit_sht4x.SHT4x(mux[EXTERNAL_SENSOR_PORT])
+            devices["SHT45_External"]["status"] = (
+                f"Detected, temperature: {sht4X_external.temperature:.2f} C, humidity: {sht4X_external.relative_humidity:.2f} %"
+            )
+
+        i2c.deinit()
+    except Exception as e:
+        devices["MUX"]["status"] = f"Error: {str(e)}"
+        if overall_status_var is not None:
+            overall_status_var["status"] = "bad"
+    finally:
+        safe_deinit(sensor, i2c)
 
 # Individual device detection functions
 def detect_sht30(devices, overall_status_var=None):
@@ -78,39 +127,33 @@ def detect_shtc3(devices, overall_status_var=None):
         safe_deinit(shtc3, i2c)
 
 
-def detect_sht41_internal(devices, overall_status_var=None):
-    i2c = sht41 = None
+def detect_sht4X_internal(devices, overall_status_var=None):
+    i2c = sht4X = None
     try:
         i2c = board.I2C()  # uses board.SCL and board.SDA
         # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
-        sht41 = adafruit_sht4x.SHT4x(i2c)
-        print("Found SHT4x with serial number", hex(sht41.serial_number))
+        sht4X = adafruit_sht4x.SHT4x(i2c)
+        print("Found SHT4x with serial number", hex(sht4X.serial_number))
+        sht4X.mode = SHT4X_NOHEAT_HIGHPRECISION
+        print("Current mode is: ", adafruit_sht4x.Mode.string[sht4X.mode])
 
-        # sht.mode = adafruit_sht4x.Mode.NOHEAT_HIGHPRECISION
-        # Can also set the mode to enable heater
-        # sht41.mode = adafruit_sht4x.Mode.LOWHEAT_100MS
-
-        sht41.mode = 0x39
-        print("Current mode is: ", adafruit_sht4x.Mode.string[sht41.mode])
-        devices["SHT41_Internal"]["status"] = (
+        devices["SHT4X_Internal"]["status"] = (
             "Detected, temperature: {:.2f} C, humidity: {:.2f} %"
-        ).format(sht41.temperature, sht41.relative_humidity)
-        sht41.mode = 0xFD
-        print("Current mode is: ", adafruit_sht4x.Mode.string[sht41.mode])
+        ).format(sht4X.temperature, sht4X.relative_humidity)
 
     except OSError as e:
-        devices["SHT41_Internal"]["status"] = f"Error: {e}"
+        devices["SHT4X_Internal"]["status"] = f"Error: {e}"
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     except Exception as e:
-        devices["SHT41_Internal"]["status"] = f"Unexpected error: {e}"
+        devices["SHT4X_Internal"]["status"] = f"Unexpected error: {e}"
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(sht41, i2c)
+        safe_deinit(sht4X, i2c)
 
 
-def detect_sht41_external(devices, overall_status_var=None):
+def detect_sht4X_external(devices, overall_status_var=None):
     i2c = sht41 = None
     try:
         i2c = busio.I2C(board.D27, board.D22)
@@ -250,21 +293,23 @@ def query_i2c_devices(installed_devices):
         "BONNET": {"address": 0x00, "status": "Not detected"},
         "EMC2101": {"address": 0x4C, "status": "Not detected"},
         "FAN": {"address": 0x3C, "status": "Not detected"},
-        "SSD1306": {"address": 0x3C, "status": "Not detected"}
+        "SSD1306": {"address": 0x3C, "status": "Not detected"},
+        "MUX": {"address": 0x70, "status": "Not detected"}
     }
     overall_status_var = {"status": "good"}
 
     detection_map = {
         "SHT30": detect_sht30,
         "SHTC3": detect_shtc3,
-        "SHT41_Internal": detect_sht41_internal,
-        "SHT41_External": detect_sht41_external,
+        "SHT4X_Internal": detect_sht4X_internal,
+        "SHT4X_External": detect_sht4X_external,
         "LCD2004": detect_lcd2004,
         "LCD1602": detect_lcd1602,
         "EMC2101": detect_emc2101,
         "FAN": detect_fan,
         "SSD1306": detect_ssd1306,
-        "BONNET": detect_bonnet
+        "BONNET": detect_bonnet,
+        "MUX": detect_mux_and_sht4X
     }
 
     for device in installed_devices:
