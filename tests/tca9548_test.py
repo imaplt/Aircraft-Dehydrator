@@ -11,8 +11,10 @@ import time
 import sys
 
 # Create I2C bus as normal
-i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+# Get the I2C driver
+i2c = qwiic_i2c.getI2CDriver()
 
 # Create the TCA9548A object and give it the I2C bus
 tca = adafruit_tca9548a.TCA9548A(i2c)
@@ -30,6 +32,7 @@ print("\nSparkFun TCA9548A 8-Channel Mux Example\n")
 
 # Create an instance of the Qwiic TCA9548A object
 myTca = qwiic_tca9548a.QwiicTCA9548A()
+mux = adafruit_tca9548a.TCA9548A(i2c)
 
 # Check if the device is connected
 if not myTca.connected:
@@ -37,8 +40,6 @@ if not myTca.connected:
           file=sys.stderr)
 
 
-# Get the I2C driver
-i2c = qwiic_i2c.getI2CDriver()
 
 print("\n--- Enabling Channels 0 and 1 ---")
 myTca.disable_all()  # Disable all channels first
@@ -50,7 +51,7 @@ devices = i2c.scan()
 print("Devices found:", devices)
 
 # Internal sensor
-sht4X_internal = adafruit_sht4x.SHT4x(myTca[0])
+sht4X_internal = adafruit_sht4x.SHT4x(mux[0])
 print(
     f"Detected, temperature: {sht4X_internal.temperature:.2f} C, humidity: {sht4X_internal.relative_humidity:.2f} %")
 
