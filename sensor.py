@@ -60,7 +60,7 @@ class Sensor:
         self.sensor_type = sensor_type
         self.address = address
 
-        if sensor_type == 'SHT41_Internal':
+        if sensor_type == 'SHT4X_Internal':
             self.i2c = busio.I2C(board.SCL, board.SDA)
             self.sensor = adafruit_sht4x.SHT4x(self.i2c, address)
 
@@ -68,7 +68,7 @@ class Sensor:
             self.i2c = busio.I2C(board.SCL, board.SDA)
             self.sensor = adafruit_shtc3.SHTC3(self.i2c)
 
-        elif sensor_type == 'SHT41_External':
+        elif sensor_type == 'SHT4X_External':
             self.i2c = busio.I2C(board.D27, board.D22)
             self.sensor = adafruit_sht4x.SHT4x(self.i2c, address)
 
@@ -76,8 +76,8 @@ class Sensor:
             self.i2c = adafruit_bitbangio.I2C(board.D27, board.D22)
             self.sensor = adafruit_sht31d.SHT31D(self.i2c, address)
         else:
-            raise ValueError("Invalid sensor type. Supported types: 'SHT41_Internal', "
-                             "'SHT41_External', 'SHTC3' ,'SHT30'")
+            raise ValueError("Invalid sensor type. Supported types: 'SHT4X_Internal', "
+                             "'SHT4X_External', 'SHTC3' ,'SHT30'")
 
     def sensor_status(self):
         if self.sensor_type == 'SHT30':
@@ -92,7 +92,7 @@ class Sensor:
 
     def read_sensor(self):
 
-        if self.sensor_type[:5] == 'SHT41':
+        if self.sensor_type[:5] == 'SHT4X':
             temperature, humidity = self.sensor.measurements
         elif self.sensor_type == 'SHT30':
             temperature = self.sensor.temperature
@@ -102,7 +102,7 @@ class Sensor:
             temperature = self.sensor.temperature
             humidity = self.sensor.relative_humidity
         else:
-            raise ValueError("Invalid sensor type. Supported types: 'SHT41', 'SHTC3', 'SHT30'")
+            raise ValueError("Invalid sensor type. Supported types: 'SHT4X', 'SHTC3', 'SHT30'")
 
         # Format the sensor output to one decimal place
         temperature = round(temperature, 1)

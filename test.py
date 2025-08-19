@@ -62,8 +62,8 @@ def query_i2c_devices(installed_devices):
     devices = {
         "SHT30": {"address": 0x44, "status": "Not detected"},
         "SHTC3": {"address": 0x70, "status": "Not detected"},
-        "SHT41_Internal": {"address": 0x44, "status": "Not detected"},
-        "SHT41_External": {"address": 0x44, "status": "Not detected"},
+        "SHT4X_Internal": {"address": 0x44, "status": "Not detected"},
+        "SHT4X_External": {"address": 0x44, "status": "Not detected"},
         "LCD2004": {"address": 0x27, "status": "Not detected"},
         "LCD1602": {"address": 0x27, "status": "Not detected"},
         "BONNET": {"address": 0x00, "status": "Not detected"},
@@ -92,17 +92,17 @@ def query_i2c_devices(installed_devices):
             devices["SHTC3"]["status"] = ("Detected, temperature: {:.2f} C,"
                                           " humidity: {:.2f} %").format(shtc3.temperature, shtc3.relative_humidity)
         except Exception as e:
-            devices["SHT41_Internal"]["status"] = f"Error: {str(e)}"
+            devices["SHT4X_Internal"]["status"] = f"Error: {str(e)}"
             overall_status = "bad"
 
-    if "SHT41_Internal" in installed_devices:
+    if "SHT4X_Internal" in installed_devices:
         try:
             i2c = busio.I2C(board.SCL, board.SDA)
             sht41 = adafruit_sht4x.SHT4x(i2c)
-            devices["SHT41_Internal"]["status"] = ("Detected, temperature: {:.2f} C,"
+            devices["SHT4X_Internal"]["status"] = ("Detected, temperature: {:.2f} C,"
                                             " humidity: {:.2f} %").format(sht41.temperature, sht41.relative_humidity)
         except Exception as e:
-            devices["SHT41_Internal"]["status"] = f"Error: {str(e)}"
+            devices["SHT4X_Internal"]["status"] = f"Error: {str(e)}"
             overall_status = "bad"
 
     if "SHT41_External" in installed_devices:
