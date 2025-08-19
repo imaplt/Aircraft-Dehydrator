@@ -21,6 +21,7 @@ tca = adafruit_tca9548a.TCA9548A(i2c)
 # For each sensor, create it using the TCA9548A channel instead of the I2C object
 sht4X_internal = adafruit_sht4x.SHT4x(tca[0])
 sht4X_external = adafruit_sht4x.SHT4x(tca[1])
+sht41 = adafruit_sht4x.SHT4x(tca[7])
 
 
 # Internal sensor
@@ -31,4 +32,6 @@ print(
 print(
     f"Detected, temperature: {sht4X_external.temperature:.2f} C, humidity: {sht4X_external.relative_humidity:.2f} %")
 
+print(
+    f"Detected, temperature: {sht41.temperature:.2f} C, humidity: {sht41.relative_humidity:.2f} %")
 
