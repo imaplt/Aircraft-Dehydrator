@@ -10,23 +10,6 @@ import qwiic_i2c
 import time
 import sys
 
-# Create I2C bus as normal
-# i2c = board.I2C()  # uses board.SCL and board.SDA
-# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
-# Get the I2C driver
-i2c = qwiic_i2c.getI2CDriver()
-
-# Create the TCA9548A object and give it the I2C bus
-tca = adafruit_tca9548a.TCA9548A(i2c)
-
-for channel in range(8):
-    if tca[channel].try_lock():
-        print(f"Channel {channel}:", end="")
-        addresses = tca[channel].scan()
-        print([hex(address) for address in addresses if address != 0x70])
-        tca[channel].unlock()
-
-
 
 print("\nSparkFun TCA9548A 8-Channel Mux Example\n")
 
@@ -38,8 +21,6 @@ mux = adafruit_tca9548a.TCA9548A(i2c)
 if not myTca.connected:
     print("The Qwiic TCA9548A 8-Channel Mux device isn't connected to the system. Please check your connection",
           file=sys.stderr)
-
-
 
 print("\n--- Enabling Channels 0 and 1 ---")
 myTca.disable_all()  # Disable all channels first
