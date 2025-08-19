@@ -618,7 +618,7 @@ if __name__ == "__main__":
         print('Initializing fan controller...')
         fanController = EMC2101()
         time.sleep(2)
-        internalsensor = Sensor('SHT41_Internal', 0x44)
+        internalsensor = Sensor('SHT4X_Internal', 0x44)
 
 
         # sht30_sensor = Sensor('SHT30', 0x44)

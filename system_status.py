@@ -154,7 +154,7 @@ def detect_sht4X_external(devices, overall_status_var=None):
     try:
         i2c = busio.I2C(board.D27, board.D22)
         mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
-        sht4X = adafruit_sht4x.SHT4x([EXTERNAL_SENSOR_PORT])
+        sht4X = adafruit_sht4x.SHT4x(mux[EXTERNAL_SENSOR_PORT])
         devices["SHT4X_External"]["status"] = (
             "Detected, temperature: {:.2f} C, humidity: {:.2f} %"
         ).format(sht4X.temperature, sht4X.relative_humidity)
