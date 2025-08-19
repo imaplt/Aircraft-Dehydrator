@@ -12,7 +12,7 @@ import sys
 
 
 print("\nSparkFun TCA9548A 8-Channel Mux Example\n")
-
+i2c = qwiic_i2c.getI2CDriver()
 # Create an instance of the Qwiic TCA9548A object
 myTca = qwiic_tca9548a.QwiicTCA9548A()
 mux = adafruit_tca9548a.TCA9548A(i2c)
