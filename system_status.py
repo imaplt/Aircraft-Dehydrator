@@ -155,15 +155,15 @@ def detect_sht4X_external(devices, overall_status_var=None):
         i2c = busio.I2C(board.D27, board.D22)
         mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
         sht4X = adafruit_sht4x.SHT4x([EXTERNAL_SENSOR_PORT])
-        devices["SHT41_External"]["status"] = (
+        devices["SHT4X_External"]["status"] = (
             "Detected, temperature: {:.2f} C, humidity: {:.2f} %"
-        ).format(sht41.temperature, sht41.relative_humidity)
+        ).format(sht4X.temperature, sht4X.relative_humidity)
     except OSError as e:
-        devices["SHT41_External"]["status"] = f"Error: {e}"
+        devices["SHT4X_External"]["status"] = f"Error: {e}"
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     except Exception as e:
-        devices["SHT41_External"]["status"] = f"Unexpected error: {e}"
+        devices["SHT4X_External"]["status"] = f"Unexpected error: {e}"
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
@@ -276,8 +276,8 @@ def query_i2c_devices(installed_devices):
     devices = {
         "SHT30": {"address": 0x44, "status": "Not detected"},
         "SHTC3": {"address": 0x70, "status": "Not detected"},
-        "SHT41_Internal": {"address": 0x44, "status": "Not detected"},
-        "SHT41_External": {"address": 0x44, "status": "Not detected"},
+        "SHT4X_Internal": {"address": 0x44, "status": "Not detected"},
+        "SHT4X_External": {"address": 0x44, "status": "Not detected"},
         "LCD2004": {"address": 0x27, "status": "Not detected"},
         "LCD1602": {"address": 0x27, "status": "Not detected"},
         "BONNET": {"address": 0x00, "status": "Not detected"},
