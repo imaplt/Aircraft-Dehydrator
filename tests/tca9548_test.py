@@ -49,19 +49,13 @@ print("Checking for I2C devices on ports 0, 1 and 7:")
 devices = i2c.scan()
 print("Devices found:", devices)
 
-
-# i2c = busio.I2C(I2C_SCL, I2C_SDA)
-# Get the I2C driver
-i2c = qwiic_i2c.getI2CDriver()
-mux = qwiic_tca9548a.QwiicTCA9548A()
-
 # Internal sensor
-sht4X_internal = adafruit_sht4x.SHT4x(mux[0])
+sht4X_internal = adafruit_sht4x.SHT4x(myTca[0])
 print(
     f"Detected, temperature: {sht4X_internal.temperature:.2f} C, humidity: {sht4X_internal.relative_humidity:.2f} %")
 
 # External sensor
-sht4X_external = adafruit_sht4x.SHT4x(mux[1])
+sht4X_external = adafruit_sht4x.SHT4x(myTca[1])
 print(
     f"Detected, temperature: {sht4X_external.temperature:.2f} C, humidity: {sht4X_external.relative_humidity:.2f} %")
 
