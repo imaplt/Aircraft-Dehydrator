@@ -151,9 +151,9 @@ def detect_sht4X_internal(devices, overall_status_var=None):
         safe_deinit(sht4X, i2c)
 
 def detect_sht4X_external(devices, overall_status_var=None):
-    i2c = sht41 = None
+    i2c = sht4X = None
     try:
-        i2c = busio.I2C(board.D27, board.D22)
+        i2c = board.I2C()
         mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
         sht4X = adafruit_sht4x.SHT4x(mux[EXTERNAL_SENSOR_PORT])
         devices["SHT4X_External"]["status"] = (
@@ -168,7 +168,7 @@ def detect_sht4X_external(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(sht41, i2c)
+        safe_deinit(sht4X, i2c)
 
 def detect_lcd2004(devices, overall_status_var=None):
     i2c = lcd = None
