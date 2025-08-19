@@ -4,11 +4,18 @@ import adafruit_shtc3
 import board
 import busio
 import adafruit_sht4x
+import adafruit_tca9548a
 import adafruit_sht31d
 import adafruit_bitbangio
 from enum import Enum
 
 # Define constants
+# Sensor Ports on Multiplexer
+# Mux address
+MUX_ADDR = 0x70  # Default address for TCA9548A multiplexer
+INTERNAL_SENSOR_PORT = 0
+EXTERNAL_SENSOR_PORT = 1
+
 SHT4X_NOHEAT_HIGHPRECISION = 0xFD  # High precision measurement, no heater
 SHT4X_NOHEAT_MEDPRECISION = 0xF6  # Medium precision measurement, no heater
 SHT4X_NOHEAT_LOWPRECISION = 0xE0  # Low precision measurement, no heater
@@ -61,16 +68,18 @@ class Sensor:
         self.address = address
 
         if sensor_type == 'SHT4X_Internal':
-            self.i2c = busio.I2C(board.SCL, board.SDA)
-            self.sensor = adafruit_sht4x.SHT4x(self.i2c, address)
+            self.i2c = board.I2C()
+            mux = adafruit_tca9548a.TCA9548A(self.i2c, address=MUX_ADDR)
+            self.sensor = adafruit_sht4x.SHT4x(mux[EXTERNAL_SENSOR_PORT])
 
         elif sensor_type == 'SHTC3':
             self.i2c = busio.I2C(board.SCL, board.SDA)
             self.sensor = adafruit_shtc3.SHTC3(self.i2c)
 
         elif sensor_type == 'SHT4X_External':
-            self.i2c = busio.I2C(board.D27, board.D22)
-            self.sensor = adafruit_sht4x.SHT4x(self.i2c, address)
+            self.i2c = board.I2C()
+            mux = adafruit_tca9548a.TCA9548A(self.i2c, address=MUX_ADDR)
+            self.sensor = adafruit_sht4x.SHT4x(mux[EXTERNAL_SENSOR_PORT])
 
         elif sensor_type == 'SHT30':
             self.i2c = adafruit_bitbangio.I2C(board.D27, board.D22)
