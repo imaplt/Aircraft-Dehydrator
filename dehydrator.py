@@ -627,6 +627,10 @@ if __name__ == "__main__":
         if isDeviceDetected(statuses, 'SHTC3'):
             externalsensor = Sensor('SHTC3', 0x70)
             externalprevious_output = {'temperature': 0, 'humidity': 0}
+        else:
+            externalsensor = Sensor('SHT4X', 0x44)
+            externalprevious_output = {'temperature': 0, 'humidity': 0}
+
 
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}

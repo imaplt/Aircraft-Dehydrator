@@ -70,7 +70,7 @@ class Sensor:
         if sensor_type == 'SHT4X_Internal':
             self.i2c = board.I2C()
             mux = adafruit_tca9548a.TCA9548A(self.i2c, address=MUX_ADDR)
-            self.sensor = adafruit_sht4x.SHT4x(mux[EXTERNAL_SENSOR_PORT])
+            self.sensor = adafruit_sht4x.SHT4x(mux[INTERNAL_SENSOR_PORT])
 
         elif sensor_type == 'SHTC3':
             self.i2c = busio.I2C(board.SCL, board.SDA)
