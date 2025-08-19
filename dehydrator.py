@@ -621,14 +621,11 @@ if __name__ == "__main__":
         internalsensor = Sensor('SHT4X_Internal', 0x44)
 
 
-        # sht30_sensor = Sensor('SHT30', 0x44)
-        # print(sht30_sensor.sensor.relative_humidity, sht30_sensor.sensor.temperature)
-
         if isDeviceDetected(statuses, 'SHTC3'):
             externalsensor = Sensor('SHTC3', 0x70)
             externalprevious_output = {'temperature': 0, 'humidity': 0}
         else:
-            externalsensor = Sensor('SHT4X', 0x44)
+            externalsensor = Sensor('SHT4X_External', 0x44)
             externalprevious_output = {'temperature': 0, 'humidity': 0}
 
 
