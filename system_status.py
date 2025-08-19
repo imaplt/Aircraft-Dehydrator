@@ -128,8 +128,8 @@ def detect_sht4X_internal(devices, overall_status_var=None):
     i2c = sht4X = None
     try:
         i2c = board.I2C()  # uses board.SCL and board.SDA
-        # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
-        sht4X = adafruit_sht4x.SHT4x(i2c)
+        mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
+        sht4X = adafruit_sht4x.SHT4x(mux[INTERNAL_SENSOR_PORT])
         print("Found SHT4x with serial number", hex(sht4X.serial_number))
         sht4X.mode = SHT4X_NOHEAT_HIGHPRECISION
         print("Current mode is: ", adafruit_sht4x.Mode.string[sht4X.mode])
@@ -153,7 +153,8 @@ def detect_sht4X_external(devices, overall_status_var=None):
     i2c = sht41 = None
     try:
         i2c = busio.I2C(board.D27, board.D22)
-        sht41 = adafruit_sht4x.SHT4x(i2c)
+        mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
+        sht4X = adafruit_sht4x.SHT4x([EXTERNAL_SENSOR_PORT])
         devices["SHT41_External"]["status"] = (
             "Detected, temperature: {:.2f} C, humidity: {:.2f} %"
         ).format(sht41.temperature, sht41.relative_humidity)
