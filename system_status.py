@@ -86,7 +86,6 @@ def detect_mux_and_sht4X(devices, overall_status_var=None):
     finally:
         safe_deinit(sensor, i2c)
 
-# Individual device detection functions
 def detect_sht30(devices, overall_status_var=None):
     i2c = sensor = None
     try:
@@ -106,7 +105,6 @@ def detect_sht30(devices, overall_status_var=None):
     finally:
         safe_deinit(sensor, i2c)
 
-
 def detect_shtc3(devices, overall_status_var=None):
     i2c = shtc3 = None
     try:
@@ -125,7 +123,6 @@ def detect_shtc3(devices, overall_status_var=None):
             overall_status_var["status"] = "bad"
     finally:
         safe_deinit(shtc3, i2c)
-
 
 def detect_sht4X_internal(devices, overall_status_var=None):
     i2c = sht4X = None
@@ -152,7 +149,6 @@ def detect_sht4X_internal(devices, overall_status_var=None):
     finally:
         safe_deinit(sht4X, i2c)
 
-
 def detect_sht4X_external(devices, overall_status_var=None):
     i2c = sht41 = None
     try:
@@ -172,7 +168,6 @@ def detect_sht4X_external(devices, overall_status_var=None):
     finally:
         safe_deinit(sht41, i2c)
 
-
 def detect_lcd2004(devices, overall_status_var=None):
     i2c = lcd = None
     try:
@@ -185,7 +180,6 @@ def detect_lcd2004(devices, overall_status_var=None):
             overall_status_var["status"] = "bad"
     finally:
         safe_deinit(lcd, i2c)
-
 
 def detect_lcd1602(devices, overall_status_var=None):
     i2c = lcd = None
@@ -200,7 +194,6 @@ def detect_lcd1602(devices, overall_status_var=None):
     finally:
         safe_deinit(lcd, i2c)
 
-
 def detect_emc2101(devices, overall_status_var=None):
     try:
         emc2101 = EMC2101()
@@ -210,7 +203,6 @@ def detect_emc2101(devices, overall_status_var=None):
         devices["EMC2101"]["status"] = f"Error: {e}"
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
-
 
 def detect_fan(devices, overall_status_var=None):
     try:
@@ -230,7 +222,6 @@ def detect_fan(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
 
-
 def detect_ssd1306(devices, overall_status_var=None):
     i2c = oled = None
     try:
@@ -243,7 +234,6 @@ def detect_ssd1306(devices, overall_status_var=None):
             overall_status_var["status"] = "bad"
     finally:
         safe_deinit(oled, i2c)
-
 
 def detect_bonnet(devices, overall_status_var=None):
     spi = cs_pin = dc_pin = reset_pin = disp = None
@@ -279,7 +269,6 @@ def detect_bonnet(devices, overall_status_var=None):
             overall_status_var["status"] = "bad"
     finally:
         safe_deinit(disp, spi, cs_pin, dc_pin, reset_pin)
-
 
 # Main function: runs all checks in list
 def query_i2c_devices(installed_devices):
