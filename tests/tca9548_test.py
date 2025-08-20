@@ -18,10 +18,18 @@ i2c = board.I2C()  # uses board.SCL and board.SDA
 # Create the TCA9548A object and give it the I2C bus
 tca = adafruit_tca9548a.TCA9548A(i2c)
 
+for channel in range(8):
+    if tca[channel].try_lock():
+        print("Channel {}:".format(channel), end="")
+        addresses = tca[channel].scan()
+        print([hex(address) for address in addresses if address != 0x70])
+        tca[channel].unlock()
+
 # For each sensor, create it using the TCA9548A channel instead of the I2C object
 sht4X_internal = adafruit_sht4x.SHT4x(tca[0])
 sht4X_external = adafruit_sht4x.SHT4x(tca[1])
 sht41 = adafruit_sht4x.SHT4x(tca[7])
+
 
 
 # Internal sensor
