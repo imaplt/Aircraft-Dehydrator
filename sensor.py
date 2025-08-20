@@ -59,6 +59,11 @@ class SHT4XHeater(Enum):
     LOW_HEATER_1S = "Low Heater 1s"
     LOW_HEATER_100MS = "Low Heater 100ms"
 
+# Shared singletons
+_I2C = None
+_MUX = None
+_BITBANG_I2C = None
+
 class Sensor:
 
     def __init__(self, sensor_type, address):
