@@ -618,9 +618,11 @@ if __name__ == "__main__":
         print('Initializing fan controller...')
         fanController = EMC2101()
         time.sleep(2)
+
+        # Initialise the internal sensor
         internalsensor = Sensor('SHT4X_Internal', 0x44)
 
-
+        # Initialize the external sensor
         if isDeviceDetected(statuses, 'SHTC3'):
             externalsensor = Sensor('SHTC3', 0x70)
             externalprevious_output = {'temperature': 0, 'humidity': 0}

@@ -45,12 +45,10 @@ hex_to_description = {
     SHT4X_SOFTRESET: "Soft Reset"
 }
 
-
 class SHT4XPrecision(Enum):
     HIGH_PRECISION = "High Precision"
     MED_PRECISION = "Medium Precision"
     LOW_PRECISION = "Low Precision"
-
 
 class SHT4XHeater(Enum):
     NO_HEATER = "No Heater"
@@ -61,32 +59,44 @@ class SHT4XHeater(Enum):
     LOW_HEATER_1S = "Low Heater 1s"
     LOW_HEATER_100MS = "Low Heater 100ms"
 
-
 class Sensor:
+
     def __init__(self, sensor_type, address):
+        global _I2C, _MUX, _BITBANG_I2C
+
         self.sensor_type = sensor_type
         self.address = address
 
-        if sensor_type == 'SHT4X_Internal':
-            self.i2c = board.I2C()
-            mux = adafruit_tca9548a.TCA9548A(self.i2c, address=MUX_ADDR)
-            self.sensor = adafruit_sht4x.SHT4x(mux[INTERNAL_SENSOR_PORT])
+        # Ensure one shared I2C object
+        if _I2C is None:
+            _I2C = busio.I2C(board.SCL, board.SDA)
 
-        elif sensor_type == 'SHTC3':
-            self.i2c = busio.I2C(board.SCL, board.SDA)
-            self.sensor = adafruit_shtc3.SHTC3(self.i2c)
+        # Ensure one mux object
+        if _MUX is None:
+            _MUX = adafruit_tca9548a.TCA9548A(_I2C, address=MUX_ADDR)
 
-        elif sensor_type == 'SHT4X_External':
-            self.i2c = board.I2C()
-            mux = adafruit_tca9548a.TCA9548A(self.i2c, address=MUX_ADDR)
-            self.sensor = adafruit_sht4x.SHT4x(mux[EXTERNAL_SENSOR_PORT])
+        # Lazy-init for bitbang bus since it's slower and specific pins
+        if sensor_type == "SHT30" and _BITBANG_I2C is None:
+            _BITBANG_I2C = adafruit_bitbangio.I2C(board.D27, board.D22)
 
-        elif sensor_type == 'SHT30':
-            self.i2c = adafruit_bitbangio.I2C(board.D27, board.D22)
-            self.sensor = adafruit_sht31d.SHT31D(self.i2c, address)
+        # Attach correct sensor type
+        if sensor_type == "SHT4X_Internal":
+            self.sensor = adafruit_sht4x.SHT4x(_MUX[INTERNAL_SENSOR_PORT])
+
+        elif sensor_type == "SHT4X_External":
+            self.sensor = adafruit_sht4x.SHT4x(_MUX[EXTERNAL_SENSOR_PORT])
+
+        elif sensor_type == "SHTC3":
+            self.sensor = adafruit_shtc3.SHTC3(_I2C)
+
+        elif sensor_type == "SHT30":
+            self.sensor = adafruit_sht31d.SHT31D(_BITBANG_I2C, address)
+
         else:
-            raise ValueError("Invalid sensor type. Supported types: 'SHT4X_Internal', "
-                             "'SHT4X_External', 'SHTC3' ,'SHT30'")
+            raise ValueError(
+                "Invalid sensor type. Supported types: 'SHT4X_Internal', "
+                "'SHT4X_External', 'SHTC3', 'SHT30'"
+            )
 
     def sensor_status(self):
         if self.sensor_type == 'SHT30':
@@ -119,7 +129,59 @@ class Sensor:
 
         return {'temperature': temperature, 'humidity': humidity}
 
-    def heat_sensor(self):
-        self.sensor.heater = True
-        time.sleep(1)
-        self.sensor.heater = False
+    def heat_sensor(self, duration=5):
+        """
+        Run high heat on the sensor for the given duration (seconds).
+        """
+        try:
+            print(f"Heating sensor {self.sensor} on HIGH for {duration}s...")
+            self.sensor.mode = self.sensor.SHT4X_MEDHEAT_1S
+            time.sleep(duration)
+            # return to normal mode
+            self.sensor.mode = self.sensor.SHT4X_NOHEAT_HIGHPRECISION
+        except Exception as e:
+            print(f"Heat cycle error: {e}")
+            return None, None
+
+    # def cooldown_sensors(sensor_a, sensor_b=None, threshold_f=1.5, max_wait=60):
+    #     """
+    #     Wait until sensors cool down enough.
+    #     - If sensor_b is provided: wait until |temp_a - temp_b| <= threshold_f
+    #     - If only sensor_a: wait until it cools to within threshold_f of its baseline
+    #     """
+    #     start_time = time.time()
+    #     baseline_temp = None
+    #     if sensor_b is None:
+    #         baseline_temp, _ = read_sensor(sensor_a)
+    #
+    #     while True:
+    #         temp_a, _ = read_sensor(sensor_a)
+    #         if temp_a is None:
+    #             break
+    #
+    #         if sensor_b:
+    #             temp_b, _ = read_sensor(sensor_b)
+    #             if temp_b is None:
+    #                 break
+    #             if abs((temp_a * 9 / 5 + 32) - (temp_b * 9 / 5 + 32)) <= threshold_f:
+    #                 print("Cooldown reached (sensors within threshold).")
+    #                 break
+    #         else:
+    #             if baseline_temp is not None:
+    #                 if abs((temp_a * 9 / 5 + 32) - (baseline_temp * 9 / 5 + 32)) <= threshold_f:
+    #                     print("Cooldown reached (single sensor baseline).")
+    #                     break
+    #
+    #         if (time.time() - start_time) > max_wait:
+    #             print("Cooldown timeout reached.")
+    #             break
+    #
+    #         time.sleep(1)
+    #
+    # def recondition_sensor(sensor, sensor_ref=None, heat_duration=5, threshold_f=1.5, max_wait=60):
+    #     """
+    #     Recondition a sensor by running a high-heat cycle and waiting for cooldown.
+    #     Optionally uses another sensor for cooldown comparison.
+    #     """
+    #     heat_sensor(sensor, duration=heat_duration)
+    #     cooldown_sensors(sensor, sensor_ref, threshold_f=threshold_f, max_wait=max_wait)
