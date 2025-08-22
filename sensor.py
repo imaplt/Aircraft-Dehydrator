@@ -135,58 +135,56 @@ class Sensor:
         return {'temperature': temperature, 'humidity': humidity}
 
     def heat_sensor(self, duration=5):
-        """
-        Run high heat on the sensor for the given duration (seconds).
-        """
+        # Run high-heat on SHT4X sensors.
+        if not isinstance(self.sensor, adafruit_sht4x.SHT4x):
+            print(f"{self.sensor_type} does not support heating.")
+            return
         try:
-            print(f"Heating sensor {self.sensor} on HIGH for {duration}s...")
-            self.sensor.mode = self.sensor.SHT4X_MEDHEAT_1S
+            print(f"Heating {self.sensor_type} on HIGH for {duration}s...")
+            self.sensor.mode = adafruit_sht4x.SHT4X_MEDHEAT_1S
             time.sleep(duration)
             # return to normal mode
-            self.sensor.mode = self.sensor.SHT4X_NOHEAT_HIGHPRECISION
+            self.sensor.mode = adafruit_sht4x.SHT4X_NOHEAT_HIGHPRECISION
         except Exception as e:
             print(f"Heat cycle error: {e}")
-            return None, None
 
-    # def cooldown_sensors(sensor_a, sensor_b=None, threshold_f=1.5, max_wait=60):
-    #     """
-    #     Wait until sensors cool down enough.
-    #     - If sensor_b is provided: wait until |temp_a - temp_b| <= threshold_f
-    #     - If only sensor_a: wait until it cools to within threshold_f of its baseline
-    #     """
-    #     start_time = time.time()
-    #     baseline_temp = None
-    #     if sensor_b is None:
-    #         baseline_temp, _ = read_sensor(sensor_a)
-    #
-    #     while True:
-    #         temp_a, _ = read_sensor(sensor_a)
-    #         if temp_a is None:
-    #             break
-    #
-    #         if sensor_b:
-    #             temp_b, _ = read_sensor(sensor_b)
-    #             if temp_b is None:
-    #                 break
-    #             if abs((temp_a * 9 / 5 + 32) - (temp_b * 9 / 5 + 32)) <= threshold_f:
-    #                 print("Cooldown reached (sensors within threshold).")
-    #                 break
-    #         else:
-    #             if baseline_temp is not None:
-    #                 if abs((temp_a * 9 / 5 + 32) - (baseline_temp * 9 / 5 + 32)) <= threshold_f:
-    #                     print("Cooldown reached (single sensor baseline).")
-    #                     break
-    #
-    #         if (time.time() - start_time) > max_wait:
-    #             print("Cooldown timeout reached.")
-    #             break
-    #
-    #         time.sleep(1)
-    #
-    # def recondition_sensor(sensor, sensor_ref=None, heat_duration=5, threshold_f=1.5, max_wait=60):
-    #     """
-    #     Recondition a sensor by running a high-heat cycle and waiting for cooldown.
-    #     Optionally uses another sensor for cooldown comparison.
-    #     """
-    #     heat_sensor(sensor, duration=heat_duration)
-    #     cooldown_sensors(sensor, sensor_ref, threshold_f=threshold_f, max_wait=max_wait)
+    def cooldown_sensors(self, ref_sensor=None, threshold_f=1.5, max_wait=60):
+        """
+        Wait until sensor cools down.
+        - If ref_sensor is provided: wait until |temp - ref_temp| <= threshold
+        - If not: wait until temp is close to baseline.
+        """
+        start_time = time.time()
+        baseline_temp, _ = (self.read_sensor() if ref_sensor is None else (None, None))
+
+        while True:
+            temp, _ = self.read_sensor()
+            if temp is None:
+                break
+
+            if ref_sensor:
+                ref_temp, _ = ref_sensor.read_sensor()
+                if ref_temp is None:
+                    break
+                if abs((temp * 9 / 5 + 32) - (ref_temp * 9 / 5 + 32)) <= threshold_f:
+                    print("Cooldown reached (relative to ref sensor).")
+                    break
+            else:
+                if baseline_temp is not None:
+                    if abs((temp * 9 / 5 + 32) - (baseline_temp * 9 / 5 + 32)) <= threshold_f:
+                        print("Cooldown reached (baseline).")
+                        break
+
+            if (time.time() - start_time) > max_wait:
+                print("Cooldown timeout reached.")
+                break
+
+            time.sleep(1)
+
+    def recondition_sensor(self, ref_sensor=None, heat_duration=5, threshold_f=1.5, max_wait=60):
+        """
+        Recondition this sensor: run heat cycle + wait for cooldown.
+        Optionally compare cooldown against a reference sensor.
+        """
+        self.heat_sensor(duration=heat_duration)
+        self.cooldown_sensors(ref_sensor=ref_sensor, threshold_f=threshold_f, max_wait=max_wait)

@@ -10,9 +10,20 @@ from gpiozero import Button
 from sensor import Sensor
 from fan_controller import EMC2101
 import threading
+from notification_manager import NotificationManager
 
 # Spinner frames to simulate rotation
 spinner_frames = ['▖', '▘', '▝', '▗']
+
+notifier = NotificationManager(
+    provider="yahoo",                     # "yahoo" | "icloud" | "apple"
+    email="imaplt@yahoo.com",
+    password="",        # app password recommended
+    recipients=["chris.auron@gmail.com"],
+    retry_days=7,                        # configurable retention
+    poll_interval=300,                   # worker checks every 5 min
+    auto_start=True                      # background thread starts automatically
+)
 
 def get_next_frame():
     global current_frame_index
@@ -207,6 +218,16 @@ def task_ambient():
 
     print(f"{ambient_timestamp} Ambient: {externaloutput}")
 
+def send_daily_status():
+    #TODO: Update the code for below
+    status = "Overall: GOOD\nInternal: 22.4C/47.1%\nExternal: 23.9C/55.3%"
+    # you can add sensor readings too
+    notifier.send_status(status)
+
+def send_daily_log():
+    log_file = "log.csv.1"  # or however you track archived logs
+    notifier.send_log(log_file)
+
 def _cycle_fan():
     # TODO: How do we want to engage this?
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
@@ -218,7 +239,11 @@ def _cycle_fan():
 
 def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1):
     schedule.every(int_interval).seconds.do(task_internal)
-    schedule.every(ext_interval).minutes.do(task_ambient)
+    schedule.every(ext_interval).seconds.do(task_ambient)
+    # --- Schedule jobs ---
+    schedule.every().day.at("09:00").do(send_daily_status)
+    schedule.every().day.at("18:00").do(send_daily_log)
+
     # schedule.every(fan_interval).minutes.do(task_fan)
 
 def run_scheduler():
@@ -456,6 +481,7 @@ def cleanup():
     print('Cleaning Up')
     running = False
     sensor_thread.join()  # Wait for the sensor thread to finish
+    notifier.stop_worker()
     try:
         display_manager.switch_image(Screen.SHUTDOWN)
         display_manager.display_current_image(BONNETDisplay.disp)
@@ -643,6 +669,27 @@ if __name__ == "__main__":
         sensor_thread.start()
         # time.sleep(2)
         run_scheduler()
+
+        # TODO:
+        ## These should be placed where they need to be
+        # # Recondition internal sensor using external as reference
+        # internalsensor.recondition_sensor(ref_sensor=externalsensor)
+        #
+        # # Recondition external sensor by itself
+        # externalsensor.recondition_sensor()
+
+        # TODO: Add for notification calling...
+        # notifier = NotificationManager("gmail", "you@gmail.com", "app_password")
+        #
+        # notifier.queue_message(
+        #     subject="Status Report",
+        #     body="System check OK.",
+        #     recipients=["target@example.com"]
+        # )
+        #
+        # while True:
+        #     notifier.process_queue()
+        #     time.sleep(300)  # check every 5 minutes
 
 
     except KeyboardInterrupt:
