@@ -666,6 +666,11 @@ if __name__ == "__main__":
 
         # Need to run the External once to update the values
         task_ambient()
+
+        # Send teh startup status now?
+        send_daily_status()
+        # Start the threading..
+
         sensor_thread.start()
         # time.sleep(2)
         run_scheduler()
@@ -677,19 +682,6 @@ if __name__ == "__main__":
         #
         # # Recondition external sensor by itself
         # externalsensor.recondition_sensor()
-
-        # TODO: Add for notification calling...
-        # notifier = NotificationManager("gmail", "you@gmail.com", "app_password")
-        #
-        # notifier.queue_message(
-        #     subject="Status Report",
-        #     body="System check OK.",
-        #     recipients=["target@example.com"]
-        # )
-        #
-        # while True:
-        #     notifier.process_queue()
-        #     time.sleep(300)  # check every 5 minutes
 
 
     except KeyboardInterrupt:
