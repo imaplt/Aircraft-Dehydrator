@@ -68,6 +68,7 @@ class NotificationManager:
     def send_status(self, body: str, subject: str = "System Status", recipients=None):
         """Queue a plain-text status email."""
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        print(f"{timestamp}: {body}")
         self.logger.log(timestamp, 'INFO', 'SYSTEM', 'NOTIFICATION', f"Status update sent...")
         self._queue_message(subject, body, recipients, attachments=None)
 

@@ -220,12 +220,28 @@ def task_ambient():
 
 def send_daily_status():
     #TODO: Update the code for below
-    status = "Overall: GOOD\nInternal: 22.4C/47.1%\nExternal: 23.9C/55.3%"
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    current_status = f"Current Status As Of: {timestamp}\n"
+    current_status += f"Overall: {overall_status}\n"
+    for s in statuses:
+        current_status += f" {s}\n"
+
     # you can add sensor readings too
-    notifier.send_status(status)
+    notifier.send_status(current_status)
+
+def send_startup_status():
+    #TODO: Update the code for below
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    current_status = f"Startup Status As Of: {timestamp}\n"
+    current_status += f"Overall: {overall_status}\n"
+    for s in statuses:
+        current_status += f" {s}\n"
+
+    # you can add sensor readings too
+    notifier.send_status(body=current_status, subject="Startup Status")
 
 def send_daily_log():
-    log_file = "log.csv.1"  # or however you track archived logs
+    log_file = "log.csv"  # or however you track archived logs
     notifier.send_log(log_file)
 
 def _cycle_fan():
@@ -667,8 +683,8 @@ if __name__ == "__main__":
         # Need to run the External once to update the values
         task_ambient()
 
-        # Send teh startup status now?
-        send_daily_status()
+        # Send the startup status now?
+        send_startup_status()
         # Start the threading..
 
         sensor_thread.start()
