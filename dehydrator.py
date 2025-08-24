@@ -720,15 +720,14 @@ if __name__ == "__main__":
         # Initialize the external sensor
         if isDeviceDetected(statuses, 'SHTC3'):
             externalsensor = Sensor('SHTC3', 0x70)
-            externalprevious_output = {'temperature': 0, 'humidity': 0}
         else:
             externalsensor = Sensor('SHT4X_External', 0x44)
-            externalprevious_output = {'temperature': 0, 'humidity': 0}
-
 
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}
         INTERNAL_PREVIOUS_HUMIDITY = 0
+        externalprevious_output = {'temperature': 0, 'humidity': 0}
+        EXTERNAL_PREVIOUS_HUMIDITY = 0
 
         schedule_tasks(int_interval=TASK_INTERNAL, fan_interval=TASK_FAN)
 
