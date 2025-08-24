@@ -45,7 +45,8 @@ def celsius_to_fahrenheit(celsius):
 def sensor(stop_event):
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY,\
      INTERNAL_TEMP, INTERNAL_HUMIDITY, INTERNAL_PREVIOUS_HUMIDITY, EXTERNAL_TEMP, EXTERNAL_LOW_TEMP, \
-        EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY, EXTERNAL_TEMP, EXTERNAL_HUMIDITY
+        EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY, EXTERNAL_TEMP, \
+        EXTERNAL_HUMIDITY, EXTERNAL_PREVIOUS_HUMIDITY
 
     while running and not stop_event.is_set():
         try:
@@ -61,7 +62,7 @@ def sensor(stop_event):
                 logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SENSORS', 'INTERNAL',
                            f"Temperature: {internaloutput['temperature']}C, Humidity: {internaloutput['humidity']}%")
                 INTERNAL_PREVIOUS_HUMIDITY = INTERNAL_HUMIDITY
-                print("Log File Updated")
+                print("Log File Updated: Internal Sensor Change...")
 
             print(f"{internal_timestamp} Internal: {internaloutput}")
 
@@ -114,10 +115,14 @@ def sensor(stop_event):
                 EXTERNAL_LOW_TEMP = new_low_temp
                 save_config()
 
-            # Log the sensor data every X seconds
-            logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'AMBIENT',
-                       f"Temperature: {externaloutput['temperature']}C,"
-                       f" Humidity: {externaloutput['humidity']}%")
+            if abs(EXTERNAL_HUMIDITY - EXTERNAL_PREVIOUS_HUMIDITY) > 0.2:
+                """Log internal sensor reading and update previous output values."""
+                logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'AMBIENT',
+                           f"Temperature: {externaloutput['temperature']}C,"
+                           f" Humidity: {externaloutput['humidity']}%")
+                EXTERNAL_PREVIOUS_HUMIDITY = EXTERNAL_HUMIDITY
+                print("Log File Updated: External Sensor Change...")
+
 
             # Update the global variables and print the reading
             EXTERNAL_TEMP = externaloutput['temperature']
@@ -300,14 +305,13 @@ def _cycle_fan():
     time.sleep(FAN_DURATION)
     fanController.set_fan_speed(0)
 
-def schedule_tasks(int_interval=1, fan_interval=1):
+def schedule_tasks(int_interval=1, fan_interval=10):
     schedule.every(int_interval).seconds.do(task_update)
     # --- Schedule jobs ---
     schedule.every().day.at("08:00").do(send_daily_status)
     schedule.every().day.at("20:00").do(send_daily_status)
     schedule.every().day.at("21:00").do(send_daily_log)
-
-    # schedule.every(fan_interval).minutes.do(task_fan)
+    schedule.every(fan_interval).minutes.do(_cycle_fan)
 
 def run_scheduler():
     while True:
