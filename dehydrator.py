@@ -86,7 +86,7 @@ def sensor():
             INTERNAL_LOW_TEMP = new_low_temp
             save_config()
 
-        time.sleep(0.5)
+        time.sleep(2)
 
 def task_internal():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
@@ -231,9 +231,9 @@ def send_daily_status():
 
 def send_startup_status():
     #TODO: Update the code for below
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    current_status = f"Startup Status As Of: {timestamp}\n"
-    current_status += f"Overall: {overall_status}\n"
+    status_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    current_status = f"Startup status as of: {status_timestamp}\n"
+    current_status += f"Overall: {overall_status}.\n".upper()
     for s in statuses:
         current_status += f" {s}\n"
 
@@ -255,7 +255,7 @@ def _cycle_fan():
 
 def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1):
     schedule.every(int_interval).seconds.do(task_internal)
-    schedule.every(ext_interval).seconds.do(task_ambient)
+    schedule.every(ext_interval).minutes.do(task_ambient)
     # --- Schedule jobs ---
     schedule.every().day.at("09:00").do(send_daily_status)
     schedule.every().day.at("18:00").do(send_daily_log)
