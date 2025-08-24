@@ -42,53 +42,98 @@ def celsius_to_fahrenheit(celsius):
     fahrenheit = (celsius * 9/5) + 32
     return round(fahrenheit, 1)
 
-def sensor():
+def sensor(stop_event):
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY,\
-     INTERNAL_TEMP, INTERNAL_HUMIDITY, INTERNAL_PREVIOUS_HUMIDITY, EXTERNAL_TEMP
+     INTERNAL_TEMP, INTERNAL_HUMIDITY, INTERNAL_PREVIOUS_HUMIDITY, EXTERNAL_TEMP, EXTERNAL_LOW_TEMP, \
+        EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY, EXTERNAL_TEMP, EXTERNAL_HUMIDITY
 
-    while running:
-        internaloutput = internalsensor.read_sensor()
-        internal_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    while running and not stop_event.is_set():
+        try:
+            internaloutput = internalsensor.read_sensor()
+            internal_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
-        # Main block to handle sensor change and fan control
-        INTERNAL_HUMIDITY = internaloutput['humidity']
-        INTERNAL_TEMP = internaloutput['temperature']
+            # Main block to handle sensor change and fan control
+            INTERNAL_HUMIDITY = internaloutput['humidity']
+            INTERNAL_TEMP = internaloutput['temperature']
 
-        if abs(INTERNAL_HUMIDITY - INTERNAL_PREVIOUS_HUMIDITY) > 0.2:
-            """Log internal sensor reading and update previous output values."""
-            logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SENSORS', 'INTERNAL',
-                       f"Temperature: {internaloutput['temperature']}C, Humidity: {internaloutput['humidity']}%")
-            INTERNAL_PREVIOUS_HUMIDITY = INTERNAL_HUMIDITY
-            print("Log File Updated")
+            if abs(INTERNAL_HUMIDITY - INTERNAL_PREVIOUS_HUMIDITY) > 0.2:
+                """Log internal sensor reading and update previous output values."""
+                logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SENSORS', 'INTERNAL',
+                           f"Temperature: {internaloutput['temperature']}C, Humidity: {internaloutput['humidity']}%")
+                INTERNAL_PREVIOUS_HUMIDITY = INTERNAL_HUMIDITY
+                print("Log File Updated")
 
-        print(f"{internal_timestamp} Internal: {internaloutput}")
+            print(f"{internal_timestamp} Internal: {internaloutput}")
 
-        # Update the config file with stats
-        new_high_humidity = max(INTERNAL_HIGH_HUMIDITY, internaloutput['humidity'])
-        new_low_humidity = min(INTERNAL_LOW_HUMIDITY, internaloutput['humidity'])
+            # Update the config file with stats
+            new_high_humidity = max(INTERNAL_HIGH_HUMIDITY, internaloutput['humidity'])
+            new_low_humidity = min(INTERNAL_LOW_HUMIDITY, internaloutput['humidity'])
 
-        new_high_temp = max(INTERNAL_HIGH_TEMP, internaloutput['temperature'])
-        new_low_temp = min(INTERNAL_LOW_TEMP, internaloutput['temperature'])
+            new_high_temp = max(INTERNAL_HIGH_TEMP, internaloutput['temperature'])
+            new_low_temp = min(INTERNAL_LOW_TEMP, internaloutput['temperature'])
 
-        # Check if any of the values changed
-        log_changed = (
-                new_high_humidity != INTERNAL_HIGH_HUMIDITY or
-                new_low_humidity != INTERNAL_LOW_HUMIDITY or
-                new_high_temp != INTERNAL_HIGH_TEMP or
-                new_low_temp != INTERNAL_LOW_TEMP
-        )
+            # Check if any of the values changed
+            log_changed = (
+                    new_high_humidity != INTERNAL_HIGH_HUMIDITY or
+                    new_low_humidity != INTERNAL_LOW_HUMIDITY or
+                    new_high_temp != INTERNAL_HIGH_TEMP or
+                    new_low_temp != INTERNAL_LOW_TEMP
+            )
 
-        # Update the variables if they changed
-        if log_changed:
-            INTERNAL_HIGH_HUMIDITY = new_high_humidity
-            INTERNAL_LOW_HUMIDITY = new_low_humidity
-            INTERNAL_HIGH_TEMP = new_high_temp
-            INTERNAL_LOW_TEMP = new_low_temp
-            save_config()
+            # Update the variables if they changed
+            if log_changed:
+                INTERNAL_HIGH_HUMIDITY = new_high_humidity
+                INTERNAL_LOW_HUMIDITY = new_low_humidity
+                INTERNAL_HIGH_TEMP = new_high_temp
+                INTERNAL_LOW_TEMP = new_low_temp
+                save_config()
 
-        time.sleep(2)
+            ambient_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            externaloutput = externalsensor.read_sensor()
 
-def task_internal():
+            # Calculate new high and low values
+            new_high_humidity = max(EXTERNAL_HIGH_HUMIDITY, externaloutput['humidity'])
+            new_low_humidity = min(EXTERNAL_LOW_HUMIDITY, externaloutput['humidity'])
+
+            new_high_temp = max(EXTERNAL_HIGH_TEMP, externaloutput['temperature'])
+            new_low_temp = min(EXTERNAL_LOW_TEMP, externaloutput['temperature'])
+
+            # Check if any values changed
+            log_changed = (
+                    new_high_humidity != EXTERNAL_HIGH_HUMIDITY or
+                    new_low_humidity != EXTERNAL_LOW_HUMIDITY or
+                    new_high_temp != EXTERNAL_HIGH_TEMP or
+                    new_low_temp != EXTERNAL_LOW_TEMP
+            )
+
+            # Update the variables if they changed
+            if log_changed:
+                EXTERNAL_HIGH_HUMIDITY = new_high_humidity
+                EXTERNAL_LOW_HUMIDITY = new_low_humidity
+                EXTERNAL_HIGH_TEMP = new_high_temp
+                EXTERNAL_LOW_TEMP = new_low_temp
+                save_config()
+
+            # Log the sensor data every X seconds
+            logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'AMBIENT',
+                       f"Temperature: {externaloutput['temperature']}C,"
+                       f" Humidity: {externaloutput['humidity']}%")
+
+            # Update the global variables and print the reading
+            EXTERNAL_TEMP = externaloutput['temperature']
+            EXTERNAL_HUMIDITY = externaloutput['humidity']
+
+            print(f"{ambient_timestamp} Ambient: {externaloutput}")
+
+            time.sleep(2)
+
+        except Exception as e:
+            logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM', 'SENSOR',
+                       "Sensor thread error: {}".format(e))
+            print(f"Sensor thread error: {e}")
+            cleanup()
+
+def task_update():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
         INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP, page_changed
@@ -220,8 +265,10 @@ def task_ambient():
 
 def send_daily_status():
     #TODO: Update the code for below
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    current_status = f"Current Status As Of: {timestamp}\n"
+    global overall_status, statuses
+    status_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    overall_status, statuses = system_status.query_i2c_devices(installed_devices)
+    current_status = f"Current Status As Of: {status_timestamp}\n"
     current_status += f"Overall: {overall_status}\n"
     for s in statuses:
         current_status += f" {s}\n"
@@ -253,12 +300,12 @@ def _cycle_fan():
     time.sleep(FAN_DURATION)
     fanController.set_fan_speed(0)
 
-def schedule_tasks(int_interval=1, ext_interval=5, fan_interval=1):
-    schedule.every(int_interval).seconds.do(task_internal)
-    schedule.every(ext_interval).minutes.do(task_ambient)
+def schedule_tasks(int_interval=1, fan_interval=1):
+    schedule.every(int_interval).seconds.do(task_update)
     # --- Schedule jobs ---
-    schedule.every().day.at("09:00").do(send_daily_status)
-    schedule.every().day.at("18:00").do(send_daily_log)
+    schedule.every().day.at("08:00").do(send_daily_status)
+    schedule.every().day.at("20:00").do(send_daily_status)
+    schedule.every().day.at("21:00").do(send_daily_log)
 
     # schedule.every(fan_interval).minutes.do(task_fan)
 
@@ -494,6 +541,7 @@ def _fan_limit_exceeded():
 def cleanup():
     # Want to add code here to update display, update log with run time etc
     global running
+    stop_event.set()
     print('Cleaning Up')
     running = False
     sensor_thread.join()  # Wait for the sensor thread to finish
@@ -636,7 +684,8 @@ if __name__ == "__main__":
     FAN_RUNNING_TIME = 0
 
     running = True
-    sensor_thread = threading.Thread(target=sensor)
+    stop_event = threading.Event()
+    sensor_thread = threading.Thread(target=sensor, args=(stop_event,))
 
     try:
         # Initialize displays...
@@ -677,11 +726,10 @@ if __name__ == "__main__":
         internalprevious_output = {'temperature': 0, 'humidity': 0}
         INTERNAL_PREVIOUS_HUMIDITY = 0
 
-        schedule_tasks(int_interval=TASK_INTERNAL, ext_interval=TASK_EXTERNAL,
-                       fan_interval=TASK_FAN)
+        schedule_tasks(int_interval=TASK_INTERNAL, fan_interval=TASK_FAN)
 
         # Need to run the External once to update the values
-        task_ambient()
+        # task_ambient()
 
         # Send the startup status now?
         send_startup_status()
