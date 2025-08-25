@@ -209,16 +209,19 @@ def detect_emc2101(devices, overall_status_var=None):
 def detect_fan(devices, overall_status_var=None):
     try:
         fan = EMC2101()
-        fan.set_fan_speed(100)
-        rpm = fan.read_fan_speed()
-        temp = fan.read_internal_temp()
-        fan.set_fan_speed(0)
-        if rpm >= 3200:
-            devices["FAN"]["status"] = f"Detected, RPM: {rpm}, Internal Temp: {temp}"
+        if fan.read_fan_speed() > 200:
+            devices["FAN"]["status"] = f"Currently Running, RPM: {fan.read_fan_speed()}"
         else:
-            devices["FAN"]["status"] = f"Not Detected, RPM: {rpm}; Should be > 3200"
-            if overall_status_var is not None:
-                overall_status_var["status"] = "bad"
+            fan.set_fan_speed(100)
+            rpm = fan.read_fan_speed()
+            temp = fan.read_internal_temp()
+            fan.set_fan_speed(0)
+            if rpm >= 3200:
+                devices["FAN"]["status"] = f"Detected, RPM: {rpm}, Internal Temp: {temp}"
+            else:
+                devices["FAN"]["status"] = f"Not Detected, RPM: {rpm}; Should be > 3200"
+                if overall_status_var is not None:
+                    overall_status_var["status"] = "bad"
     except Exception as e:
         devices["FAN"]["status"] = f"Error: {e}"
         if overall_status_var is not None:

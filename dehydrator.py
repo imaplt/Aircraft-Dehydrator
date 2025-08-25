@@ -37,6 +37,7 @@ def get_next_frame():
 
 # Initialize the lock
 lock = threading.Lock()
+shutdown_timer = None
 
 def celsius_to_fahrenheit(celsius):
     fahrenheit = (celsius * 9/5) + 32
@@ -57,7 +58,7 @@ def sensor(stop_event):
             INTERNAL_HUMIDITY = internaloutput['humidity']
             INTERNAL_TEMP = internaloutput['temperature']
 
-            if abs(INTERNAL_HUMIDITY - INTERNAL_PREVIOUS_HUMIDITY) > 0.2:
+            if abs(INTERNAL_HUMIDITY - INTERNAL_PREVIOUS_HUMIDITY) > 0.3:
                 """Log internal sensor reading and update previous output values."""
                 logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SENSORS', 'INTERNAL',
                            f"Temperature: {internaloutput['temperature']}C, Humidity: {internaloutput['humidity']}%")
@@ -89,7 +90,7 @@ def sensor(stop_event):
                 INTERNAL_LOW_TEMP = new_low_temp
                 save_config()
 
-            ambient_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            ambient_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) # type: ignore
             externaloutput = externalsensor.read_sensor()
 
             # Calculate new high and low values
@@ -115,7 +116,7 @@ def sensor(stop_event):
                 EXTERNAL_LOW_TEMP = new_low_temp
                 save_config()
 
-            if abs(EXTERNAL_HUMIDITY - EXTERNAL_PREVIOUS_HUMIDITY) > 0.2:
+            if abs(EXTERNAL_HUMIDITY - EXTERNAL_PREVIOUS_HUMIDITY) > 0.3:
                 """Log internal sensor reading and update previous output values."""
                 logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'AMBIENT',
                            f"Temperature: {externaloutput['temperature']}C,"
@@ -143,10 +144,10 @@ def task_update():
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
         INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP, page_changed
 
-    def handle_fan_operation(started, stopped, run_time, action):
+    def handle_fan_operation(fan_started, fan_stopped, run_time, action):
         global FAN_RUNNING, FAN_RUNNING_TIME, FAN_TOTAL_DURATION, CYCLE_COUNT  # Explicitly declare global variables
         """Handle fan start/stop operations, including logging, display updates, and timing."""
-        if action == "start" and started:
+        if action == "start" and fan_started:
             fanController.start_time = time.time()
             logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan started, exceeded MAX humidity of {MAX_HUMIDITY}%")
             print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
@@ -157,7 +158,7 @@ def task_update():
             update_stats()
             time.sleep(2)
             show_page(current_page)
-        elif action == "stop" and stopped:
+        elif action == "stop" and fan_stopped:
             print(f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
             logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
             logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan run time: {str(timedelta(seconds=run_time))}")
@@ -301,7 +302,7 @@ def _cycle_fan():
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                'INFO', 'SYSTEM', 'FAN', "Fan Cycle Started...")
     print("Fan Cycle Started...")
-    fanController.set_fan_speed(50)
+    fanController.set_fan_speed(100)
     time.sleep(FAN_DURATION)
     fanController.set_fan_speed(0)
 
@@ -474,7 +475,12 @@ def save_config():
 
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, \
-        humidity_mode, FAN_LIMIT, selected_option, page_changed
+        humidity_mode, FAN_LIMIT, selected_option, page_changed, shutdown_timer
+
+    if shutdown_timer:  # noinspection PyUnreachableCode
+        shutdown_timer.cancel() # type: ignore
+        shutdown_timer = None
+
     if button.pin.number == BTN_L_PIN:
         print("Button L pressed")
         if current_page == Screen.FAN_LIMIT.index:
@@ -531,16 +537,30 @@ def button_hold_callback(button):
         current_page = 0
         display_default_page()
 
+def auto_shutdown():
+    # Called if nobody presses a button in time
+    global current_page, FAN_LIMIT
+    FAN_LIMIT *= 2  # Double the fan limit
+    current_page = Screen.DEFAULT.index  # Return to page 0
+    schedule_tasks()
+
 def _fan_limit_exceeded():
     global current_page
     schedule.clear()
     current_page = 5
+    # Display fan limit exceeded banner
     display_manager.switch_image(Screen.FAN_LIMIT)
     display_manager.display_current_image(BONNETDisplay.disp)
-    time.sleep(3)
+    time.sleep(3) # Display it for three seconds
+    # Create the fan limit screen
     draw_fan_limit()
+    # Set the fan speed to 0 RPM
     fanController.set_fan_speed(0)
+    # Save any config changes
     save_config()
+    # Start auto-shutdown timer (e.g., 30 seconds)
+    shutdown_timer = threading.Timer(FAN_LIMIT_TIMEOUT, auto_shutdown)
+    shutdown_timer.start()
 
 def cleanup():
     # Want to add code here to update display, update log with run time etc
@@ -633,6 +653,7 @@ if __name__ == "__main__":
     FAN_TOTAL_DURATION = configManager.get_duration_config('LOG', 'FAN_TOTAL_DURATION')
     FAN_MAX_RUNTIME = configManager.get_duration_config('LOG', 'FAN_MAX_RUNTIME')
     FAN_LIMIT = configManager.get_duration_config('DEFAULT', 'FAN_LIMIT')
+    FAN_LIMIT_TIMEOUT = configManager.get_duration_config('DEFAULT', 'FAN_LIMIT_TIMEOUT')
     UOM = configManager.get_config('UOM')
 
     logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'SYSTEM',
@@ -736,7 +757,7 @@ if __name__ == "__main__":
 
         # Send the startup status now?
         send_startup_status()
-        # Start the threading..
+        # Start the threading.
 
         sensor_thread.start()
         # time.sleep(2)
