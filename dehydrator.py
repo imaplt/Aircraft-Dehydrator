@@ -475,7 +475,7 @@ def save_config():
 
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, \
-        humidity_mode, FAN_LIMIT, selected_option, page_changed, shutdown_timer
+        humidity_mode, FAN_LIMIT, selected_option, page_changed, shutdown_timer, fan_limit_exceeded_count
 
     if shutdown_timer:  # noinspection PyUnreachableCode
         shutdown_timer.cancel() # type: ignore
@@ -519,6 +519,7 @@ def button_pressed_callback(button):
                 raise SystemExit
             elif selected_option == 2: # CLEAR Selected
                 FAN_LIMIT *= 2  # Double the fan limit
+                fan_limit_exceeded_count += 1  # reset counter
                 current_page = Screen.DEFAULT.index  # Return to page 0
                 schedule_tasks()
     elif button.pin.number == BTN_B_PIN:
@@ -545,9 +546,19 @@ def auto_shutdown():
     schedule_tasks()
 
 def _fan_limit_exceeded():
-    global current_page
+    global current_page, fan_limit_exceeded_count
+    fan_limit_exceeded_count += 1
     schedule.clear()
     current_page = 5
+    if fan_limit_exceeded_count >= MAX_EXCEEDED_ATTEMPTS:
+        # Too many repeats — force shutdown
+        print("Fan limit exceeded too many times. Shutting down.")
+        logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'ERROR', 'SYSTEM', 'FAN',
+                   "Fan limit exceeded too many times. Shutting down.")
+        fanController.set_fan_speed(0)
+        save_config()
+        cleanup()
+        raise SystemExit
     # Display fan limit exceeded banner
     display_manager.switch_image(Screen.FAN_LIMIT)
     display_manager.display_current_image(BONNETDisplay.disp)
@@ -654,6 +665,8 @@ if __name__ == "__main__":
     FAN_MAX_RUNTIME = configManager.get_duration_config('LOG', 'FAN_MAX_RUNTIME')
     FAN_LIMIT = configManager.get_duration_config('DEFAULT', 'FAN_LIMIT')
     FAN_LIMIT_TIMEOUT = configManager.get_duration_config('DEFAULT', 'FAN_LIMIT_TIMEOUT')
+    fan_limit_exceeded_count = 0
+    MAX_EXCEEDED_ATTEMPTS = 3
     UOM = configManager.get_config('UOM')
 
     logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'SYSTEM',
