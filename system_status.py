@@ -39,6 +39,7 @@ SHT4X_LOWHEAT_100MS = 0x15  # High precision measurement, low heat for 0.1 sec
 SHT4X_READSERIAL = 0x89  # Read Out of Serial Register
 SHT4X_SOFTRESET = 0x94  # Soft Reset
 
+
 def _init_i2c(scl=I2C_SCL, sda=I2C_SDA):
     """Initialize and return an I2C bus object."""
     return busio.I2C(scl, sda)

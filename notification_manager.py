@@ -4,7 +4,6 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
-from logger import Logger as Log
 from config_manager import ConfigManager
 import time
 
@@ -23,10 +22,10 @@ class NotificationManager:
     LOGFILE = configManager.get_config('logfile')
     MAX_LOG_SIZE = configManager.get_int_config('max_log_size')
     MAX_ARCHIVE_SIZE = configManager.get_int_config('max_archive_size')
-    logger = Log(LOGFILE, MAX_LOG_SIZE, MAX_ARCHIVE_SIZE)
 
     def __init__(
         self,
+        logger,
         provider: str,
         email: str,
         password: str,
@@ -39,7 +38,7 @@ class NotificationManager:
         provider = provider.lower()
         if provider not in self.SMTP_CONFIGS:
             raise ValueError(f"Unsupported provider '{provider}'. Use gmail|yahoo|icloud|apple")
-
+        self.logger = logger
         self.provider = provider
         self.email = email           # also used as SMTP username
         self.password = password

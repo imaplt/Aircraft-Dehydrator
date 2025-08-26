@@ -18,15 +18,23 @@ print("Dehydrator main loaded")
 
 # Spinner frames to simulate rotation
 spinner_frames = ['▖', '▘', '▝', '▗']
+# Get configuration items
+configManager = ConfigManager('config.ini')
+LOGFILE = configManager.get_config('logfile')
+MAX_LOG_SIZE = configManager.get_int_config('max_log_size')
+MAX_ARCHIVE_SIZE = configManager.get_int_config('max_archive_size')
 
+# Initialize logging system
+logger = Log(LOGFILE, MAX_LOG_SIZE, MAX_ARCHIVE_SIZE)
 notifier = NotificationManager(
-    provider="yahoo",                     # "yahoo" | "icloud" | "apple"
+    logger = logger,
+    provider="yahoo",                       # "yahoo" | "icloud" | "apple"
     email="imaplt@yahoo.com",
-    password="",        # app password recommended
+    password="",                            # app password recommended
     recipients=["chris.auron@gmail.com"],
-    retry_days=7,                        # configurable retention
-    poll_interval=300,                   # worker checks every 5 min
-    auto_start=True                      # background thread starts automatically
+    retry_days=7,                           # configurable retention
+    poll_interval=300,                      # worker checks every 5 min
+    auto_start=True                         # background thread starts automatically
 )
 
 def get_next_frame():
@@ -611,12 +619,6 @@ def isDeviceDetected(statuses, device):
     return False
 
 if __name__ == "__main__":
-    # Get configuration items
-    configManager = ConfigManager('config.ini')
-    LOGFILE = configManager.get_config('logfile')
-    MAX_LOG_SIZE = configManager.get_int_config('max_log_size')
-    MAX_ARCHIVE_SIZE = configManager.get_int_config('max_archive_size')
-    logger = Log(LOGFILE, MAX_LOG_SIZE, MAX_ARCHIVE_SIZE)
 
     # First check for the installed devices.
     installed_devices = read_installed_devices(configManager)
@@ -789,8 +791,6 @@ if __name__ == "__main__":
         #
         # # Recondition external sensor by itself
         # externalsensor.recondition_sensor()
-
-
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt detected!")
     except ValueError as e:
