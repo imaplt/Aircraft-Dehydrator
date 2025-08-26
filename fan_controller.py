@@ -1,10 +1,8 @@
 import board
 import adafruit_emc2101
 import time
-import threading
 from adafruit_bus_device.i2c_device import I2CDevice
 
-_fan_lock = threading.Lock()
 
 class EMC2101:
     def __init__(self, i2c_address=0x4C):

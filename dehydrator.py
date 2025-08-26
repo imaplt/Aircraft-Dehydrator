@@ -11,8 +11,6 @@ from sensor import Sensor
 from fan_controller import EMC2101
 import threading
 from notification_manager import NotificationManager
-import board
-import busio
 
 print("Dehydrator main loaded")
 
@@ -554,7 +552,6 @@ def _fan_limit_exceeded():
     fan_limit_exceeded_count += 1
     schedule.clear()
     current_page = 5
-    print("Fan limit exceeded too many times. Shutting down.")
     if fan_limit_exceeded_count >= MAX_EXCEEDED_ATTEMPTS:
         # Too many repeats — force shutdown
         print("Fan limit exceeded too many times. Shutting down.")
@@ -618,12 +615,8 @@ if __name__ == "__main__":
     MAX_ARCHIVE_SIZE = configManager.get_int_config('max_archive_size')
     logger = Log(LOGFILE, MAX_LOG_SIZE, MAX_ARCHIVE_SIZE)
 
-    # Initialise various objects here for I2C etc
-    i2c = busio.I2C(board.SCL, board.SDA)
-
     # First check for the installed devices.
     installed_devices = read_installed_devices(configManager)
-    system_status.init(i2c)
     overall_status, statuses = system_status.query_i2c_devices(installed_devices)
     print(f"Overall status: {overall_status}")
 
