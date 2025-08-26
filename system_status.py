@@ -304,4 +304,5 @@ def query_i2c_devices(installed_devices):
             detection_map[device](devices, overall_status_var)
 
     statuses = [f"{dev}: {devices[dev]['status']}" for dev in installed_devices]
+    safe_deinit(_I2C)
     return overall_status_var["status"], statuses
