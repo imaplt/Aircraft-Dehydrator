@@ -14,6 +14,8 @@ from notification_manager import NotificationManager
 import board
 import busio
 
+print("Dehydrator main loaded")
+
 # Spinner frames to simulate rotation
 spinner_frames = ['▖', '▘', '▝', '▗']
 
