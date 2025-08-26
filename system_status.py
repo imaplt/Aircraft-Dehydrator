@@ -39,9 +39,11 @@ SHT4X_LOWHEAT_100MS = 0x15  # High precision measurement, low heat for 0.1 sec
 SHT4X_READSERIAL = 0x89  # Read Out of Serial Register
 SHT4X_SOFTRESET = 0x94  # Soft Reset
 
-def _init_i2c(scl=I2C_SCL, sda=I2C_SDA):
-    """Initialize and return an I2C bus object."""
-    return busio.I2C(scl, sda)
+_I2C = None
+
+def init(I2C):
+    global _I2C
+    _I2C = I2C
 
 def _format_status(temp, humidity):
     """Return formatted status string for temperature + humidity."""
@@ -58,10 +60,9 @@ def safe_deinit(*resources):
                 pass
 
 def detect_mux_and_sht4X(devices, overall_status_var=None):
-    i2c = sensor = None
+    sensor = None
     try:
-        i2c = board.I2C()
-        mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
+        mux = adafruit_tca9548a.TCA9548A(_I2C, address=MUX_ADDR)
         devices["MUX"]["status"] = "Detected"
 
         # Internal sensor
@@ -78,20 +79,16 @@ def detect_mux_and_sht4X(devices, overall_status_var=None):
                 f"Detected, temperature: {sht4X_external.temperature:.2f} C, humidity: {sht4X_external.relative_humidity:.2f} %"
             )
             print(f"Detected, temperature: {sht4X_external.temperature:.2f} C, humidity: {sht4X_external.relative_humidity:.2f} %")
-
-        i2c.deinit()
     except Exception as e:
         devices["MUX"]["status"] = f"Error: {str(e)}"
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(sensor, i2c)
+        safe_deinit(sensor)
 
 def detect_sht30(devices, overall_status_var=None):
-    i2c = sensor = None
     try:
-        i2c = adafruit_bitbangio.I2C(board.D27, board.D22)
-        sensor = adafruit_sht31d.SHT31D(i2c, 0x44)
+        sensor = adafruit_sht31d.SHT31D(_I2C, 0x44)
         devices["SHT30"]["status"] = (
             "Detected, temperature: {:.2f} C, humidity: {:.2f} %"
         ).format(sensor.temperature, sensor.relative_humidity)
@@ -104,13 +101,12 @@ def detect_sht30(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(sensor, i2c)
+        safe_deinit(sensor)
 
 def detect_shtc3(devices, overall_status_var=None):
-    i2c = shtc3 = None
+    shtc3 = None
     try:
-        i2c = busio.I2C(board.SCL, board.SDA)
-        shtc3 = adafruit_shtc3.SHTC3(i2c)
+        shtc3 = adafruit_shtc3.SHTC3(_I2C)
         devices["SHTC3"]["status"] = (
             "Detected, temperature: {:.2f} C, humidity: {:.2f} %"
         ).format(shtc3.temperature, shtc3.relative_humidity)
@@ -123,13 +119,12 @@ def detect_shtc3(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(shtc3, i2c)
+        safe_deinit(shtc3)
 
 def detect_sht4X_internal(devices, overall_status_var=None):
-    i2c = sht4X = None
+    sht4X = None
     try:
-        i2c = board.I2C()  # uses board.SCL and board.SDA
-        mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
+        mux = adafruit_tca9548a.TCA9548A(_I2C, address=MUX_ADDR)
         sht4X = adafruit_sht4x.SHT4x(mux[INTERNAL_SENSOR_PORT])
         print("Found SHT4x with serial number", hex(sht4X.serial_number))
         sht4X.mode = SHT4X_NOHEAT_HIGHPRECISION
@@ -148,13 +143,12 @@ def detect_sht4X_internal(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(sht4X, i2c)
+        safe_deinit(sht4X)
 
 def detect_sht4X_external(devices, overall_status_var=None):
-    i2c = sht4X = None
+    sht4X = None
     try:
-        i2c = board.I2C()
-        mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
+        mux = adafruit_tca9548a.TCA9548A(_I2C, address=MUX_ADDR)
         sht4X = adafruit_sht4x.SHT4x(mux[EXTERNAL_SENSOR_PORT])
         devices["SHT4X_External"]["status"] = (
             "Detected, temperature: {:.2f} C, humidity: {:.2f} %"
@@ -168,7 +162,7 @@ def detect_sht4X_external(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(sht4X, i2c)
+        safe_deinit(sht4X)
 
 def detect_lcd2004(devices, overall_status_var=None):
     i2c = lcd = None
@@ -216,7 +210,7 @@ def detect_fan(devices, overall_status_var=None):
             rpm = fan.read_fan_speed()
             temp = fan.read_internal_temp()
             fan.set_fan_speed(0)
-            if rpm >= 3200:
+            if rpm >= 3000:
                 devices["FAN"]["status"] = f"Detected, RPM: {rpm}, Internal Temp: {temp}"
             else:
                 devices["FAN"]["status"] = f"Not Detected, RPM: {rpm}; Should be > 3200"
