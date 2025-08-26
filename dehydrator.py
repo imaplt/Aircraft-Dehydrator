@@ -11,6 +11,8 @@ from sensor import Sensor
 from fan_controller import EMC2101
 import threading
 from notification_manager import NotificationManager
+import board
+import busio
 
 print("Dehydrator main loaded")
 
@@ -552,6 +554,7 @@ def _fan_limit_exceeded():
     fan_limit_exceeded_count += 1
     schedule.clear()
     current_page = 5
+    print("Fan limit exceeded too many times. Shutting down.")
     if fan_limit_exceeded_count >= MAX_EXCEEDED_ATTEMPTS:
         # Too many repeats — force shutdown
         print("Fan limit exceeded too many times. Shutting down.")
