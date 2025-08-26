@@ -635,6 +635,7 @@ if __name__ == "__main__":
         print("Overall Status: Fail")
         # raise ValueError("Overall Status Failed")
 
+    print("Loading config variables...")
     MIN_HUMIDITY = configManager.get_int_config('min_humidity')
     MAX_HUMIDITY = configManager.get_int_config('max_humidity')
     FAN_DURATION = configManager.get_int_config('fan_duration')
@@ -675,7 +676,7 @@ if __name__ == "__main__":
     fan_limit_exceeded_count = 0
     MAX_EXCEEDED_ATTEMPTS = 3
     UOM = configManager.get_config('UOM')
-
+    print("Config variables loaded...")
     logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'SYSTEM',
                 "System Starting Up...")
 
@@ -701,7 +702,7 @@ if __name__ == "__main__":
     min_color = "white"
     current_frame_index = 0
     page_changed = False
-
+    print("Setting up buttons...")
     # GPIO setup using gpiozero for input buttons
     btn_lt = Button(BTN_L_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
     btn_rt = Button(BTN_R_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
@@ -720,7 +721,7 @@ if __name__ == "__main__":
     btn_a.when_pressed = button_pressed_callback
     btn_b.when_pressed = button_pressed_callback
     btn_b.when_held = button_hold_callback
-
+    print("Setting up buttons completed...")
     # Initialize lines
     oled_lines = [""] * 5  # For five line bonnet display...
     lcd_lines = [""] * 4  # For four line ssd1306_display...
