@@ -6,7 +6,6 @@ import adafruit_sht4x
 import adafruit_shtc3
 import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import adafruit_ssd1306
-import adafruit_bitbangio
 import digitalio
 from fan_controller import EMC2101
 from adafruit_rgb_display import st7789
@@ -49,7 +48,6 @@ def _format_status(temp, humidity):
     """Return formatted status string for temperature + humidity."""
     return "Detected, temperature: {:.2f} C, humidity: {:.2f} %".format(temp, humidity)
 
-# Helper: Safe cleanup
 def safe_deinit(*resources):
     """Safely deinitialize hardware resources without throwing errors."""
     for res in resources:
@@ -87,6 +85,7 @@ def detect_mux_and_sht4X(devices, overall_status_var=None):
         safe_deinit(sensor)
 
 def detect_sht30(devices, overall_status_var=None):
+    sensor = None
     try:
         sensor = adafruit_sht31d.SHT31D(_I2C, 0x44)
         devices["SHT30"]["status"] = (
@@ -165,7 +164,7 @@ def detect_sht4X_external(devices, overall_status_var=None):
         safe_deinit(sht4X)
 
 def detect_lcd2004(devices, overall_status_var=None):
-    i2c = lcd = None
+    lcd = None
     try:
         i2c = busio.I2C(board.SCL, board.SDA)
         lcd = character_lcd.Character_LCD_I2C(i2c, 20, 4, devices["LCD2004"]["address"])
@@ -175,10 +174,10 @@ def detect_lcd2004(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(lcd, i2c)
+        safe_deinit(lcd)
 
 def detect_lcd1602(devices, overall_status_var=None):
-    i2c = lcd = None
+    lcd = None
     try:
         i2c = busio.I2C(board.SCL, board.SDA)
         lcd = character_lcd.Character_LCD_I2C(i2c, 16, 2, devices["LCD1602"]["address"])
@@ -188,7 +187,7 @@ def detect_lcd1602(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(lcd, i2c)
+        safe_deinit(lcd)
 
 def detect_emc2101(devices, overall_status_var=None):
     try:
@@ -222,7 +221,7 @@ def detect_fan(devices, overall_status_var=None):
             overall_status_var["status"] = "bad"
 
 def detect_ssd1306(devices, overall_status_var=None):
-    i2c = oled = None
+    oled = None
     try:
         i2c = busio.I2C(board.SCL, board.SDA)
         oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)
@@ -232,7 +231,7 @@ def detect_ssd1306(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(oled, i2c)
+        safe_deinit(oled)
 
 def detect_bonnet(devices, overall_status_var=None):
     spi = cs_pin = dc_pin = reset_pin = disp = None
