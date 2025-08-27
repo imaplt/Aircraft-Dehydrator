@@ -285,7 +285,7 @@ def send_daily_status():
     #TODO: Update the code for below
     global overall_status, statuses
     status_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    overall_status, statuses = system_status.query_i2c_devices(installed_devices)
+    overall_status, statuses = system_status.query_i2c_devices(i2c, installed_devices)
     current_status = f"Current Status As Of: {status_timestamp}\n"
     current_status += f"Overall: {overall_status}\n"
     for s in statuses:
@@ -625,7 +625,7 @@ if __name__ == "__main__":
 
     # First check for the installed devices.
     installed_devices = read_installed_devices(configManager)
-    overall_status, statuses = system_status.query_i2c_devices(installed_devices)
+    overall_status, statuses = system_status.query_i2c_devices(i2c, installed_devices)
     print(f"Overall status: {overall_status}")
 
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
