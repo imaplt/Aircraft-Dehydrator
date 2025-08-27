@@ -620,6 +620,8 @@ def isDeviceDetected(statuses, device):
 
 if __name__ == "__main__":
 
+    i2c = board.I2C()
+
     # First check for the installed devices.
     installed_devices = read_installed_devices(configManager)
     overall_status, statuses = system_status.query_i2c_devices(installed_devices)
@@ -699,6 +701,9 @@ if __name__ == "__main__":
     min_color = "white"
     current_frame_index = 0
     page_changed = False
+
+
+
     # GPIO setup using gpiozero for input buttons
     btn_lt = Button(BTN_L_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
     btn_rt = Button(BTN_R_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
@@ -749,7 +754,7 @@ if __name__ == "__main__":
 
         # Initialize fan controller
         print('Initializing fan controller...')
-        fanController = EMC2101()
+        fanController = EMC2101(i2c)
         time.sleep(2)
 
         # Initialise the internal sensor
