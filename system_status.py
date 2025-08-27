@@ -8,7 +8,7 @@ import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import adafruit_ssd1306
 import adafruit_bitbangio
 import digitalio
-from fan_controller import EMC2101
+from fan_controller import EMC2101Controller
 from adafruit_rgb_display import st7789
 
 # Constants
@@ -199,7 +199,7 @@ def detect_lcd1602(devices, overall_status_var=None):
 
 def detect_emc2101(devices, overall_status_var=None):
     try:
-        emc2101 = EMC2101()
+        emc2101 = EMC2101Controller()
         status = emc2101.read_status()
         devices["EMC2101"]["status"] = f"Detected, Status: {status}"
     except Exception as e:
@@ -209,7 +209,7 @@ def detect_emc2101(devices, overall_status_var=None):
 
 def detect_fan(devices, overall_status_var=None):
     try:
-        fan = EMC2101()
+        fan = EMC2101Controller()
         if fan.read_fan_speed() > 200:
             devices["FAN"]["status"] = f"Currently Running, RPM: {fan.read_fan_speed()}"
         else:
