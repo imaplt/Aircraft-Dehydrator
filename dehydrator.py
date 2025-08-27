@@ -745,7 +745,7 @@ if __name__ == "__main__":
 
         display_manager.switch_image(Screen.INITIAL)
         display_manager.display_current_image(BONNETDisplay.disp)
-        time.sleep(3)
+        time.sleep(2)
 
         # Initialize the stats screens
         update_stats()
