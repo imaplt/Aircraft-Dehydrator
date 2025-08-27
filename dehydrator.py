@@ -621,6 +621,7 @@ def isDeviceDetected(statuses, device):
 if __name__ == "__main__":
 
     i2c = board.I2C()
+    system_status.init_i2c(i2c)
 
     # First check for the installed devices.
     installed_devices = read_installed_devices(configManager)
