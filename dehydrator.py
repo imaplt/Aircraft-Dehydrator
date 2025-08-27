@@ -622,6 +622,8 @@ if __name__ == "__main__":
 
     i2c = busio.I2C(board.SCL, board.SDA)
     system_status.init_i2c(i2c)
+    print(type(i2c))
+    print(dir(i2c))
 
     # First check for the installed devices.
     installed_devices = read_installed_devices(configManager)
@@ -755,6 +757,8 @@ if __name__ == "__main__":
 
         # Initialize fan controller
         print('Initializing fan controller...')
+        print(type(i2c))
+        print(dir(i2c))
         fanController = EMC2101Controller(i2c_board=i2c)
         time.sleep(2)
 
