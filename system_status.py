@@ -42,6 +42,7 @@ SHT4X_SOFTRESET = 0x94  # Soft Reset
 i2c = None
 
 def init_i2c(i2c_board):
+   global i2c
    i2c = i2c_board
 
 def _format_status(temp, humidity):
@@ -199,7 +200,7 @@ def detect_lcd1602(devices, overall_status_var=None):
 
 def detect_emc2101(devices, overall_status_var=None):
     try:
-        emc2101 = EMC2101Controller()
+        emc2101 = EMC2101Controller(i2c)
         status = emc2101.read_status()
         devices["EMC2101"]["status"] = f"Detected, Status: {status}"
     except Exception as e:
@@ -209,7 +210,7 @@ def detect_emc2101(devices, overall_status_var=None):
 
 def detect_fan(devices, overall_status_var=None):
     try:
-        fan = EMC2101Controller()
+        fan = EMC2101Controller(i2c)
         if fan.read_fan_speed() > 200:
             devices["FAN"]["status"] = f"Currently Running, RPM: {fan.read_fan_speed()}"
         else:
