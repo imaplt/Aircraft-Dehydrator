@@ -8,7 +8,7 @@ from display import BONNETDisplay, DisplayConfig
 from oled_display_manager import OLEDDisplayManager, Screen
 from gpiozero import Button
 from sensor import Sensor
-from fan_controller import EMC2101
+from fan_controller import EMC2101Controller
 import threading
 from notification_manager import NotificationManager
 import board
@@ -754,7 +754,7 @@ if __name__ == "__main__":
 
         # Initialize fan controller
         print('Initializing fan controller...')
-        fanController = EMC2101(i2c=i2c)
+        fanController = EMC2101Controller(i2c=i2c)
         time.sleep(2)
 
         # Initialise the internal sensor
