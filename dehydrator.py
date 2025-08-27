@@ -754,7 +754,7 @@ if __name__ == "__main__":
 
         # Initialize fan controller
         print('Initializing fan controller...')
-        fanController = EMC2101(i2c)
+        fanController = EMC2101(i2c=i2c)
         time.sleep(2)
 
         # Initialise the internal sensor
