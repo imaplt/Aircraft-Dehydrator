@@ -49,7 +49,6 @@ def _format_status(temp, humidity):
     """Return formatted status string for temperature + humidity."""
     return "Detected, temperature: {:.2f} C, humidity: {:.2f} %".format(temp, humidity)
 
-# Helper: Safe cleanup
 def safe_deinit(*resources):
     """Safely deinitialize hardware resources without throwing errors."""
     for res in resources:
@@ -60,9 +59,8 @@ def safe_deinit(*resources):
                 pass
 
 def detect_mux_and_sht4X(devices, overall_status_var=None):
-    i2c = sensor = None
+    sensor = None
     try:
-        i2c = board.I2C()
         mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
         devices["MUX"]["status"] = "Detected"
 
@@ -81,7 +79,6 @@ def detect_mux_and_sht4X(devices, overall_status_var=None):
             )
             print(f"Detected, temperature: {sht4X_external.temperature:.2f} C, humidity: {sht4X_external.relative_humidity:.2f} %")
 
-        i2c.deinit()
     except Exception as e:
         devices["MUX"]["status"] = f"Error: {str(e)}"
         if overall_status_var is not None:
@@ -278,7 +275,7 @@ def detect_bonnet(devices, overall_status_var=None):
         safe_deinit(disp, spi, cs_pin, dc_pin, reset_pin)
 
 # Main function: runs all checks in list
-def query_i2c_devices(installed_devices):
+def query_i2c_devices(query_i2c, installed_devices):
     devices = {
         "SHT30": {"address": 0x44, "status": "Not detected"},
         "SHTC3": {"address": 0x70, "status": "Not detected"},
