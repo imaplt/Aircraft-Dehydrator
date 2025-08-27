@@ -1,11 +1,11 @@
-import adafruit_emc2101
+from adafruit_emc2101 import EMC2101
 import time
 from adafruit_bus_device.i2c_device import I2CDevice
 
 class EMC2101Controller:
     def __init__(self, i2c_board, i2c_address=0x4C):
         self.i2c = i2c_board
-        self.sensor = adafruit_emc2101.EMC2101(self.i2c)
+        self.sensor = EMC2101(i2c_bus=self.i2c)
         self.fan_engaged = False
         self.fan_engaged_time = 0
         self.start_time = time.time()
