@@ -1,6 +1,5 @@
 from adafruit_emc2101 import EMC2101
 import time
-from adafruit_bus_device.i2c_device import I2CDevice
 
 class EMC2101Controller:
     def __init__(self, i2c_board, i2c_address=0x4C):
@@ -18,33 +17,6 @@ class EMC2101Controller:
         self.STATUS_REG = 0x02
         self.CONFIG_REG = 0x03
         self.RESET_REG = 0x05
-        self.device = I2CDevice(self.i2c, self.I2C_ADDRESS)
-
-    def _read_register(self, register):
-        with self.device:
-            self.device.write(bytes([register]))
-            result = bytearray(1)
-            self.device.readinto(result)
-        return result[0]
-
-    def read_config(self):
-        config = self._read_register(self.CONFIG_REG)
-        config_description = []
-
-        if config & 0x01:
-            config_description.append("Device enabled")
-        else:
-            config_description.append("Device disabled")
-        if config & 0x02:
-            config_description.append("Fan control enabled")
-        else:
-            config_description.append("Fan control disabled")
-        if config & 0x04:
-            config_description.append("Temperature monitoring enabled")
-        else:
-            config_description.append("Temperature monitoring disabled")
-
-        return ", ".join(config_description)
 
     def read_internal_temp(self):
         temp = self.sensor.internal_temperature

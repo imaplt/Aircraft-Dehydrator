@@ -275,7 +275,7 @@ def detect_bonnet(devices, overall_status_var=None):
         safe_deinit(disp, spi, cs_pin, dc_pin, reset_pin)
 
 # Main function: runs all checks in list
-def query_i2c_devices(query_i2c, installed_devices):
+def query_i2c_devices(installed_devices):
     devices = {
         "SHT30": {"address": 0x44, "status": "Not detected"},
         "SHTC3": {"address": 0x70, "status": "Not detected"},
