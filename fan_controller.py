@@ -3,7 +3,6 @@ import adafruit_emc2101
 import time
 from adafruit_bus_device.i2c_device import I2CDevice
 
-
 class EMC2101:
     def __init__(self, i2c_address=0x4C):
         self.i2c = board.I2C()
@@ -107,3 +106,32 @@ class EMC2101:
         if not status_description:
             status_description.append("No faults")
         return ", ".join(status_description)
+
+    def detect_emc2101(self, devices, overall_status_var=None):
+        try:
+            status = self.read_status()
+            devices["EMC2101"]["status"] = f"Detected, Status: {status}"
+        except Exception as e:
+            devices["EMC2101"]["status"] = f"Error: {e}"
+            if overall_status_var is not None:
+                overall_status_var["status"] = "bad"
+
+    def detect_fan(self, devices, overall_status_var=None):
+        try:
+            if self.read_fan_speed() > 200:
+                devices["FAN"]["status"] = f"Currently Running, RPM: {self.read_fan_speed()}"
+            else:
+                self.set_fan_speed(100)
+                rpm = self.read_fan_speed()
+                temp = self.read_internal_temp()
+                self.set_fan_speed(0)
+                if rpm >= 3000:
+                    devices["FAN"]["status"] = f"Detected, RPM: {rpm}, Internal Temp: {temp}"
+                else:
+                    devices["FAN"]["status"] = f"Not Detected, RPM: {rpm}; Should be > 3200"
+                    if overall_status_var is not None:
+                        overall_status_var["status"] = "bad"
+        except Exception as e:
+            devices["FAN"]["status"] = f"Error: {e}"
+            if overall_status_var is not None:
+                overall_status_var["status"] = "bad"

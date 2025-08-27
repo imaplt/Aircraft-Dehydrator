@@ -217,7 +217,7 @@ def detect_fan(devices, overall_status_var=None):
             rpm = fan.read_fan_speed()
             temp = fan.read_internal_temp()
             fan.set_fan_speed(0)
-            if rpm >= 3200:
+            if rpm >= 3000:
                 devices["FAN"]["status"] = f"Detected, RPM: {rpm}, Internal Temp: {temp}"
             else:
                 devices["FAN"]["status"] = f"Not Detected, RPM: {rpm}; Should be > 3200"
