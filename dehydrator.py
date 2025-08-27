@@ -12,6 +12,7 @@ from fan_controller import EMC2101Controller
 import threading
 from notification_manager import NotificationManager
 import board
+import busio
 
 print("Dehydrator main loaded")
 
@@ -619,7 +620,7 @@ def isDeviceDetected(statuses, device):
 
 if __name__ == "__main__":
 
-    i2c = board.I2C()
+    i2c = busio.I2C(board.SCL, board.SDA)
     system_status.init_i2c(i2c)
 
     # First check for the installed devices.
