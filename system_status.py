@@ -61,6 +61,7 @@ def safe_deinit(*resources):
 def detect_mux_and_sht4X(devices, overall_status_var=None):
     sensor = None
     try:
+        i2c = busio.I2C(board.SCL, board.SDA)
         mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
         devices["MUX"]["status"] = "Detected"
 
@@ -207,7 +208,8 @@ def detect_emc2101(devices, overall_status_var=None):
 
 def detect_fan(devices, overall_status_var=None):
     try:
-        fan = EMC2101Controller(i2c_board=i2c)
+        i2c = busio.I2C(board.SCL, board.SDA)
+        fan = EMC2101Controller(i2c)
         if fan.read_fan_speed() > 200:
             devices["FAN"]["status"] = f"Currently Running, RPM: {fan.read_fan_speed()}"
         else:
