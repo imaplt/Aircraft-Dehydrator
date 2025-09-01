@@ -64,6 +64,7 @@ def sensor(stop_event):
     while running and not stop_event.is_set():
         try:
             internaloutput = internalsensor.read_sensor()
+            internaloutput['temperature'] = celsius_to_fahrenheit(internaloutput['temperature'])
             internal_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
             # Main block to handle sensor change and fan control
@@ -104,6 +105,7 @@ def sensor(stop_event):
 
             ambient_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) # type: ignore
             externaloutput = externalsensor.read_sensor()
+            externaloutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
 
             # Calculate new high and low values
             new_high_humidity = max(EXTERNAL_HIGH_HUMIDITY, externaloutput['humidity'])
@@ -246,6 +248,7 @@ def task_ambient():
 
     ambient_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     externaloutput = externalsensor.read_sensor()
+    externaloutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
 
     # Calculate new high and low values
     new_high_humidity = max(EXTERNAL_HIGH_HUMIDITY, externaloutput['humidity'])
@@ -272,7 +275,7 @@ def task_ambient():
 
     # Log the sensor data every X seconds
     logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'AMBIENT',
-               f"Temperature: {externaloutput['temperature']}C,"
+               f"Temperature: {externaloutput['temperature']}F,"
                f" Humidity: {externaloutput['humidity']}%")
 
     # Update the global variables and print the reading

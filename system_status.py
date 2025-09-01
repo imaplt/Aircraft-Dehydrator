@@ -73,16 +73,19 @@ def detect_mux_and_sht4X(devices, overall_status_var=None):
         if INTERNAL_SENSOR_PORT < len(mux):
             sht4X_internal = adafruit_sht4x.SHT4x(mux[INTERNAL_SENSOR_PORT])
             devices["SHT4X_Internal"]["status"] = (
-                f"Detected, temperature: {sht4X_internal.temperature:.2f} C, humidity: {sht4X_internal.relative_humidity:.2f} %"
-            )
-            print(f"Detected, temperature: {sht4X_internal.temperature:.2f} C, humidity: {sht4X_internal.relative_humidity:.2f} %")
+                f"Detected, temperature: {_celsius_to_fahrenheit(sht4X_internal.temperature):.2f} F, humidity: "
+                f"{sht4X_internal.relative_humidity:.2f} %")
+            print(f"Detected, temperature: {_celsius_to_fahrenheit(sht4X_internal.temperature):.2f} F, humidity: "
+                  f"{sht4X_internal.relative_humidity:.2f} %")
         # External sensor
         if EXTERNAL_SENSOR_PORT < len(mux):
             sht4X_external = adafruit_sht4x.SHT4x(mux[EXTERNAL_SENSOR_PORT])
             devices["SHT4X_External"]["status"] = (
-                f"Detected, temperature: {sht4X_external.temperature:.2f} C, humidity: {sht4X_external.relative_humidity:.2f} %"
+                f"Detected, temperature: {_celsius_to_fahrenheit(sht4X_external.temperature):.2f} F, humidity: "
+                f"{sht4X_external.relative_humidity:.2f} %"
             )
-            print(f"Detected, temperature: {sht4X_external.temperature:.2f} C, humidity: {sht4X_external.relative_humidity:.2f} %")
+            print(f"Detected, temperature: {_celsius_to_fahrenheit(sht4X_external.temperature):.2f} F, humidity: "
+                  f"{sht4X_external.relative_humidity:.2f} %")
 
     except Exception as e:
         devices["MUX"]["status"] = f"Error: {str(e)}"
