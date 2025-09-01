@@ -204,9 +204,9 @@ def task_update():
         if current_page == Screen.DEFAULT.index:
             with lock:
                 if UOM == 'F':
-                    BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {celsius_to_fahrenheit(INTERNAL_TEMP)}°F",
+                    BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°F",
                                                x_pos=0,y_pos=63, color_name="white", brightness_factor=1.0)
-                    BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {celsius_to_fahrenheit(EXTERNAL_TEMP)}°F",
+                    BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°F",
                                                x_pos=0,y_pos=159, color_name="white", brightness_factor=1.0)
                 else:
                     BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°C",
@@ -419,16 +419,10 @@ def display_set_humidity():
     BONNETDisplay.display_text(f"{MIN_HUMIDITY}%", 100, 120, color_name=min_color)
 
 def update_stats():
-    if UOM == 'F':
-        internal_max_temp = celsius_to_fahrenheit(INTERNAL_HIGH_TEMP)
-        ambient_max_temp = celsius_to_fahrenheit(EXTERNAL_HIGH_TEMP)
-        internal_min_temp = celsius_to_fahrenheit(INTERNAL_HIGH_TEMP)
-        ambient_min_temp = celsius_to_fahrenheit(EXTERNAL_HIGH_TEMP)
-    else:
-        internal_max_temp = INTERNAL_HIGH_TEMP
-        ambient_max_temp = EXTERNAL_HIGH_TEMP
-        internal_min_temp = INTERNAL_HIGH_TEMP
-        ambient_min_temp = EXTERNAL_HIGH_TEMP
+    internal_max_temp = INTERNAL_HIGH_TEMP
+    ambient_max_temp = EXTERNAL_HIGH_TEMP
+    internal_min_temp = INTERNAL_HIGH_TEMP
+    ambient_min_temp = EXTERNAL_HIGH_TEMP
 
     display_manager.update_internal_screen(texts=["Internal Stats:", f"Max Temp {internal_max_temp}F",
                                            f"Min Temp {internal_min_temp}F", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
