@@ -66,4 +66,5 @@ def log_file_sizes(log_dir=".", log_base="log.csv"):
     for fname in archives:
         results[os.path.basename(fname)] = get_file_size(fname)
 
+    print(results)
     return results

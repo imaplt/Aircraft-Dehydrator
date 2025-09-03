@@ -16,6 +16,7 @@ import board
 import busio
 import signal
 import sys
+import os
 
 print("Dehydrator main loaded")
 
@@ -305,7 +306,7 @@ def send_startup_status():
     current_status = f"Startup status as of: {status_timestamp}\n"
     current_status += f"Overall: {overall_status}.\n".upper()
     for s in statuses:
-        current_status += f" {s}\n"
+        current_status += f"{s}\n"
     current_status += f"{system_stats}\n"
     # you can add sensor readings too
     notifier.send_status(body=current_status, subject="Startup Status")
@@ -325,7 +326,8 @@ def _cycle_fan():
 
 def log_system_status():
     global system_stats
-    stats = get_system_stats()
+    log_path = os.path.expanduser("~/dehydrator/Aircraft-Dehydrator")
+    stats = get_system_stats(log_dir=log_path)
     if "error" in stats:
         print(f"System monitor error: {stats['error']}")
         log_line = f"System monitor error: {stats['error']}"
