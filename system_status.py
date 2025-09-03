@@ -119,7 +119,7 @@ def detect_shtc3(devices, overall_status_var=None):
         i2c = busio.I2C(board.SCL, board.SDA)
         shtc3 = adafruit_shtc3.SHTC3(i2c)
         devices["SHTC3"]["status"] = (
-            "Detected, temperature: {:.2f} F, humidity: {:.2f} %"
+            "Detected, temperature: {:.1f} F, humidity: {:.1f} %"
         ).format(_celsius_to_fahrenheit(shtc3.temperature), shtc3.relative_humidity)
     except OSError as e:
         devices["SHTC3"]["status"] = f"Error: {e}"
@@ -143,7 +143,7 @@ def detect_sht4X_internal(devices, overall_status_var=None):
         print("Current mode is: ", adafruit_sht4x.Mode.string[sht4X.mode])
 
         devices["SHT4X_Internal"]["status"] = (
-            "Detected, temperature: {:.2f} F, humidity: {:.2f} %"
+            "Detected, temperature: {:.1f} F, humidity: {:.1f} %"
         ).format(  _celsius_to_fahrenheit(sht4X.temperature), sht4X.relative_humidity)
 
     except OSError as e:
@@ -164,7 +164,7 @@ def detect_sht4X_external(devices, overall_status_var=None):
         mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
         sht4X = adafruit_sht4x.SHT4x(mux[EXTERNAL_SENSOR_PORT])
         devices["SHT4X_External"]["status"] = (
-            "Detected, temperature: {:.2f} F, humidity: {:.2f} %"
+            "Detected, temperature: {:.1f} F, humidity: {:.1f} %"
         ).format(_celsius_to_fahrenheit(sht4X.temperature), sht4X.relative_humidity)
     except OSError as e:
         devices["SHT4X_External"]["status"] = f"Error: {e}"

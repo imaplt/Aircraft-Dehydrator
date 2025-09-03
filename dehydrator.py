@@ -14,6 +14,8 @@ from notification_manager import NotificationManager
 from system_monitor import get_system_stats
 import board
 import busio
+import signal
+import sys
 
 print("Dehydrator main loaded")
 
@@ -24,7 +26,6 @@ configManager = ConfigManager('config.ini')
 LOGFILE = configManager.get_config('logfile')
 MAX_LOG_SIZE = configManager.get_int_config('max_log_size')
 MAX_ARCHIVE_SIZE = configManager.get_int_config('max_archive_size')
-
 # Initialize logging system
 logger = Log(LOGFILE, MAX_LOG_SIZE, MAX_ARCHIVE_SIZE)
 notifier = NotificationManager(
@@ -330,7 +331,7 @@ def log_system_status():
         log_line = f"System monitor error: {stats['error']}"
         logger.log(timestamp, 'WARN', 'SYSTEM', 'MONITOR', log_line)
     else:
-        log_line = (f"[System] CPU: {stats['cpu_percent']}%, "
+        log_line = (f"CPU: {stats['cpu_percent']}%, "
                     f"Mem: {stats['memory_percent']}% ({stats['memory_used_mb']}MB), "
                     f"Disk Free: {stats['disk_free_gb']}GB, "
                     f"Temp: {celsius_to_fahrenheit(stats['cpu_temp'])}°F")
@@ -338,7 +339,6 @@ def log_system_status():
         logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', log_line)
         # you can also write to your output.log or CSV here
     system_stats = log_line
-
 
 def schedule_tasks(int_interval=1, fan_interval=10, system_interval=10):
     schedule.every(int_interval).seconds.do(task_update)
@@ -602,6 +602,13 @@ def _fan_limit_exceeded():
     shutdown_timer = threading.Timer(FAN_LIMIT_TIMEOUT, auto_shutdown)
     shutdown_timer.start()
 
+def handle_shutdown(signum, frame):
+    print(f"\nSignal {signum} received, shutting down...")
+    logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM', 'SYSTEM',
+               f"\nSignal {signum} received, shutting down...")
+    cleanup()
+    sys.exit(0)
+
 def cleanup():
     # Want to add code here to update display, update log with run time etc
     global running
@@ -639,6 +646,10 @@ if __name__ == "__main__":
     i2c = busio.I2C(board.SCL, board.SDA)
     system_status.init_i2c(i2c)
     system_stats = None
+
+    # Register signal handlers at program startup
+    signal.signal(signal.SIGINT, handle_shutdown)  # kill -2
+    signal.signal(signal.SIGTERM, handle_shutdown)  # kill -15
 
     # First check for the installed devices.
     installed_devices = read_installed_devices(configManager)
