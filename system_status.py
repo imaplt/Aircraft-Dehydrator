@@ -11,6 +11,7 @@ import digitalio
 from fan_controller import EMC2101Controller
 from adafruit_rgb_display import st7789
 
+
 # Constants
 I2C_SCL = board.SCL
 I2C_SDA = board.SDA
@@ -283,7 +284,6 @@ def detect_bonnet(devices, overall_status_var=None):
     finally:
         safe_deinit(disp, spi, cs_pin, dc_pin, reset_pin)
 
-# Main function: runs all checks in list
 def query_i2c_devices(installed_devices):
     devices = {
         "SHT30": {"address": 0x44, "status": "Not detected"},
