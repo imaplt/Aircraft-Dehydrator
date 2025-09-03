@@ -289,7 +289,7 @@ def task_ambient():
 
 def send_daily_status():
     #TODO: Update the code for below
-    global overall_status, statuses
+    global overall_status, statuses, system_stats
     status_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     overall_status, statuses = system_status.query_i2c_devices(installed_devices)
     current_status = f"Current Status As Of: {status_timestamp}\n"
@@ -297,6 +297,7 @@ def send_daily_status():
     for s in statuses:
         current_status += f" {s}\n"
     current_status += f"{system_stats}\n"
+
     # you can add sensor readings too
     notifier.send_status(current_status)
 
