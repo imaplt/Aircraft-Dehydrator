@@ -11,6 +11,7 @@ from sensor import Sensor
 from fan_controller import EMC2101Controller
 import threading
 from notification_manager import NotificationManager
+from system_monitor import get_system_stats
 import board
 import busio
 
@@ -74,7 +75,7 @@ def sensor(stop_event):
             if abs(INTERNAL_HUMIDITY - INTERNAL_PREVIOUS_HUMIDITY) > 0.3:
                 """Log internal sensor reading and update previous output values."""
                 logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SENSORS', 'INTERNAL',
-                           f"Temperature: {internaloutput['temperature']}C, Humidity: {internaloutput['humidity']}%")
+                           f"Temperature: {internaloutput['temperature']}F, Humidity: {internaloutput['humidity']}%")
                 INTERNAL_PREVIOUS_HUMIDITY = INTERNAL_HUMIDITY
                 print("Log File Updated: Internal Sensor Change...")
 
@@ -133,7 +134,7 @@ def sensor(stop_event):
             if abs(EXTERNAL_HUMIDITY - EXTERNAL_PREVIOUS_HUMIDITY) > 0.3:
                 """Log internal sensor reading and update previous output values."""
                 logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'AMBIENT',
-                           f"Temperature: {externaloutput['temperature']}C,"
+                           f"Temperature: {externaloutput['temperature']}F,"
                            f" Humidity: {externaloutput['humidity']}%")
                 EXTERNAL_PREVIOUS_HUMIDITY = EXTERNAL_HUMIDITY
                 print("Log File Updated: External Sensor Change...")
@@ -293,7 +294,7 @@ def send_daily_status():
     current_status += f"Overall: {overall_status}\n"
     for s in statuses:
         current_status += f" {s}\n"
-
+    current_status += f"{system_stats}\n"
     # you can add sensor readings too
     notifier.send_status(current_status)
 
@@ -304,7 +305,7 @@ def send_startup_status():
     current_status += f"Overall: {overall_status}.\n".upper()
     for s in statuses:
         current_status += f" {s}\n"
-
+    current_status += f"{system_stats}\n"
     # you can add sensor readings too
     notifier.send_status(body=current_status, subject="Startup Status")
 
@@ -321,13 +322,31 @@ def _cycle_fan():
     time.sleep(FAN_DURATION)
     fanController.set_fan_speed(0)
 
-def schedule_tasks(int_interval=1, fan_interval=10):
+def log_system_status():
+    global system_stats
+    stats = get_system_stats()
+    if "error" in stats:
+        print(f"System monitor error: {stats['error']}")
+        log_line = f"System monitor error: {stats['error']}"
+        logger.log(timestamp, 'WARN', 'SYSTEM', 'MONITOR', log_line)
+    else:
+        log_line = (f"[System] CPU: {stats['cpu_percent']}%, "
+                    f"Mem: {stats['memory_percent']}% ({stats['memory_used_mb']}MB), "
+                    f"Disk Free: {stats['disk_free_gb']}GB, "
+                    f"Temp: {celsius_to_fahrenheit(stats['cpu_temp'])}°F")
+        print(log_line)
+        logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', log_line)
+        # you can also write to your output.log or CSV here
+    system_stats = log_line
+
+
+def schedule_tasks(int_interval=1, fan_interval=10, system_interval=10):
     schedule.every(int_interval).seconds.do(task_update)
-    # --- Schedule jobs ---
     schedule.every().day.at("08:00").do(send_daily_status)
     schedule.every().day.at("20:00").do(send_daily_status)
     schedule.every().day.at("21:00").do(send_daily_log)
     schedule.every(fan_interval).minutes.do(_cycle_fan)
+    schedule.every(system_interval).minutes.do(log_system_status)
 
 def run_scheduler():
     while True:
@@ -619,6 +638,7 @@ if __name__ == "__main__":
 
     i2c = busio.I2C(board.SCL, board.SDA)
     system_status.init_i2c(i2c)
+    system_stats = None
 
     # First check for the installed devices.
     installed_devices = read_installed_devices(configManager)
@@ -634,6 +654,8 @@ if __name__ == "__main__":
         logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
         print("Overall Status: Fail")
         # raise ValueError("Overall Status Failed")
+
+    log_system_status()
 
     MIN_HUMIDITY = configManager.get_int_config('min_humidity')
     MAX_HUMIDITY = configManager.get_int_config('max_humidity')
