@@ -609,8 +609,8 @@ def handle_shutdown(signum, frame):
     print(f"\nSignal {signum} received, shutting down...")
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM', 'SYSTEM',
                f"\nSignal {signum} received, shutting down...")
-    cleanup()
-    sys.exit(0)
+    # cleanup()
+    # sys.exit(0)
 
 def cleanup():
     # Want to add code here to update display, update log with run time etc
@@ -807,9 +807,6 @@ if __name__ == "__main__":
         EXTERNAL_PREVIOUS_HUMIDITY = 0
 
         schedule_tasks(int_interval=TASK_INTERNAL, fan_interval=TASK_FAN)
-
-        # Need to run the External once to update the values
-        # task_ambient()
 
         # Send the startup status now?
         send_startup_status()
