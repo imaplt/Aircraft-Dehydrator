@@ -2,6 +2,10 @@ import psutil
 import os
 import glob
 
+global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY
+global EXTERNAL_HIGH_TEMP, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY
+global CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_MAX_RUNTIME
+
 def get_system_stats(log_dir="."):
     try:
         cpu_percent = psutil.cpu_percent(interval=0.1)  # very short sample
@@ -16,7 +20,8 @@ def get_system_stats(log_dir="."):
             "disk_percent": disk.percent,
             "disk_free_gb": disk.free // (1024 * 1024 * 1024),
             "cpu_temp": get_cpu_temp(temps),
-            "logs": log_file_sizes(log_dir=log_dir)
+            "logs": log_file_summary(log_dir=log_dir),
+            "sensors": sensor_summary_stats()
         }
     except Exception as e:
         return {"error": str(e)}
@@ -48,23 +53,78 @@ def get_file_size(path):
         return "Not found"
 
 def log_file_sizes(log_dir=".", log_base="log.csv"):
-    """
-    Report sizes of output.log, log.csv, and rotated archives (log.csv.1, log.csv.2, …).
-    """
+    # Report sizes of output.log, log.csv, and rotated archives (log.csv.1, log.csv.2, …).
     results = {}
-
     # output.log
     results["output.log"] = get_file_size(os.path.join(log_dir, "output.log"))
-
     # log.csv (main)
     results[log_base] = get_file_size(os.path.join(log_dir, log_base))
-
     # archives log.csv.N
     archive_pattern = os.path.join(log_dir, f"{log_base}.*")
     archives = sorted(glob.glob(archive_pattern))
-
     for fname in archives:
         results[os.path.basename(fname)] = get_file_size(fname)
 
     print(results)
     return results
+
+def log_file_summary(log_dir=".", log_base="log.csv"):
+    """
+    Return a one-line summary:
+    output.log: XX log.csv: XX log archive count: X log archive total size: XXX
+    Sizes are auto-scaled (B, KB, MB, GB).
+    """
+    output_log = os.path.join(log_dir, "output.log")
+    csv_log = os.path.join(log_dir, log_base)
+    archive_pattern = os.path.join(log_dir, f"{log_base}.*")
+
+    # Get main file sizes (default to 0 if missing)
+    output_size = os.path.getsize(output_log) if os.path.exists(output_log) else 0
+    csv_size = os.path.getsize(csv_log) if os.path.exists(csv_log) else 0
+
+    # Gather archives
+    archives = sorted(glob.glob(archive_pattern))
+    archive_count = len(archives)
+    archive_total = sum(os.path.getsize(f) for f in archives)
+
+    def fmt(size_bytes):
+        """Format size dynamically with 1 decimal place."""
+        units = ['B', 'KB', 'MB', 'GB', 'TB']
+        size = float(size_bytes)
+        for unit in units:
+            if size < 1024 or unit == units[-1]:
+                return f"{size:.1f}{unit}"
+            size /= 1024
+
+    return (
+        f"output.log: {fmt(output_size)} "
+        f"{log_base}: {fmt(csv_size)} "
+        f"log archive count: {archive_count} "
+        f"log archive total size: {fmt(archive_total)}"
+    )
+
+def sensor_summary_stats():
+    """
+    Return multi-line summary for internal, external, and fan stats.
+    Uses global config variables already loaded.
+    """
+    # Internal environment
+    internal_line = (
+        f"Internal → Temp: {INTERNAL_LOW_TEMP:.1f}–{INTERNAL_HIGH_TEMP:.1f}°F  "
+        f"Humidity: {INTERNAL_LOW_HUMIDITY:.1f}–{INTERNAL_HIGH_HUMIDITY:.1f}%"
+    )
+
+    # External environment
+    external_line = (
+        f"External → Temp: {EXTERNAL_LOW_TEMP:.1f}–{EXTERNAL_HIGH_TEMP:.1f}°F  "
+        f"Humidity: {EXTERNAL_LOW_HUMIDITY:.1f}–{EXTERNAL_HIGH_HUMIDITY:.1f}%"
+    )
+
+    # Fan stats
+    fan_line = (
+        f"Fan → Cycles: {CYCLE_COUNT}  "
+        f"Total Runtime: {FAN_TOTAL_DURATION}  "
+        f"Max Runtime: {FAN_MAX_RUNTIME}"
+    )
+
+    return "\n".join([internal_line, external_line, fan_line])

@@ -654,11 +654,11 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, handle_shutdown)  # kill -2
     signal.signal(signal.SIGTERM, handle_shutdown)  # kill -15
 
+    # BEGIN STATUS CHECKS ETC
     # First check for the installed devices.
     installed_devices = read_installed_devices(configManager)
     overall_status, statuses = system_status.query_i2c_devices(installed_devices)
     print(f"Overall status: {overall_status}")
-
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     for status in statuses:
         print(status)
@@ -668,8 +668,9 @@ if __name__ == "__main__":
         logger.log(timestamp, 'WARN', 'SYSTEM', 'OVERALL', "Overall Status: Fail")
         print("Overall Status: Fail")
         # raise ValueError("Overall Status Failed")
-
+    # The below logs the HW stats as well as the log file information
     log_system_status()
+    # END STATUS CHECKS
 
     MIN_HUMIDITY = configManager.get_int_config('min_humidity')
     MAX_HUMIDITY = configManager.get_int_config('max_humidity')
@@ -823,8 +824,7 @@ if __name__ == "__main__":
         #
         # # Recondition external sensor by itself
         # externalsensor.recondition_sensor()
-    except KeyboardInterrupt:
-        print("\nKeyboardInterrupt detected!")
+
     except ValueError as e:
         print("\nValue Error!",e)
     except OSError as e:
