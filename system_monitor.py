@@ -1,10 +1,9 @@
 import psutil
 import os
 import glob
+from config_manager import ConfigManager
 
-global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY
-global EXTERNAL_HIGH_TEMP, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY
-global CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_MAX_RUNTIME
+configManager = ConfigManager('config.ini')
 
 def get_system_stats(log_dir="."):
     try:
@@ -108,6 +107,18 @@ def sensor_summary_stats():
     Return multi-line summary for internal, external, and fan stats.
     Uses global config variables already loaded.
     """
+    # Initialise the logging and pull numbers from the config.
+    INTERNAL_HIGH_TEMP = configManager.get_float_config('LOG', 'internal_high_temp')
+    INTERNAL_LOW_TEMP = configManager.get_float_config('LOG', 'internal_low_temp')
+    INTERNAL_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'internal_high_humidity')
+    INTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'internal_low_humidity')
+    EXTERNAL_HIGH_TEMP = configManager.get_float_config('LOG', 'external_high_temp')
+    EXTERNAL_LOW_TEMP = configManager.get_float_config('LOG', 'external_low_temp')
+    EXTERNAL_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'external_high_humidity')
+    EXTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'external_low_humidity')
+    CYCLE_COUNT = configManager.get_int_config('cycle_count')
+    FAN_TOTAL_DURATION = configManager.get_duration_config('LOG', 'FAN_TOTAL_DURATION')
+    FAN_MAX_RUNTIME = configManager.get_duration_config('LOG', 'FAN_MAX_RUNTIME')
     # Internal environment
     internal_line = (
         f"Internal → Temp: {INTERNAL_LOW_TEMP:.1f}–{INTERNAL_HIGH_TEMP:.1f}°F  "
