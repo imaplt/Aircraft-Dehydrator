@@ -126,13 +126,13 @@ def sensor_summary_stats():
     FAN_MAX_RUNTIME = configManager.get_duration_config('LOG', 'FAN_MAX_RUNTIME')
     # Internal environment
     internal_line = (
-        f"Internal → Temp: {INTERNAL_LOW_TEMP:.1f}–{INTERNAL_HIGH_TEMP:.1f}°F  "
+        f"Internal Temp: {INTERNAL_LOW_TEMP:.1f}–{INTERNAL_HIGH_TEMP:.1f}°F  "
         f"Humidity: {INTERNAL_LOW_HUMIDITY:.1f}–{INTERNAL_HIGH_HUMIDITY:.1f}%"
     )
     print(internal_line)
     # External environment
     external_line = (
-        f"External → Temp: {EXTERNAL_LOW_TEMP:.1f}–{EXTERNAL_HIGH_TEMP:.1f}°F  "
+        f"External Temp: {EXTERNAL_LOW_TEMP:.1f}–{EXTERNAL_HIGH_TEMP:.1f}°F  "
         f"Humidity: {EXTERNAL_LOW_HUMIDITY:.1f}–{EXTERNAL_HIGH_HUMIDITY:.1f}%"
     )
     print(external_line)
@@ -143,4 +143,5 @@ def sensor_summary_stats():
         f"Max Runtime: {FAN_MAX_RUNTIME}"
     )
     print(fan_line)
-    return "\n".join([internal_line, external_line, fan_line])
+    return " ".join([internal_line, external_line, fan_line])
+    # return "\n".join([internal_line, external_line, fan_line])

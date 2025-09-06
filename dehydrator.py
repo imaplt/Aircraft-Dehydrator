@@ -309,6 +309,14 @@ def send_startup_status():
     for s in statuses:
         current_status += f"{s}\n"
     current_status += f"{system_stats}\n"
+    startup_stats = get_system_stats()
+    current_status += (f"CPU: {startup_stats['cpu_percent']}%, "
+                    f"Mem: {startup_stats['memory_percent']}% ({startup_stats['memory_used_mb']}MB), "
+                    f"Disk Free: {startup_stats['disk_free_gb']}GB, "
+                    f"Temp: {celsius_to_fahrenheit(startup_stats['cpu_temp'])}°F\n")
+
+    current_status += f"Logs: {startup_stats['logs']}\n"
+    current_status += f"Sensors: {startup_stats['sensors']}\n"
     # you can add sensor readings too
     notifier.send_status(body=current_status, subject="Startup Status")
 
@@ -628,8 +636,6 @@ def cleanup():
     try:
         display_manager.switch_image(Screen.SHUTDOWN)
         display_manager.display_current_image(BONNETDisplay.disp)
-        logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
-                   'System', 'System', "Shutting down...")
         # make sure fan is off
         fanController.set_fan_speed(0)
         time.sleep(3)
@@ -639,7 +645,7 @@ def cleanup():
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'FATAL',
                    'System', 'System', "No display available...")
     finally:
-        logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'FATAL',
+        logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
                    'System', 'System', "System Shutting down..")
     exit()
 
@@ -762,7 +768,6 @@ if __name__ == "__main__":
     btn_a.when_pressed = button_pressed_callback
     btn_b.when_pressed = button_pressed_callback
     btn_b.when_held = button_hold_callback
-    print("Setting up buttons completed...")
     # Initialize lines
     oled_lines = [""] * 5  # For five line bonnet display...
     lcd_lines = [""] * 4  # For four line ssd1306_display...
