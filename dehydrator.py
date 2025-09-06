@@ -609,8 +609,8 @@ def handle_shutdown(signum, frame):
     print(f"\nSignal {signum} received, shutting down...")
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM', 'SYSTEM',
                f"\nSignal {signum} received, shutting down...")
-    # cleanup()
-    # sys.exit(0)
+    cleanup()
+    sys.exit(0)
 
 def cleanup():
     # Want to add code here to update display, update log with run time etc

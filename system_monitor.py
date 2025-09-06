@@ -94,7 +94,12 @@ def log_file_summary(log_dir=".", log_base="log.csv"):
             if size < 1024 or unit == units[-1]:
                 return f"{size:.1f}{unit}"
             size /= 1024
-
+    print(
+        f"output.log: {fmt(output_size)} "
+        f"{log_base}: {fmt(csv_size)} "
+        f"log archive count: {archive_count} "
+        f"log archive total size: {fmt(archive_total)}"
+    )
     return (
         f"output.log: {fmt(output_size)} "
         f"{log_base}: {fmt(csv_size)} "
@@ -124,18 +129,18 @@ def sensor_summary_stats():
         f"Internal → Temp: {INTERNAL_LOW_TEMP:.1f}–{INTERNAL_HIGH_TEMP:.1f}°F  "
         f"Humidity: {INTERNAL_LOW_HUMIDITY:.1f}–{INTERNAL_HIGH_HUMIDITY:.1f}%"
     )
-
+    print(internal_line)
     # External environment
     external_line = (
         f"External → Temp: {EXTERNAL_LOW_TEMP:.1f}–{EXTERNAL_HIGH_TEMP:.1f}°F  "
         f"Humidity: {EXTERNAL_LOW_HUMIDITY:.1f}–{EXTERNAL_HIGH_HUMIDITY:.1f}%"
     )
-
+    print(external_line)
     # Fan stats
     fan_line = (
         f"Fan → Cycles: {CYCLE_COUNT}  "
         f"Total Runtime: {FAN_TOTAL_DURATION}  "
         f"Max Runtime: {FAN_MAX_RUNTIME}"
     )
-
+    print(fan_line)
     return "\n".join([internal_line, external_line, fan_line])
