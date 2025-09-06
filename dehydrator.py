@@ -340,6 +340,11 @@ def log_system_status():
                     f"Temp: {celsius_to_fahrenheit(stats['cpu_temp'])}°F")
         print(log_line)
         logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', log_line)
+        print(f"Logs: {stats['logs']}")
+        logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', f"Logs: {stats['logs']}")
+        print(f"Sensors: {stats['sensors']}")
+        logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', f"Sensors: {stats['sensors']}")
+
         # you can also write to your output.log or CSV here
     system_stats = log_line
 
