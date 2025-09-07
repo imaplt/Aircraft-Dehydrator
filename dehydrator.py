@@ -297,7 +297,8 @@ def send_daily_status():
     for s in statuses:
         current_status += f" {s}\n"
     current_status += f"{system_stats}\n"
-
+    for sensor, stat in statuses["sensors"].items():
+        current_status += f"{sensor.capitalize()}: {stat}\n"
     # you can add sensor readings too
     notifier.send_status(current_status)
 
@@ -316,7 +317,9 @@ def send_startup_status():
                     f"Temp: {celsius_to_fahrenheit(startup_stats['cpu_temp'])}°F\n")
 
     current_status += f"Logs: {startup_stats['logs']}\n"
-    current_status += f"Sensors: {startup_stats['sensors']}\n"
+    for sensor, stat in startup_stats["sensors"].items():
+        current_status += f"{sensor.capitalize()}: {stat}\n"
+
     # you can add sensor readings too
     notifier.send_status(body=current_status, subject="Startup Status")
 
@@ -351,7 +354,8 @@ def log_system_status():
         print(f"Logs: {stats['logs']}")
         logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', f"Logs: {stats['logs']}")
         print(f"Sensors: {stats['sensors']}")
-        logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', f"Sensors: {stats['sensors']}")
+        for sensor, stat in stats["sensors"].items():
+            logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', f"{sensor.capitalize()}: {stat}\n")
 
         # you can also write to your output.log or CSV here
     system_stats = log_line
@@ -622,8 +626,7 @@ def handle_shutdown(signum, frame):
     print(f"\nSignal {signum} received, shutting down...")
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM', 'SYSTEM',
                f"\nSignal {signum} received, shutting down...")
-    cleanup()
-    sys.exit(0)
+    raise KeyboardInterrupt
 
 def cleanup():
     # Want to add code here to update display, update log with run time etc
@@ -835,6 +838,8 @@ if __name__ == "__main__":
         # # Recondition external sensor by itself
         # externalsensor.recondition_sensor()
 
+    except KeyboardInterrupt as e:
+        print("\nValue Error!", e)
     except ValueError as e:
         print("\nValue Error!",e)
     except OSError as e:

@@ -143,5 +143,9 @@ def sensor_summary_stats():
         f"Max Runtime: {FAN_MAX_RUNTIME}"
     )
     print(fan_line)
-    return " ".join([internal_line, external_line, fan_line])
-    # return "\n".join([internal_line, external_line, fan_line])
+
+    return {
+        "internal": internal_line,
+        "external": external_line,
+        "fan": fan_line
+    }
