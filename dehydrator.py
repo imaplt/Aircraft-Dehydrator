@@ -355,7 +355,7 @@ def log_system_status():
         logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', f"Logs: {stats['logs']}")
         print(f"Sensors: {stats['sensors']}")
         for sensor, stat in stats["sensors"].items():
-            logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', f"{sensor.capitalize()}: {stat}\n")
+            logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', f"{sensor.capitalize()}: {stat}")
 
         # you can also write to your output.log or CSV here
     system_stats = log_line

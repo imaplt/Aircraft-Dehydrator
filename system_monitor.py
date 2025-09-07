@@ -95,16 +95,16 @@ def log_file_summary(log_dir=".", log_base="log.csv"):
                 return f"{size:.1f}{unit}"
             size /= 1024
     print(
-        f"output.log: {fmt(output_size)} "
-        f"{log_base}: {fmt(csv_size)} "
-        f"log archive count: {archive_count} "
-        f"log archive total size: {fmt(archive_total)}"
+        f"output.log: {fmt(output_size)}, "
+        f"{log_base}: {fmt(csv_size)}, "
+        f"archive count: {archive_count}, "
+        f"archive total size: {fmt(archive_total)}"
     )
     return (
-        f"output.log: {fmt(output_size)} "
-        f"{log_base}: {fmt(csv_size)} "
-        f"log archive count: {archive_count} "
-        f"log archive total size: {fmt(archive_total)}"
+        f"output.log: {fmt(output_size)}, "
+        f"{log_base}: {fmt(csv_size)}, "
+        f"archive count: {archive_count}, "
+        f"archive total size: {fmt(archive_total)}"
     )
 
 def sensor_summary_stats():
@@ -126,26 +126,26 @@ def sensor_summary_stats():
     FAN_MAX_RUNTIME = configManager.get_duration_config('LOG', 'FAN_MAX_RUNTIME')
     # Internal environment
     internal_line = (
-        f"Internal Temp: {INTERNAL_LOW_TEMP:.1f}–{INTERNAL_HIGH_TEMP:.1f}°F  "
+        f"Temp: {INTERNAL_LOW_TEMP:.1f}–{INTERNAL_HIGH_TEMP:.1f}°F  "
         f"Humidity: {INTERNAL_LOW_HUMIDITY:.1f}–{INTERNAL_HIGH_HUMIDITY:.1f}%"
     )
     print(internal_line)
     # External environment
     external_line = (
-        f"External Temp: {EXTERNAL_LOW_TEMP:.1f}–{EXTERNAL_HIGH_TEMP:.1f}°F  "
+        f"Temp: {EXTERNAL_LOW_TEMP:.1f}–{EXTERNAL_HIGH_TEMP:.1f}°F  "
         f"Humidity: {EXTERNAL_LOW_HUMIDITY:.1f}–{EXTERNAL_HIGH_HUMIDITY:.1f}%"
     )
     print(external_line)
     # Fan stats
     fan_line = (
-        f"Fan → Cycles: {CYCLE_COUNT}  "
-        f"Total Runtime: {FAN_TOTAL_DURATION}  "
+        f"Cycles: {CYCLE_COUNT}, "
+        f"Total Runtime: {FAN_TOTAL_DURATION}, "
         f"Max Runtime: {FAN_MAX_RUNTIME}"
     )
     print(fan_line)
 
     return {
-        "internal": internal_line,
-        "external": external_line,
-        "fan": fan_line
+        "Internal Sensor": internal_line,
+        "External Sensor": external_line,
+        "Fan": fan_line
     }
