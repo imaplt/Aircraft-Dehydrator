@@ -558,6 +558,8 @@ def button_pressed_callback(button):
         print("Down button pressed")
     elif button.pin.number == BTN_C_PIN:
         print("Center button pressed")
+        cleanup()
+        os.system("sudo shutdown -h now")
     elif button.pin.number == BTN_A_PIN:
         print("A button pressed")
         if current_page == Screen.FAN_LIMIT.index :
