@@ -652,7 +652,6 @@ def cleanup():
     finally:
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
                    'System', 'System', "System Shutting down..")
-    exit()
 
 def isDeviceDetected(statuses, device):
     for status in statuses:
