@@ -160,13 +160,14 @@ def task_update():
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
         INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP, page_changed
-
+    global EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP, EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY
+    task_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     def handle_fan_operation(fan_started, fan_stopped, run_time, action):
         global FAN_RUNNING, FAN_RUNNING_TIME, FAN_TOTAL_DURATION, CYCLE_COUNT  # Explicitly declare global variables
         """Handle fan start/stop operations, including logging, display updates, and timing."""
         if action == "start" and fan_started:
             fanController.start_time = time.time()
-            logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan started, exceeded MAX humidity of {MAX_HUMIDITY}%")
+            logger.log(task_timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan started, exceeded MAX humidity of {MAX_HUMIDITY}%")
             print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
             display_manager.switch_image(Screen.FAN_START)
             display_manager.display_current_image(BONNETDisplay.disp)
@@ -177,13 +178,14 @@ def task_update():
             show_page(current_page)
         elif action == "stop" and fan_stopped:
             print(f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
-            logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
-            logger.log(timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan run time: {str(timedelta(seconds=run_time))}")
+            logger.log(task_timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
+            logger.log(task_timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan run time: {str(timedelta(seconds=run_time))}")
             FAN_TOTAL_DURATION += timedelta(seconds=int(run_time))
             FAN_RUNNING = False
             display_manager.switch_image(Screen.FAN_STOP)
             display_manager.display_current_image(BONNETDisplay.disp)
             update_stats()
+            save_config()
             time.sleep(2)
             show_page(current_page)
 
