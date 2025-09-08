@@ -63,8 +63,6 @@ def log_file_sizes(log_dir=".", log_base="log.csv"):
     archives = sorted(glob.glob(archive_pattern))
     for fname in archives:
         results[os.path.basename(fname)] = get_file_size(fname)
-
-    print(results)
     return results
 
 def log_file_summary(log_dir=".", log_base="log.csv"):
@@ -94,12 +92,7 @@ def log_file_summary(log_dir=".", log_base="log.csv"):
             if size < 1024 or unit == units[-1]:
                 return f"{size:.1f}{unit}"
             size /= 1024
-    print(
-        f"output.log: {fmt(output_size)}, "
-        f"{log_base}: {fmt(csv_size)}, "
-        f"archive count: {archive_count}, "
-        f"archive total size: {fmt(archive_total)}"
-    )
+
     return (
         f"output.log: {fmt(output_size)}, "
         f"{log_base}: {fmt(csv_size)}, "
@@ -129,20 +122,17 @@ def sensor_summary_stats():
         f"Temp: {INTERNAL_LOW_TEMP:.1f}–{INTERNAL_HIGH_TEMP:.1f}°F  "
         f"Humidity: {INTERNAL_LOW_HUMIDITY:.1f}–{INTERNAL_HIGH_HUMIDITY:.1f}%"
     )
-    print(internal_line)
     # External environment
     external_line = (
         f"Temp: {EXTERNAL_LOW_TEMP:.1f}–{EXTERNAL_HIGH_TEMP:.1f}°F  "
         f"Humidity: {EXTERNAL_LOW_HUMIDITY:.1f}–{EXTERNAL_HIGH_HUMIDITY:.1f}%"
     )
-    print(external_line)
     # Fan stats
     fan_line = (
         f"Cycles: {CYCLE_COUNT}, "
         f"Total Runtime: {FAN_TOTAL_DURATION}, "
         f"Max Runtime: {FAN_MAX_RUNTIME}"
     )
-    print(fan_line)
 
     return {
         "Internal Sensor": internal_line,

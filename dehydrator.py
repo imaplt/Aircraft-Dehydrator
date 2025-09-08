@@ -148,8 +148,6 @@ def sensor(stop_event):
 
             print(f"{ambient_timestamp} Ambient: {externaloutput}")
 
-            time.sleep(2)
-
         except Exception as e:
             logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM', 'SENSOR',
                        "Sensor thread error: {}".format(e))
@@ -201,7 +199,8 @@ def task_update():
             FAN_MAX_RUNTIME = FAN_RUNNING_TIME
         if FAN_RUNNING_TIME > FAN_LIMIT:
             print("Fan limit exceeded")
-            logger.log(timestamp, 'WARN', 'SYSTEM', 'FAN', f"Fan time limit exceeded: {FAN_LIMIT}")
+            logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM',
+                        'FAN', f"Fan time limit exceeded: {FAN_LIMIT}")
             _fan_limit_exceeded()
 
     def update_current_page():
@@ -345,19 +344,17 @@ def log_system_status():
     if "error" in stats:
         print(f"System monitor error: {stats['error']}")
         log_line = f"System monitor error: {stats['error']}"
-        logger.log(timestamp, 'WARN', 'SYSTEM', 'MONITOR', log_line)
+        logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM', 'MONITOR', log_line)
     else:
         log_line = (f"CPU: {stats['cpu_percent']}%, "
                     f"Mem: {stats['memory_percent']}% ({stats['memory_used_mb']}MB), "
                     f"Disk Free: {stats['disk_free_gb']}GB, "
                     f"Temp: {celsius_to_fahrenheit(stats['cpu_temp'])}°F")
-        print(log_line)
-        logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', log_line)
-        print(f"Logs: {stats['logs']}")
-        logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', f"Logs: {stats['logs']}")
+        logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'MONITOR', log_line)
+        logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'MONITOR', f"Logs: {stats['logs']}")
         print(f"Sensors: {stats['sensors']}")
         for sensor, stat in stats["sensors"].items():
-            logger.log(timestamp, 'INFO', 'SYSTEM', 'MONITOR', f"{sensor.capitalize()}: {stat}")
+            logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'MONITOR', f"{sensor.capitalize()}: {stat}")
 
         # you can also write to your output.log or CSV here
     system_stats = log_line
