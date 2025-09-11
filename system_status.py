@@ -45,7 +45,7 @@ i2c = None
 
 def init_i2c(i2c_board):
    global i2c
-   i2c = i2c_board
+   i2c = SafeI2C()
 
 def _celsius_to_fahrenheit(celsius):
     fahrenheit = (celsius * 9/5) + 32
@@ -67,7 +67,7 @@ def safe_deinit(*resources):
 def detect_mux_and_sht4X(devices, overall_status_var=None):
     sensor = None
     try:
-        i2c = busio.I2C(board.SCL, board.SDA)
+        # i2c = busio.I2C(board.SCL, board.SDA)
         mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
         devices["MUX"]["status"] = "Detected"
 
@@ -118,7 +118,7 @@ def detect_sht30(devices, overall_status_var=None):
 def detect_shtc3(devices, overall_status_var=None):
     i2c = shtc3 = None
     try:
-        i2c = busio.I2C(board.SCL, board.SDA)
+        # i2c = busio.I2C(board.SCL, board.SDA)
         shtc3 = adafruit_shtc3.SHTC3(i2c)
         devices["SHTC3"]["status"] = (
             "Detected, temperature: {:.1f} F, humidity: {:.1f} %"
@@ -137,7 +137,7 @@ def detect_shtc3(devices, overall_status_var=None):
 def detect_sht4X_internal(devices, overall_status_var=None):
     i2c = sht4X = None
     try:
-        i2c = board.I2C()  # uses board.SCL and board.SDA
+        # i2c = board.I2C()  # uses board.SCL and board.SDA
         mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
         sht4X = adafruit_sht4x.SHT4x(mux[INTERNAL_SENSOR_PORT])
         print("Found SHT4x with serial number", hex(sht4X.serial_number))
@@ -162,7 +162,7 @@ def detect_sht4X_internal(devices, overall_status_var=None):
 def detect_sht4X_external(devices, overall_status_var=None):
     i2c = sht4X = None
     try:
-        i2c = board.I2C()
+        # i2c = board.I2C()
         mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
         sht4X = adafruit_sht4x.SHT4x(mux[EXTERNAL_SENSOR_PORT])
         devices["SHT4X_External"]["status"] = (
@@ -195,7 +195,7 @@ def detect_lcd2004(devices, overall_status_var=None):
 def detect_lcd1602(devices, overall_status_var=None):
     i2c = lcd = None
     try:
-        i2c = busio.I2C(board.SCL, board.SDA)
+        # i2c = busio.I2C(board.SCL, board.SDA)
         lcd = character_lcd.Character_LCD_I2C(i2c, 16, 2, devices["LCD1602"]["address"])
         devices["LCD1602"]["status"] = "Detected"
     except Exception as e:
@@ -217,7 +217,7 @@ def detect_emc2101(devices, overall_status_var=None):
 
 def detect_fan(devices, overall_status_var=None):
     try:
-        i2c = busio.I2C(board.SCL, board.SDA)
+        # i2c = busio.I2C(board.SCL, board.SDA)
         fan = EMC2101Controller(i2c)
         if fan.read_fan_speed() > 200:
             devices["FAN"]["status"] = f"Currently Running, RPM: {fan.read_fan_speed()}"
