@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class SafeI2C(busio.I2C):
-    def __init__(self, scl=board.SCL, sda=board.SDA, retries=3, delay=0.1):
+    def __init__(self, scl=board.SCL, sda=board.SDA, retries=5, delay=0.1):
         super().__init__(scl, sda)
         self._lock = threading.Lock()
         self._retries = retries

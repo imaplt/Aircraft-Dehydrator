@@ -240,7 +240,7 @@ def detect_fan(devices, overall_status_var=None):
 def detect_ssd1306(devices, overall_status_var=None):
     i2c = oled = None
     try:
-        i2c = busio.I2C(board.SCL, board.SDA)
+        # i2c = busio.I2C(board.SCL, board.SDA)
         oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)
         devices["SSD1306"]["status"] = "Detected"
     except Exception as e:
