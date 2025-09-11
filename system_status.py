@@ -41,7 +41,6 @@ SHT4X_LOWHEAT_100MS = 0x15  # High precision measurement, low heat for 0.1 sec
 SHT4X_READSERIAL = 0x89  # Read Out of Serial Register
 SHT4X_SOFTRESET = 0x94  # Soft Reset
 
-i2c = None
 
 def init_i2c(i2c_board):
    global i2c
@@ -135,7 +134,6 @@ def detect_shtc3(devices, overall_status_var=None):
         safe_deinit(shtc3, i2c)
 
 def detect_sht4X_internal(devices, overall_status_var=None):
-    i2c = sht4X = None
     try:
         # i2c = board.I2C()  # uses board.SCL and board.SDA
         mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
@@ -160,7 +158,6 @@ def detect_sht4X_internal(devices, overall_status_var=None):
         safe_deinit(sht4X, i2c)
 
 def detect_sht4X_external(devices, overall_status_var=None):
-    i2c = sht4X = None
     try:
         # i2c = board.I2C()
         mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
@@ -193,7 +190,6 @@ def detect_lcd2004(devices, overall_status_var=None):
         safe_deinit(lcd, i2c)
 
 def detect_lcd1602(devices, overall_status_var=None):
-    i2c = lcd = None
     try:
         # i2c = busio.I2C(board.SCL, board.SDA)
         lcd = character_lcd.Character_LCD_I2C(i2c, 16, 2, devices["LCD1602"]["address"])
@@ -207,7 +203,7 @@ def detect_lcd1602(devices, overall_status_var=None):
 
 def detect_emc2101(devices, overall_status_var=None):
     try:
-        emc2101 = EMC2101Controller(i2c_board=i2c)
+        emc2101 = EMC2101Controller(i2c)
         status = emc2101.read_status()
         devices["EMC2101"]["status"] = f"Detected, Status: {status}"
     except Exception as e:
@@ -238,7 +234,7 @@ def detect_fan(devices, overall_status_var=None):
             overall_status_var["status"] = "bad"
 
 def detect_ssd1306(devices, overall_status_var=None):
-    i2c = oled = None
+    oled = None
     try:
         # i2c = busio.I2C(board.SCL, board.SDA)
         oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)
