@@ -41,10 +41,11 @@ SHT4X_LOWHEAT_100MS = 0x15  # High precision measurement, low heat for 0.1 sec
 SHT4X_READSERIAL = 0x89  # Read Out of Serial Register
 SHT4X_SOFTRESET = 0x94  # Soft Reset
 
+global i2c
 
 def init_i2c(i2c_board):
-   global i2c
-   i2c = SafeI2C()
+    global i2c
+    i2c = SafeI2C()
 
 def _celsius_to_fahrenheit(celsius):
     fahrenheit = (celsius * 9/5) + 32
@@ -96,7 +97,7 @@ def detect_mux_and_sht4X(devices, overall_status_var=None):
         safe_deinit(sensor, i2c)
 
 def detect_sht30(devices, overall_status_var=None):
-    i2c = sensor = None
+    sensor = None
     try:
         i2c = adafruit_bitbangio.I2C(board.D27, board.D22)
         sensor = adafruit_sht31d.SHT31D(i2c, 0x44)
@@ -112,7 +113,7 @@ def detect_sht30(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(sensor, i2c)
+        safe_deinit(sensor)
 
 def detect_shtc3(devices, overall_status_var=None):
     shtc3 = None
