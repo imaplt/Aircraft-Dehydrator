@@ -115,7 +115,7 @@ def detect_sht30(devices, overall_status_var=None):
         safe_deinit(sensor, i2c)
 
 def detect_shtc3(devices, overall_status_var=None):
-    i2c = shtc3 = None
+    shtc3 = None
     try:
         # i2c = busio.I2C(board.SCL, board.SDA)
         shtc3 = adafruit_shtc3.SHTC3(i2c)
@@ -131,10 +131,11 @@ def detect_shtc3(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(shtc3, i2c)
+        safe_deinit(shtc3)
 
 def detect_sht4X_internal(devices, overall_status_var=None):
     try:
+        sht4X = None
         # i2c = board.I2C()  # uses board.SCL and board.SDA
         mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
         sht4X = adafruit_sht4x.SHT4x(mux[INTERNAL_SENSOR_PORT])
@@ -155,10 +156,12 @@ def detect_sht4X_internal(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(sht4X, i2c)
+        safe_deinit(sht4X)
 
 def detect_sht4X_external(devices, overall_status_var=None):
     try:
+
+        sht4X = None
         # i2c = board.I2C()
         mux = adafruit_tca9548a.TCA9548A(i2c, address=MUX_ADDR)
         sht4X = adafruit_sht4x.SHT4x(mux[EXTERNAL_SENSOR_PORT])
@@ -174,7 +177,7 @@ def detect_sht4X_external(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(sht4X, i2c)
+        safe_deinit(sht4X)
 
 def detect_lcd2004(devices, overall_status_var=None):
     i2c = lcd = None
@@ -191,6 +194,7 @@ def detect_lcd2004(devices, overall_status_var=None):
 
 def detect_lcd1602(devices, overall_status_var=None):
     try:
+        lcd = None
         # i2c = busio.I2C(board.SCL, board.SDA)
         lcd = character_lcd.Character_LCD_I2C(i2c, 16, 2, devices["LCD1602"]["address"])
         devices["LCD1602"]["status"] = "Detected"
@@ -199,7 +203,7 @@ def detect_lcd1602(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(lcd, i2c)
+        safe_deinit(lcd)
 
 def detect_emc2101(devices, overall_status_var=None):
     try:
@@ -244,7 +248,7 @@ def detect_ssd1306(devices, overall_status_var=None):
         if overall_status_var is not None:
             overall_status_var["status"] = "bad"
     finally:
-        safe_deinit(oled, i2c)
+        safe_deinit(oled)
 
 def detect_bonnet(devices, overall_status_var=None):
     spi = cs_pin = dc_pin = reset_pin = disp = None
