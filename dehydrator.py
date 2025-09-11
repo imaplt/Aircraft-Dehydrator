@@ -15,7 +15,6 @@ from system_monitor import get_system_stats
 import board
 import busio
 import signal
-import sys
 import os
 
 print("Dehydrator main loaded")
@@ -298,7 +297,8 @@ def send_daily_status():
     for s in statuses:
         current_status += f" {s}\n"
     current_status += f"{system_stats}\n"
-    for sensor, stat in statuses["sensors"].items():
+    daily_stats = get_system_stats()
+    for sensor, stat in daily_stats["sensors"].items():
         current_status += f"{sensor.capitalize()}: {stat}\n"
     # you can add sensor readings too
     notifier.send_status(current_status)
@@ -361,8 +361,9 @@ def log_system_status():
 
 def schedule_tasks(int_interval=1, fan_interval=10, system_interval=10):
     schedule.every(int_interval).seconds.do(task_update)
-    schedule.every().day.at("08:00").do(send_daily_status)
-    schedule.every().day.at("20:00").do(send_daily_status)
+    schedule.every().day.at("09:00").do(send_daily_status)
+    schedule.every().day.at("10:00").do(send_daily_status)
+    schedule.every().day.at("11:00").do(send_daily_status)
     schedule.every().day.at("21:00").do(send_daily_log)
     schedule.every(fan_interval).minutes.do(_cycle_fan)
     schedule.every(system_interval).minutes.do(log_system_status)
