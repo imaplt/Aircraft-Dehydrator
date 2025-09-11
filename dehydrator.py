@@ -12,10 +12,9 @@ from fan_controller import EMC2101Controller
 import threading
 from notification_manager import NotificationManager
 from system_monitor import get_system_stats
-import board
-import busio
 import signal
 import os
+from safei2c import SafeI2C
 
 print("Dehydrator main loaded")
 
@@ -145,7 +144,7 @@ def sensor(stop_event):
             EXTERNAL_TEMP = externaloutput['temperature']
             EXTERNAL_HUMIDITY = externaloutput['humidity']
 
-            print(f"{ambient_timestamp} Ambient: {externaloutput}")
+
 
         except Exception as e:
             logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM', 'SENSOR',
@@ -661,7 +660,8 @@ def isDeviceDetected(statuses, device):
 
 if __name__ == "__main__":
 
-    i2c = busio.I2C(board.SCL, board.SDA)
+    # i2c = busio.I2C(board.SCL, board.SDA)
+    i2c = SafeI2C()
     system_status.init_i2c(i2c)
     system_stats = None
 

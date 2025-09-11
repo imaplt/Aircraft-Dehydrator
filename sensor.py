@@ -2,12 +2,12 @@ import time
 
 import adafruit_shtc3
 import board
-import busio
 import adafruit_sht4x
 import adafruit_tca9548a
 import adafruit_sht31d
 import adafruit_bitbangio
 from enum import Enum
+from safei2c import SafeI2C
 
 # Define constants
 # Sensor Ports on Multiplexer
@@ -74,7 +74,8 @@ class Sensor:
 
         # Ensure one shared I2C object
         if _I2C is None:
-            _I2C = busio.I2C(board.SCL, board.SDA)
+            # _I2C = busio.I2C(board.SCL, board.SDA)
+            _I2C = SafeI2C()
 
         # Ensure one mux object
         if _MUX is None:

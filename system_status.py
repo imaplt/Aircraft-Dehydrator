@@ -10,6 +10,7 @@ import adafruit_bitbangio
 import digitalio
 from fan_controller import EMC2101Controller
 from adafruit_rgb_display import st7789
+from safei2c import SafeI2C
 
 
 # Constants
