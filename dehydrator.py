@@ -67,7 +67,6 @@ def sensor(stop_event):
         try:
             internaloutput = internalsensor.read_sensor()
             internaloutput['temperature'] = celsius_to_fahrenheit(internaloutput['temperature'])
-            internal_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
             # Main block to handle sensor change and fan control
             INTERNAL_HUMIDITY = internaloutput['humidity']
@@ -242,26 +241,10 @@ def task_update():
         current_page = Screen.DEFAULT.index
         show_page(current_page)
 
-def send_daily_status():
-    #TODO: Update the code for below
-    global overall_status, statuses, system_stats
-    status_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    overall_status, statuses = systemstatus.query_i2c_devices(installed_devices)
-    current_status = f"Current Status As Of: {status_timestamp}\n"
-    current_status += f"Overall: {overall_status}\n"
-    for s in statuses:
-        current_status += f" {s}\n"
-    current_status += f"{system_stats}\n"
-    daily_stats = get_system_stats()
-    for sensor, stat in daily_stats["sensors"].items():
-        current_status += f"{sensor.capitalize()}: {stat}\n"
-    # you can add sensor readings too
-    notifier.send_status(current_status)
-
-def send_startup_status():
+def send_status(message="Status"):
     #TODO: Update the code for below
     status_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    current_status = f"Startup status as of: {status_timestamp}\n"
+    current_status = f"{message} as of: {status_timestamp}\n"
     current_status += f"Overall: {overall_status}.\n".upper()
     for s in statuses:
         current_status += f"{s}\n"
@@ -277,7 +260,7 @@ def send_startup_status():
         current_status += f"{sensor.capitalize()}: {stat}\n"
 
     # you can add sensor readings too
-    notifier.send_status(body=current_status, subject="Startup Status")
+    notifier.send_status(body=current_status, subject=message)
 
 def send_daily_log():
     log_file = "log.csv"  # or however you track archived logs
@@ -316,10 +299,10 @@ def log_system_status():
 
 def schedule_tasks(int_interval=1, fan_interval=10, system_interval=10):
     schedule.every(int_interval).seconds.do(task_update)
-    schedule.every().day.at("08:00").do(send_daily_status)
-    schedule.every().day.at("20:00").do(send_daily_status)
-    schedule.every().hour.do(send_startup_status)
-    schedule.every().day.at("11:00").do(send_daily_status)
+    schedule.every().day.at("09:00").do(send_status, message="Daily Status")
+    schedule.every().day.at("09:30").do(send_status, message="Daily Status")
+    schedule.every().day.at("10:00").do(send_status, message="Daily Status")
+    schedule.every().day.at("20:00").do(send_status, message="Daily Status")
     schedule.every().day.at("21:00").do(send_daily_log)
     schedule.every(fan_interval).minutes.do(_cycle_fan)
     schedule.every(system_interval).minutes.do(log_system_status)
@@ -577,13 +560,13 @@ def _fan_limit_exceeded():
     # Save any config changes
     save_config()
     # Start auto-shutdown timer (e.g., 30 seconds)
-    shutdown_timer = threading.Timer(FAN_LIMIT_TIMEOUT, auto_shutdown)
+    shutdown_timer = threading.Timer(FAN_LIMIT_TIMEOUT.total_seconds(), auto_shutdown)
     shutdown_timer.start()
 
 def handle_shutdown(signum, frame):
     print(f"\nSignal {signum} received, shutting down...")
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM', 'SYSTEM',
-               f"\nSignal {signum} received, shutting down...")
+               f"Signal {signum} received, shutting down...")
     raise KeyboardInterrupt
 
 def cleanup():
@@ -617,7 +600,6 @@ def isDeviceDetected(statuses, device):
 
 if __name__ == "__main__":
 
-    # i2c = busio.I2C(board.SCL, board.SDA)
     i2c = SafeI2C()
     system_stats = None
 
@@ -780,7 +762,7 @@ if __name__ == "__main__":
         schedule_tasks(int_interval=TASK_INTERNAL, fan_interval=TASK_FAN)
 
         # Send the startup status now?
-        send_startup_status()
+        send_status(message="Startup status")
         # Start the threading.
 
         sensor_thread.start()
