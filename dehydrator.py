@@ -3,7 +3,6 @@ import time
 from datetime import timedelta
 from config_manager import ConfigManager
 from logger import Logger as Log
-import system_status
 from display import BONNETDisplay, DisplayConfig
 from oled_display_manager import OLEDDisplayManager, Screen
 from gpiozero import Button
@@ -15,6 +14,7 @@ from system_monitor import get_system_stats
 import signal
 import os
 from safei2c import SafeI2C
+from system_status import SystemStatus
 
 print("Dehydrator main loaded")
 
@@ -51,6 +51,7 @@ def get_next_frame():
 # Initialize the lock
 lock = threading.Lock()
 shutdown_timer = None
+systemstatus = SystemStatus()
 
 def celsius_to_fahrenheit(celsius):
     fahrenheit = (celsius * 9/5) + 32
@@ -245,7 +246,7 @@ def send_daily_status():
     #TODO: Update the code for below
     global overall_status, statuses, system_stats
     status_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    overall_status, statuses = system_status.query_i2c_devices(installed_devices)
+    overall_status, statuses = systemstatus.query_i2c_devices(installed_devices)
     current_status = f"Current Status As Of: {status_timestamp}\n"
     current_status += f"Overall: {overall_status}\n"
     for s in statuses:
@@ -618,7 +619,6 @@ if __name__ == "__main__":
 
     # i2c = busio.I2C(board.SCL, board.SDA)
     i2c = SafeI2C()
-    system_status.init_i2c(i2c)
     system_stats = None
 
     # Register signal handlers at program startup
@@ -628,7 +628,7 @@ if __name__ == "__main__":
     # BEGIN STATUS CHECKS ETC
     # First check for the installed devices.
     installed_devices = read_installed_devices(configManager)
-    overall_status, statuses = system_status.query_i2c_devices(installed_devices)
+    overall_status, statuses = systemstatus.query_i2c_devices(installed_devices)
     print(f"Overall status: {overall_status}")
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     for status in statuses:
