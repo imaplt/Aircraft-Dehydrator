@@ -445,29 +445,6 @@ def show_page(page_index):
     elif page_index == 5:
         display_stats_reset()
 
-def save_config():
-    global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
-    global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
-    global EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
-    global CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_MAX_RUNTIME
-
-    configManager.update_config('min_humidity', MIN_HUMIDITY)
-    configManager.update_config('max_humidity', MAX_HUMIDITY)
-    configManager.update_config('internal_high_temp', INTERNAL_HIGH_TEMP, 'LOG')
-    configManager.update_config('internal_low_temp', INTERNAL_LOW_TEMP, 'LOG')
-    configManager.update_config('internal_high_humidity', INTERNAL_HIGH_HUMIDITY, 'LOG')
-    configManager.update_config('internal_low_humidity', INTERNAL_LOW_HUMIDITY, 'LOG')
-    configManager.update_config('external_high_temp', EXTERNAL_HIGH_TEMP, 'LOG')
-    configManager.update_config('external_low_temp', EXTERNAL_LOW_TEMP, 'LOG')
-    configManager.update_config('external_high_humidity', EXTERNAL_HIGH_HUMIDITY, 'LOG')
-    configManager.update_config('external_low_humidity', EXTERNAL_LOW_HUMIDITY, 'LOG')
-    configManager.update_config('cycle_count', CYCLE_COUNT, 'LOG')
-    configManager.set_duration_config('fan_total_duration', FAN_TOTAL_DURATION, 'LOG')
-    configManager.set_duration_config('MAX_FAN_RUNTIME', FAN_MAX_RUNTIME, 'LOG')
-    configManager.update_config('UOM', UOM)
-    logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'CONFIG',
-                "Config File Updated")
-
 def button_pressed_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, \
         humidity_mode, FAN_LIMIT, selected_option, page_changed, shutdown_timer, fan_limit_exceeded_count
@@ -574,6 +551,19 @@ def handle_shutdown(signum, frame):
                f"Signal {signum} received, shutting down...")
     raise KeyboardInterrupt
 
+def stats_reset():
+    global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
+    global INTERNAL_HIGH_TEMP, INTERNAL_LOW_TEMP
+    global EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
+    global CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_MAX_RUNTIME
+
+    CYCLE_COUNT = FAN_TOTAL_DURATION = FAN_MAX_RUNTIME = 0
+    INTERNAL_HIGH_TEMP = INTERNAL_LOW_TEMP = (INTERNAL_TEMP, ) * 2
+    INTERNAL_HIGH_HUMIDITY = INTERNAL_LOW_HUMIDITY = (INTERNAL_HUMIDITY, ) * 2
+    EXTERNAL_HIGH_TEMP = EXTERNAL_LOW_TEMP = (EXTERNAL_TEMP, ) * 2
+    EXTERNAL_HIGH_HUMIDITY = EXTERNAL_LOW_HUMIDITY = (EXTERNAL_HUMIDITY, ) * 2
+
+
 def cleanup():
     # Want to add code here to update display, update log with run time etc
     global running
@@ -596,6 +586,29 @@ def cleanup():
     finally:
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO',
                    'System', 'System', "System Shutting down..")
+
+def save_config():
+    global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
+    global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
+    global EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
+    global CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_MAX_RUNTIME
+
+    configManager.update_config('min_humidity', MIN_HUMIDITY)
+    configManager.update_config('max_humidity', MAX_HUMIDITY)
+    configManager.update_config('internal_high_temp', INTERNAL_HIGH_TEMP, 'LOG')
+    configManager.update_config('internal_low_temp', INTERNAL_LOW_TEMP, 'LOG')
+    configManager.update_config('internal_high_humidity', INTERNAL_HIGH_HUMIDITY, 'LOG')
+    configManager.update_config('internal_low_humidity', INTERNAL_LOW_HUMIDITY, 'LOG')
+    configManager.update_config('external_high_temp', EXTERNAL_HIGH_TEMP, 'LOG')
+    configManager.update_config('external_low_temp', EXTERNAL_LOW_TEMP, 'LOG')
+    configManager.update_config('external_high_humidity', EXTERNAL_HIGH_HUMIDITY, 'LOG')
+    configManager.update_config('external_low_humidity', EXTERNAL_LOW_HUMIDITY, 'LOG')
+    configManager.update_config('cycle_count', CYCLE_COUNT, 'LOG')
+    configManager.set_duration_config('fan_total_duration', FAN_TOTAL_DURATION, 'LOG')
+    configManager.set_duration_config('MAX_FAN_RUNTIME', FAN_MAX_RUNTIME, 'LOG')
+    configManager.update_config('UOM', UOM)
+    logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'CONFIG',
+                "Config File Updated")
 
 def isDeviceDetected(statuses, device):
     for status in statuses:
