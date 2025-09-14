@@ -524,9 +524,6 @@ def button_pressed_callback(button):
     else:
         print("Unknown button")
 
-    # if current_page == 4:
-    #     edit_humidity_set(button)
-
 def button_hold_callback(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page
     if button.pin.number == BTN_B_PIN:
@@ -691,7 +688,7 @@ if __name__ == "__main__":
     humidity_selected = "max"  # Can be 'max' or 'min'
     humidity_blink_state = True  # Used for blinking the value in edit mode
     current_page = 0
-    total_pages = 5
+    total_pages = 6
     selected_option = 1
     max_color = "white"
     min_color = "white"
