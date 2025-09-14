@@ -77,7 +77,6 @@ def sensor(stop_event):
                 logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SENSORS', 'INTERNAL',
                            f"Temperature: {internaloutput['temperature']}F, Humidity: {internaloutput['humidity']}%")
                 INTERNAL_PREVIOUS_HUMIDITY = INTERNAL_HUMIDITY
-                print("Log File Updated: Internal Sensor Change...")
 
 
             # Update the config file with stats
@@ -136,8 +135,6 @@ def sensor(stop_event):
                            f"Temperature: {externaloutput['temperature']}F,"
                            f" Humidity: {externaloutput['humidity']}%")
                 EXTERNAL_PREVIOUS_HUMIDITY = EXTERNAL_HUMIDITY
-                print("Log File Updated: External Sensor Change...")
-
 
             # Update the global variables and print the reading
             EXTERNAL_TEMP = externaloutput['temperature']
@@ -156,6 +153,7 @@ def task_update():
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
         INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP, page_changed
     global EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP, EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY
+    global runtime
     task_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     def handle_fan_operation(fan_started, fan_stopped, run_time, action):
         global FAN_RUNNING, FAN_RUNNING_TIME, FAN_TOTAL_DURATION, CYCLE_COUNT  # Explicitly declare global variables
@@ -176,6 +174,7 @@ def task_update():
             logger.log(task_timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
             logger.log(task_timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan run time: {str(timedelta(seconds=run_time))}")
             FAN_TOTAL_DURATION += timedelta(seconds=int(run_time))
+            print(f"Fab Total Duration: {str(timedelta(seconds=run_time))}")
             FAN_RUNNING = False
             display_manager.switch_image(Screen.FAN_STOP)
             display_manager.display_current_image(BONNETDisplay.disp)
@@ -221,9 +220,11 @@ def task_update():
     # Handle fan start logic based on humidity thresholds
     if INTERNAL_HUMIDITY > MAX_HUMIDITY:
         started, run_time = fanController.set_fan_speed(100)
+        print(f"Started fan run time: {str(timedelta(seconds=run_time))}")
         handle_fan_operation(started, False, run_time, "start")
     elif INTERNAL_HUMIDITY < MIN_HUMIDITY:
         stopped, run_time = fanController.set_fan_speed(0)
+        print(f"Stopped fan run time: {str(timedelta(seconds=run_time))}")
         handle_fan_operation(False, stopped, run_time, "stop")
 
     if fanController.fan_engaged:
