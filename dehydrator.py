@@ -462,7 +462,7 @@ def save_config():
     configManager.update_config('external_high_humidity', EXTERNAL_HIGH_HUMIDITY, 'LOG')
     configManager.update_config('external_low_humidity', EXTERNAL_LOW_HUMIDITY, 'LOG')
     configManager.update_config('cycle_count', CYCLE_COUNT, 'LOG')
-    configManager.set_duration_config('total_cycle_duration', FAN_TOTAL_DURATION, 'LOG')
+    configManager.set_duration_config('fan_total_duration', FAN_TOTAL_DURATION, 'LOG')
     configManager.set_duration_config('MAX_FAN_RUNTIME', FAN_MAX_RUNTIME, 'LOG')
     configManager.update_config('UOM', UOM)
     logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'CONFIG',
