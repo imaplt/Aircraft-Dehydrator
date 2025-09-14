@@ -220,11 +220,11 @@ def task_update():
     # Handle fan start logic based on humidity thresholds
     if INTERNAL_HUMIDITY > MAX_HUMIDITY:
         started, run_time = fanController.set_fan_speed(100)
-        print(f"Started fan run time: {str(timedelta(seconds=run_time))}")
+        print(f"Started fan run time: {str(run_time)}")
         handle_fan_operation(started, False, run_time, "start")
     elif INTERNAL_HUMIDITY < MIN_HUMIDITY:
         stopped, run_time = fanController.set_fan_speed(0)
-        print(f"Stopped fan run time: {str(timedelta(seconds=run_time))}")
+        print(f"Stopped fan run time: {str(run_time)}")
         handle_fan_operation(False, stopped, run_time, "stop")
 
     if fanController.fan_engaged:
