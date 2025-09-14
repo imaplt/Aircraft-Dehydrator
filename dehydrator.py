@@ -397,6 +397,12 @@ def display_set_humidity():
     BONNETDisplay.display_text("Min:", 1, 120, color_name="white")
     BONNETDisplay.display_text(f"{MIN_HUMIDITY}%", 100, 120, color_name=min_color)
 
+def display_stats_reset():
+    global selected_option, current_page
+    current_page = 5
+    BONNETDisplay.display_ok_clear("Stats Reset",ok_text="OK", clear_text="CANCEL", color_name="white",
+                                   brightness_factor=1.0, selected=selected_option)
+
 def update_stats():
     internal_max_temp = INTERNAL_HIGH_TEMP
     ambient_max_temp = EXTERNAL_HIGH_TEMP
@@ -416,14 +422,13 @@ def update_stats():
 
 def draw_fan_limit():
     global selected_option, current_page
-    current_page = 5
+    current_page = 6
     BONNETDisplay.display_ok_clear("Fan Limit Exceeded",ok_text="OK", clear_text="CLEAR", color_name="white",
                                    brightness_factor=1.0, selected=selected_option)
 
 def show_page(page_index):
     global last_page_changed
     last_page_changed = time.time()
-    print(page_index)
     if page_index == Screen.DEFAULT.index:
         display_default_page()
     elif page_index == Screen.FAN.index:
@@ -437,6 +442,8 @@ def show_page(page_index):
         display_manager.display_current_image(BONNETDisplay.disp)
     elif page_index == 4:
         display_set_humidity()
+    elif page_index == 5:
+        display_stats_reset()
 
 def save_config():
     global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
