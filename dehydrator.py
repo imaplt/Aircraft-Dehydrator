@@ -231,14 +231,14 @@ def task_update():
         fan_runtime_exceeded(int(time.time() -  fanController.start_time))
         update_stats()
 
-    if page_changed and current_page < 5:
+    if page_changed and current_page < 6:
         page_changed = False
         show_page(current_page)
 
     # Display the updated information on the current page if applicable
     update_current_page()
 
-    if time.time() - last_page_changed  > 8 and (0 < current_page < 4):
+    if time.time() - last_page_changed  > 8 and (0 < current_page < 5):
         current_page = Screen.DEFAULT.index
         show_page(current_page)
 
