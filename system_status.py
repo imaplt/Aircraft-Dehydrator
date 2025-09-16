@@ -27,6 +27,7 @@ MUX_ADDR = 0x70  # Default address for TCA9548A multiplexer
 # Sensor Ports on Multiplexer
 INTERNAL_SENSOR_PORT = 0
 EXTERNAL_SENSOR_PORT = 1
+AMBIENT_SENSOR_PORT = 7
 
 # SHT4X Constants
 SHT4X_NOHEAT_HIGHPRECISION = 0xFD  # High precision measurement, no heater
@@ -125,7 +126,6 @@ class SystemStatus:
             print("Found SHT4x with serial number", hex(sht4X.serial_number))
             sht4X.mode = SHT4X_NOHEAT_HIGHPRECISION
             print("Current mode is: ", adafruit_sht4x.Mode.string[sht4X.mode])
-
             devices["SHT4X_Internal"]["status"] = (
                 "Detected, temperature: {:.1f} F, humidity: {:.1f} %"
             ).format(  _celsius_to_fahrenheit(sht4X.temperature), sht4X.relative_humidity)
@@ -153,6 +153,23 @@ class SystemStatus:
                 overall_status_var["status"] = "bad"
         except Exception as e:
             devices["SHT4X_External"]["status"] = f"Unexpected error: {e}"
+            if overall_status_var is not None:
+                overall_status_var["status"] = "bad"
+
+    def detect_sht4X_ambient(self, devices, overall_status_var=None):
+        try:
+
+            mux = adafruit_tca9548a.TCA9548A(self.i2c, address=MUX_ADDR)
+            sht4X = adafruit_sht4x.SHT4x(mux[AMBIENT_SENSOR_PORT])
+            devices["SHT4X_Ambient"]["status"] = (
+                "Detected, temperature: {:.1f} F, humidity: {:.1f} %"
+            ).format(_celsius_to_fahrenheit(sht4X.temperature), sht4X.relative_humidity)
+        except OSError as e:
+            devices["SHT4X_Ambient"]["status"] = f"Error: {e}"
+            if overall_status_var is not None:
+                overall_status_var["status"] = "bad"
+        except Exception as e:
+            devices["SHT4X_Ambient"]["status"] = f"Unexpected error: {e}"
             if overall_status_var is not None:
                 overall_status_var["status"] = "bad"
 
@@ -253,6 +270,7 @@ class SystemStatus:
             "SHTC3": {"address": 0x70, "status": "Not detected"},
             "SHT4X_Internal": {"address": 0x44, "status": "Not detected"},
             "SHT4X_External": {"address": 0x44, "status": "Not detected"},
+            "SHT4X_Ambient": {"address": 0x44, "status": "Not detected"},
             "LCD2004": {"address": 0x27, "status": "Not detected"},
             "LCD1602": {"address": 0x27, "status": "Not detected"},
             "BONNET": {"address": 0x00, "status": "Not detected"},
@@ -268,6 +286,7 @@ class SystemStatus:
             "SHTC3": self.detect_shtc3,
             "SHT4X_Internal": self.detect_sht4X_internal,
             "SHT4X_External": self.detect_sht4X_external,
+            "SHT4X_Ambient": self.detect_sht4X_external,
             "LCD2004": self.detect_lcd2004,
             "LCD1602": self.detect_lcd1602,
             "EMC2101": self.detect_emc2101,

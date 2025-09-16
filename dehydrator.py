@@ -62,6 +62,8 @@ def sensor(stop_event):
      INTERNAL_TEMP, INTERNAL_HUMIDITY, INTERNAL_PREVIOUS_HUMIDITY, EXTERNAL_TEMP, EXTERNAL_LOW_TEMP, \
         EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY, EXTERNAL_TEMP, \
         EXTERNAL_HUMIDITY, EXTERNAL_PREVIOUS_HUMIDITY
+    global AMBIENT_HIGH_TEMP, AMBIENT_HIGH_HUMIDITY, AMBIENT_LOW_TEMP, AMBIENT_LOW_HUMIDITY,\
+     AMBIENT_TEMP, AMBIENT_HUMIDITY, AMBIENT_PREVIOUS_HUMIDITY
 
     while running and not stop_event.is_set():
         try:
@@ -77,7 +79,6 @@ def sensor(stop_event):
                 logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SENSORS', 'INTERNAL',
                            f"Temperature: {internaloutput['temperature']}F, Humidity: {internaloutput['humidity']}%")
                 INTERNAL_PREVIOUS_HUMIDITY = INTERNAL_HUMIDITY
-
 
             # Update the config file with stats
             new_high_humidity = max(INTERNAL_HIGH_HUMIDITY, internaloutput['humidity'])
@@ -130,8 +131,8 @@ def sensor(stop_event):
                 save_config()
 
             if abs(EXTERNAL_HUMIDITY - EXTERNAL_PREVIOUS_HUMIDITY) > 0.3:
-                """Log internal sensor reading and update previous output values."""
-                logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'AMBIENT',
+                """Log external sensor reading and update previous output values."""
+                logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'EXTERNAL',
                            f"Temperature: {externaloutput['temperature']}F,"
                            f" Humidity: {externaloutput['humidity']}%")
                 EXTERNAL_PREVIOUS_HUMIDITY = EXTERNAL_HUMIDITY
@@ -140,7 +141,14 @@ def sensor(stop_event):
             EXTERNAL_TEMP = externaloutput['temperature']
             EXTERNAL_HUMIDITY = externaloutput['humidity']
 
-
+            ambientoutput = externalsensor.read_sensor()
+            ambientoutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
+            AMBIENT_TEMP = ambientoutput['temperature']
+            AMBIENT_HUMIDITY = ambientoutput['humidity']
+            """Log external sensor reading and update previous output values."""
+            logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'AMBIENT',
+                       f"Temperature: {ambientoutput['temperature']}F,"
+                       f" Humidity: {ambientoutput['humidity']}%")
 
         except Exception as e:
             logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM', 'SENSOR',
@@ -399,7 +407,7 @@ def display_set_humidity():
 
 def display_stats_reset():
     global selected_option, current_page
-    current_page = 5
+    current_page = Screen.RESET.index
     BONNETDisplay.display_ok_clear("Stats Reset",ok_text="OK", clear_text="CANCEL", color_name="white",
                                    brightness_factor=1.0, selected=selected_option)
 
@@ -494,6 +502,13 @@ def button_pressed_callback(button):
             elif selected_option == 2: # CLEAR Selected
                 FAN_LIMIT *= 2  # Double the fan limit
                 fan_limit_exceeded_count += 1  # reset counter
+                current_page = Screen.DEFAULT.index  # Return to page 0
+                schedule_tasks()
+        elif current_page == Screen.RESET.index:
+            if selected_option == 1: # OK Selected
+                schedule.clear()
+                stats_reset()
+            elif selected_option == 2: # CANCEL Selected
                 current_page = Screen.DEFAULT.index  # Return to page 0
                 schedule_tasks()
     elif button.pin.number == BTN_B_PIN:
@@ -674,6 +689,10 @@ if __name__ == "__main__":
     EXTERNAL_LOW_TEMP = configManager.get_float_config('LOG', 'external_low_temp')
     EXTERNAL_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'external_high_humidity')
     EXTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'external_low_humidity')
+    AMBIENT_HIGH_TEMP = configManager.get_float_config('LOG', 'ambient_high_temp')
+    AMBIENT_LOW_TEMP = configManager.get_float_config('LOG', 'ambient_low_temp')
+    AMBIENT_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'ambient_high_humidity')
+    AMBIENT_LOW_HUMIDITY = configManager.get_float_config('LOG', 'ambient_low_humidity')
     CYCLE_COUNT = configManager.get_int_config('cycle_count')
     FAN_TOTAL_DURATION = configManager.get_duration_config('LOG', 'FAN_TOTAL_DURATION')
     FAN_MAX_RUNTIME = configManager.get_duration_config('LOG', 'FAN_MAX_RUNTIME')

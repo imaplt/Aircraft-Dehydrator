@@ -59,11 +59,12 @@ class Screen(Enum):
     INTERNAL = (2, "Internal Stats Screen")
     AMBIENT = (3, "Ambient Stats Screen")
     HUMIDITY = (4, "Humidity Set Screen")
-    FAN_LIMIT = (5, "Fan Limit")
-    SHUTDOWN = (6, "Shutdown")
-    INITIAL = (7, "Initial")
-    FAN_START = (8, "Fan Start")
-    FAN_STOP = (9, "Fan Stop")
+    RESET = (5, "Reset")
+    FAN_LIMIT = (6, "Fan Limit")
+    SHUTDOWN = (7, "Shutdown")
+    INITIAL = (8, "Initial")
+    FAN_START = (9, "Fan Start")
+    FAN_STOP = (10, "Fan Stop")
 
     def __init__(self, index, title):
         self.index = index                  # The screen index (for switching)

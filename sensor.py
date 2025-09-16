@@ -15,6 +15,7 @@ from safei2c import SafeI2C
 MUX_ADDR = 0x70  # Default address for TCA9548A multiplexer
 INTERNAL_SENSOR_PORT = 0
 EXTERNAL_SENSOR_PORT = 1
+AMBIENT_SENSOR_PORT = 7
 
 SHT4X_NOHEAT_HIGHPRECISION = 0xFD  # High precision measurement, no heater
 SHT4X_NOHEAT_MEDPRECISION = 0xF6  # Medium precision measurement, no heater
@@ -91,6 +92,9 @@ class Sensor:
 
         elif sensor_type == "SHT4X_External":
             self.sensor = adafruit_sht4x.SHT4x(_MUX[EXTERNAL_SENSOR_PORT])
+
+        elif sensor_type == "SHT4X_Ambient":
+            self.sensor = adafruit_sht4x.SHT4x(_MUX[AMBIENT_SENSOR_PORT])
 
         elif sensor_type == "SHTC3":
             self.sensor = adafruit_shtc3.SHTC3(_I2C)

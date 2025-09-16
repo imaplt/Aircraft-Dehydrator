@@ -114,6 +114,10 @@ def sensor_summary_stats():
     EXTERNAL_LOW_TEMP = configManager.get_float_config('LOG', 'external_low_temp')
     EXTERNAL_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'external_high_humidity')
     EXTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'external_low_humidity')
+    AMBIENT_HIGH_TEMP = configManager.get_float_config('LOG', 'ambient_high_temp')
+    AMBIENT_LOW_TEMP = configManager.get_float_config('LOG', 'ambient_low_temp')
+    AMBIENT_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'ambient_high_humidity')
+    AMBIENT_LOW_HUMIDITY = configManager.get_float_config('LOG', 'ambient_low_humidity')
     CYCLE_COUNT = configManager.get_int_config('cycle_count')
     FAN_TOTAL_DURATION = configManager.get_duration_config('LOG', 'FAN_TOTAL_DURATION')
     FAN_MAX_RUNTIME = configManager.get_duration_config('LOG', 'FAN_MAX_RUNTIME')
@@ -127,6 +131,11 @@ def sensor_summary_stats():
         f"Temp: {EXTERNAL_LOW_TEMP:.1f}–{EXTERNAL_HIGH_TEMP:.1f}°F  "
         f"Humidity: {EXTERNAL_LOW_HUMIDITY:.1f}–{EXTERNAL_HIGH_HUMIDITY:.1f}%"
     )
+    # External environment
+    ambient_line = (
+        f"Temp: {AMBIENT_LOW_TEMP:.1f}–{AMBIENT_HIGH_TEMP:.1f}°F  "
+        f"Humidity: {AMBIENT_LOW_HUMIDITY:.1f}–{AMBIENT_HIGH_HUMIDITY:.1f}%"
+    )
     # Fan stats
     fan_line = (
         f"Cycles: {CYCLE_COUNT}, "
@@ -137,5 +146,6 @@ def sensor_summary_stats():
     return {
         "Internal Sensor": internal_line,
         "External Sensor": external_line,
+        "Ambient Sensor": ambient_line,
         "Fan": fan_line
     }
