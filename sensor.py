@@ -105,7 +105,7 @@ class Sensor:
         else:
             raise ValueError(
                 "Invalid sensor type. Supported types: 'SHT4X_Internal', "
-                "'SHT4X_External', 'SHTC3', 'SHT30'"
+                "'SHT4X_External', 'SHT4X_Ambient', 'SHTC3', 'SHT30'"
             )
 
     def sensor_status(self):

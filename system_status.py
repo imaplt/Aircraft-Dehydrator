@@ -81,6 +81,16 @@ class SystemStatus:
                 )
                 print(f"Detected, temperature: {_celsius_to_fahrenheit(sht4X_external.temperature):.1f} F, humidity: "
                       f"{sht4X_external.relative_humidity:.1f} %")
+                # External sensor
+            if AMBIENT_SENSOR_PORT < len(mux):
+                sht4X_ambient = adafruit_sht4x.SHT4x(mux[AMBIENT_SENSOR_PORT])
+                devices["SHT4X_Ambient"]["status"] = (
+                    f"Detected, temperature: {_celsius_to_fahrenheit(sht4X_ambient.temperature):.1f} F, humidity: "
+                    f"{sht4X_ambient.relative_humidity:.1f} %"
+                )
+                print(
+                    f"Detected, temperature: {_celsius_to_fahrenheit(sht4X_ambient.temperature):.1f} F, humidity: "
+                    f"{sht4X_ambient.relative_humidity:.1f} %")
 
         except Exception as e:
             devices["MUX"]["status"] = f"Error: {str(e)}"
