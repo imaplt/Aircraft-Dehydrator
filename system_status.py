@@ -296,7 +296,7 @@ class SystemStatus:
             "SHTC3": self.detect_shtc3,
             "SHT4X_Internal": self.detect_sht4X_internal,
             "SHT4X_External": self.detect_sht4X_external,
-            "SHT4X_Ambient": self.detect_sht4X_external,
+            "SHT4X_Ambient": self.detect_sht4X_ambient,
             "LCD2004": self.detect_lcd2004,
             "LCD1602": self.detect_lcd1602,
             "EMC2101": self.detect_emc2101,

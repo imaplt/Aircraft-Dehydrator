@@ -232,7 +232,6 @@ def task_update():
         handle_fan_operation(started, False, run_time, "start")
     elif INTERNAL_HUMIDITY < MIN_HUMIDITY:
         stopped, run_time = fanController.set_fan_speed(0)
-        print(f"Stopped fan run time: {str(run_time)}")
         handle_fan_operation(False, stopped, run_time, "stop")
 
     if fanController.fan_engaged:
@@ -577,7 +576,6 @@ def stats_reset():
     INTERNAL_HIGH_HUMIDITY = INTERNAL_LOW_HUMIDITY = (INTERNAL_HUMIDITY, ) * 2
     EXTERNAL_HIGH_TEMP = EXTERNAL_LOW_TEMP = (EXTERNAL_TEMP, ) * 2
     EXTERNAL_HIGH_HUMIDITY = EXTERNAL_LOW_HUMIDITY = (EXTERNAL_HUMIDITY, ) * 2
-
 
 def cleanup():
     # Want to add code here to update display, update log with run time etc
