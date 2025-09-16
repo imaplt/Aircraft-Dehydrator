@@ -141,7 +141,7 @@ def sensor(stop_event):
             EXTERNAL_TEMP = externaloutput['temperature']
             EXTERNAL_HUMIDITY = externaloutput['humidity']
 
-            ambientoutput = externalsensor.read_sensor()
+            ambientoutput = ambientsensor.read_sensor()
             ambientoutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
             AMBIENT_TEMP = ambientoutput['temperature']
             AMBIENT_HUMIDITY = ambientoutput['humidity']
@@ -789,6 +789,10 @@ if __name__ == "__main__":
             externalsensor = Sensor('SHTC3', 0x70)
         else:
             externalsensor = Sensor('SHT4X_External', 0x44)
+
+        # Initialise the ambient sensor
+        ambientsensor = Sensor('SHT4X_Ambient', 0x44)
+
 
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}
