@@ -22,6 +22,7 @@ print("Dehydrator main loaded")
 spinner_frames = ['▖', '▘', '▝', '▗']
 # Get configuration items
 configManager = ConfigManager('config.ini')
+INITIAL_STARTUP = configManager.get_config('initial_startup')
 LOGFILE = configManager.get_config('logfile')
 MAX_LOG_SIZE = configManager.get_int_config('max_log_size')
 MAX_ARCHIVE_SIZE = configManager.get_int_config('max_archive_size')
@@ -279,7 +280,7 @@ def task_update():
     # Display the updated information on the current page if applicable
     update_current_page()
 
-    if time.time() - last_page_changed  > 8 and (0 < current_page < 5):
+    if time.time() - last_page_changed  > 8 and (0 < current_page < 6):
         current_page = Screen.DEFAULT.index
         show_page(current_page)
 
@@ -753,7 +754,6 @@ if __name__ == "__main__":
     EXTERNAL_TEMP = EXTERNAL_HUMIDITY = 0
     AMBIENT_TEMP = AMBIENT_HUMIDITY = 0
 
-
     # Global state variables
     humidity_mode = "selection"  # Can be 'selection' or 'edit'
     humidity_selected = "max"  # Can be 'max' or 'min'
@@ -765,8 +765,6 @@ if __name__ == "__main__":
     min_color = "white"
     current_frame_index = 0
     page_changed = False
-
-
 
     # GPIO setup using gpiozero for input buttons
     btn_lt = Button(BTN_L_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
@@ -841,7 +839,7 @@ if __name__ == "__main__":
         AMBIENT_PREVIOUS_HUMIDITY = 0
 
         # This should happen when things are reset
-        if AMBIENT_LOW_TEMP and AMBIENT_HIGH_TEMP == 0:
+        if INITIAL_STARTUP == "True":
             ambientoutput = ambientsensor.read_sensor()
             AMBIENT_TEMP = AMBIENT_LOW_TEMP = AMBIENT_HIGH_TEMP = ambientoutput['temperature'] = celsius_to_fahrenheit(ambientoutput['temperature'])
             ambientprevious_output = ambientoutput
