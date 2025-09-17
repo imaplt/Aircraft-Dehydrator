@@ -67,6 +67,7 @@ def sensor(stop_event):
 
     while running and not stop_event.is_set():
         try:
+            ### BEGIN Internal Sensor Code block
             internaloutput = internalsensor.read_sensor()
             internaloutput['temperature'] = celsius_to_fahrenheit(internaloutput['temperature'])
 
@@ -104,6 +105,8 @@ def sensor(stop_event):
                 save_config()
 
             ambient_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) # type: ignore
+
+            ### BEGIN EXTERNAL Sensor Code block
             externaloutput = externalsensor.read_sensor()
             externaloutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
 
@@ -141,14 +144,44 @@ def sensor(stop_event):
             EXTERNAL_TEMP = externaloutput['temperature']
             EXTERNAL_HUMIDITY = externaloutput['humidity']
 
+            ### BEGIN AMBIENT Sensor Code block
             ambientoutput = ambientsensor.read_sensor()
             ambientoutput['temperature'] = celsius_to_fahrenheit(ambientoutput['temperature'])
+
+            # Calculate new high and low values
+            new_high_humidity = max(AMBIENT_HIGH_HUMIDITY, ambientoutput['humidity'])
+            new_low_humidity = min(AMBIENT_LOW_HUMIDITY, ambientoutput['humidity'])
+
+            new_high_temp = max(AMBIENT_HIGH_TEMP, ambientoutput['temperature'])
+            new_low_temp = min(AMBIENT_LOW_TEMP, ambientoutput['temperature'])
+
+            # Check if any values changed
+            log_changed = (
+                    new_high_humidity != AMBIENT_HIGH_HUMIDITY or
+                    new_low_humidity != AMBIENT_LOW_HUMIDITY or
+                    new_high_temp != AMBIENT_HIGH_TEMP or
+                    new_low_temp != AMBIENT_LOW_TEMP
+            )
+
+            # Update the variables if they changed
+            if log_changed:
+                AMBIENT_HIGH_HUMIDITY = new_high_humidity
+                AMBIENT_LOW_HUMIDITY = new_low_humidity
+                AMBIENT_HIGH_TEMP = new_high_temp
+                AMBIENT_LOW_TEMP = new_low_temp
+                save_config()
+
+            if abs(AMBIENT_HUMIDITY - AMBIENT_PREVIOUS_HUMIDITY) > 0.3:
+                """Log ambient sensor reading and update previous output values."""
+                logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'AMBIENT',
+                           f"Temperature: {ambientoutput['temperature']}F,"
+                           f" Humidity: {ambientoutput['humidity']}%")
+                AMBIENT_PREVIOUS_HUMIDITY = AMBIENT_HUMIDITY
+
+            # Update the global variables and print the reading
             AMBIENT_TEMP = ambientoutput['temperature']
             AMBIENT_HUMIDITY = ambientoutput['humidity']
-            """Log external sensor reading and update previous output values."""
-            logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'AMBIENT',
-                       f"Temperature: {ambientoutput['temperature']}F,"
-                       f" Humidity: {ambientoutput['humidity']}%")
+
 
         except Exception as e:
             logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM', 'SENSOR',
@@ -161,6 +194,7 @@ def task_update():
         CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
         INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP, page_changed
     global EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP, EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY
+    global AMBIENT_LOW_TEMP, AMBIENT_HIGH_TEMP, AMBIENT_LOW_HUMIDITY, AMBIENT_HIGH_HUMIDITY
     global runtime
     task_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     def handle_fan_operation(fan_started, fan_stopped, run_time, action):
@@ -793,21 +827,6 @@ if __name__ == "__main__":
         # Initialise the ambient sensor
         ambientsensor = Sensor('SHT4X_Ambient', 0x44)
 
-        # This should happen when things are reset
-        if AMBIENT_LOW_TEMP and AMBIENT_HIGH_TEMP == 0:
-            ambientoutput = ambientsensor.read_sensor()
-            ambientoutput['temperature'] = celsius_to_fahrenheit(ambientoutput['temperature'])
-            AMBIENT_TEMP = ambientoutput['temperature']
-            AMBIENT_HUMIDITY = ambientoutput['humidity']
-            internaloutput = internalsensor.read_sensor()
-            internaloutput['temperature'] = celsius_to_fahrenheit(internaloutput['temperature'])
-            INTERNAL_TEMP = internaloutput['temperature']
-            INTERNAL_HUMIDITY = internaloutput['humidity']
-            externaloutput = externalsensor.read_sensor()
-            externaloutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
-            EXTERNAL_TEMP = externaloutput['temperature']
-            EXTERNAL_HUMIDITY = externaloutput['humidity']
-
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}
         INTERNAL_PREVIOUS_HUMIDITY = 0
@@ -815,6 +834,22 @@ if __name__ == "__main__":
         EXTERNAL_PREVIOUS_HUMIDITY = 0
         ambientprevious_output = {'temperature': 0, 'humidity': 0}
         AMBIENT_PREVIOUS_HUMIDITY = 0
+
+        # This should happen when things are reset
+        if AMBIENT_LOW_TEMP and AMBIENT_HIGH_TEMP == 0:
+            ambientoutput = ambientsensor.read_sensor()
+            AMBIENT_TEMP, ambientoutput['temperature'] = celsius_to_fahrenheit(ambientoutput['temperature'])
+            ambientprevious_output = ambientoutput
+            AMBIENT_PREVIOUS_HUMIDITY, AMBIENT_HUMIDITY = ambientoutput['humidity']
+            internaloutput = internalsensor.read_sensor()
+            INTERNAL_TEMP, internaloutput['temperature'] = celsius_to_fahrenheit(internaloutput['temperature'])
+            internalprevious_output = internaloutput
+            INTERNAL_PREVIOUS_HUMIDITY, INTERNAL_HUMIDITY = internaloutput['humidity']
+            externaloutput = externalsensor.read_sensor()
+            EXTERNAL_TEMP, externaloutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
+            externalprevious_output = externaloutput
+            EXTERNAL_PREVIOUS_HUMIDITY, EXTERNAL_HUMIDITY = externaloutput['humidity']
+
 
         schedule_tasks(int_interval=TASK_INTERNAL, fan_interval=TASK_FAN)
 
