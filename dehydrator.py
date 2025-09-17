@@ -744,9 +744,9 @@ if __name__ == "__main__":
     BUTTON_HOLD_TIME = 3
     humidity_changed = False
     mode = None
-    INTERNAL_TEMP, INTERNAL_HUMIDITY = 0
-    EXTERNAL_TEMP, EXTERNAL_HUMIDITY = 0
-    AMBIENT_TEMP, AMBIENT_HUMIDITY = 0
+    INTERNAL_TEMP = INTERNAL_HUMIDITY = 0
+    EXTERNAL_TEMP = EXTERNAL_HUMIDITY = 0
+    AMBIENT_TEMP = AMBIENT_HUMIDITY = 0
 
 
     # Global state variables
@@ -838,17 +838,17 @@ if __name__ == "__main__":
         # This should happen when things are reset
         if AMBIENT_LOW_TEMP and AMBIENT_HIGH_TEMP == 0:
             ambientoutput = ambientsensor.read_sensor()
-            AMBIENT_TEMP, ambientoutput['temperature'] = celsius_to_fahrenheit(ambientoutput['temperature'])
+            AMBIENT_TEMP = ambientoutput['temperature'] = celsius_to_fahrenheit(ambientoutput['temperature'])
             ambientprevious_output = ambientoutput
-            AMBIENT_PREVIOUS_HUMIDITY, AMBIENT_HUMIDITY = ambientoutput['humidity']
+            AMBIENT_PREVIOUS_HUMIDITY = AMBIENT_HUMIDITY = ambientoutput['humidity']
             internaloutput = internalsensor.read_sensor()
-            INTERNAL_TEMP, internaloutput['temperature'] = celsius_to_fahrenheit(internaloutput['temperature'])
+            INTERNAL_TEMP = internaloutput['temperature'] = celsius_to_fahrenheit(internaloutput['temperature'])
             internalprevious_output = internaloutput
-            INTERNAL_PREVIOUS_HUMIDITY, INTERNAL_HUMIDITY = internaloutput['humidity']
+            INTERNAL_PREVIOUS_HUMIDITY = INTERNAL_HUMIDITY = internaloutput['humidity']
             externaloutput = externalsensor.read_sensor()
-            EXTERNAL_TEMP, externaloutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
+            EXTERNAL_TEMP = externaloutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
             externalprevious_output = externaloutput
-            EXTERNAL_PREVIOUS_HUMIDITY, EXTERNAL_HUMIDITY = externaloutput['humidity']
+            EXTERNAL_PREVIOUS_HUMIDITY = EXTERNAL_HUMIDITY = externaloutput['humidity']
 
 
         schedule_tasks(int_interval=TASK_INTERNAL, fan_interval=TASK_FAN)
