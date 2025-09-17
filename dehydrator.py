@@ -640,6 +640,7 @@ def save_config():
     global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
     global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
     global EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
+    global AMBIENT_LOW_HUMIDITY, AMBIENT_HIGH_HUMIDITY, AMBIENT_LOW_TEMP, AMBIENT_HIGH_TEMP
     global CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_MAX_RUNTIME
 
     configManager.update_config('min_humidity', MIN_HUMIDITY)
@@ -652,6 +653,10 @@ def save_config():
     configManager.update_config('external_low_temp', EXTERNAL_LOW_TEMP, 'LOG')
     configManager.update_config('external_high_humidity', EXTERNAL_HIGH_HUMIDITY, 'LOG')
     configManager.update_config('external_low_humidity', EXTERNAL_LOW_HUMIDITY, 'LOG')
+    configManager.update_config('ambient_high_temp', AMBIENT_HIGH_TEMP, 'LOG')
+    configManager.update_config('ambient_low_temp', AMBIENT_LOW_TEMP, 'LOG')
+    configManager.update_config('ambient_high_humidity', AMBIENT_HIGH_HUMIDITY, 'LOG')
+    configManager.update_config('ambient_low_humidity', AMBIENT_LOW_HUMIDITY, 'LOG')
     configManager.update_config('cycle_count', CYCLE_COUNT, 'LOG')
     configManager.set_duration_config('fan_total_duration', FAN_TOTAL_DURATION, 'LOG')
     configManager.set_duration_config('MAX_FAN_RUNTIME', FAN_MAX_RUNTIME, 'LOG')
