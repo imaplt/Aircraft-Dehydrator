@@ -849,7 +849,7 @@ if __name__ == "__main__":
             EXTERNAL_TEMP = EXTERNAL_LOW_TEMP = EXTERNAL_HIGH_TEMP = externaloutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
             externalprevious_output = externaloutput
             EXTERNAL_PREVIOUS_HUMIDITY = EXTERNAL_HUMIDITY = EXTERNAL_LOW_HUMIDITY = EXTERNAL_HIGH_HUMIDITY = externaloutput['humidity']
-
+            save_config()
 
         schedule_tasks(int_interval=TASK_INTERNAL, fan_interval=TASK_FAN)
 
