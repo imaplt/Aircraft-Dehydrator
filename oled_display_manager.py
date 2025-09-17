@@ -57,7 +57,7 @@ class Screen(Enum):
     DEFAULT = (0, "Internal Sensor Screen")
     FAN = (1, "Fan Status Screen")
     INTERNAL = (2, "Internal Stats Screen")
-    AMBIENT = (3, "Ambient Stats Screen")
+    AMBIENT = (3, "External Stats Screen")
     HUMIDITY = (4, "Humidity Set Screen")
     RESET = (5, "Reset")
     FAN_LIMIT = (6, "Fan Limit")

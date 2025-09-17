@@ -142,7 +142,7 @@ def sensor(stop_event):
             EXTERNAL_HUMIDITY = externaloutput['humidity']
 
             ambientoutput = ambientsensor.read_sensor()
-            ambientoutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
+            ambientoutput['temperature'] = celsius_to_fahrenheit(ambientoutput['temperature'])
             AMBIENT_TEMP = ambientoutput['temperature']
             AMBIENT_HUMIDITY = ambientoutput['humidity']
             """Log external sensor reading and update previous output values."""
@@ -505,11 +505,10 @@ def button_pressed_callback(button):
                 schedule_tasks()
         elif current_page == Screen.RESET.index:
             if selected_option == 1: # OK Selected
-                schedule.clear()
                 stats_reset()
+                save_config()
             elif selected_option == 2: # CANCEL Selected
                 current_page = Screen.DEFAULT.index  # Return to page 0
-                schedule_tasks()
     elif button.pin.number == BTN_B_PIN:
          print("B button pressed")
     else:
@@ -569,6 +568,7 @@ def stats_reset():
     global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
     global INTERNAL_HIGH_TEMP, INTERNAL_LOW_TEMP
     global EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
+    global AMBIENT_LOW_HUMIDITY, AMBIENT_HIGH_HUMIDITY, AMBIENT_LOW_TEMP, AMBIENT_HIGH_TEMP
     global CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_MAX_RUNTIME
 
     CYCLE_COUNT = FAN_TOTAL_DURATION = FAN_MAX_RUNTIME = 0
@@ -576,6 +576,8 @@ def stats_reset():
     INTERNAL_HIGH_HUMIDITY = INTERNAL_LOW_HUMIDITY = (INTERNAL_HUMIDITY, ) * 2
     EXTERNAL_HIGH_TEMP = EXTERNAL_LOW_TEMP = (EXTERNAL_TEMP, ) * 2
     EXTERNAL_HIGH_HUMIDITY = EXTERNAL_LOW_HUMIDITY = (EXTERNAL_HUMIDITY, ) * 2
+    AMBIENT_HIGH_TEMP = AMBIENT_LOW_TEMP = (AMBIENT_TEMP, ) * 2
+    AMBIENT_HIGH_HUMIDITY = AMBIENT_LOW_HUMIDITY = (AMBIENT_HUMIDITY, ) * 2
 
 def cleanup():
     # Want to add code here to update display, update log with run time etc
@@ -791,12 +793,28 @@ if __name__ == "__main__":
         # Initialise the ambient sensor
         ambientsensor = Sensor('SHT4X_Ambient', 0x44)
 
+        # This should happen when things are reset
+        if AMBIENT_LOW_TEMP and AMBIENT_HIGH_TEMP == 0:
+            ambientoutput = ambientsensor.read_sensor()
+            ambientoutput['temperature'] = celsius_to_fahrenheit(ambientoutput['temperature'])
+            AMBIENT_TEMP = ambientoutput['temperature']
+            AMBIENT_HUMIDITY = ambientoutput['humidity']
+            internaloutput = internalsensor.read_sensor()
+            internaloutput['temperature'] = celsius_to_fahrenheit(internaloutput['temperature'])
+            INTERNAL_TEMP = internaloutput['temperature']
+            INTERNAL_HUMIDITY = internaloutput['humidity']
+            externaloutput = externalsensor.read_sensor()
+            externaloutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
+            EXTERNAL_TEMP = externaloutput['temperature']
+            EXTERNAL_HUMIDITY = externaloutput['humidity']
 
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}
         INTERNAL_PREVIOUS_HUMIDITY = 0
         externalprevious_output = {'temperature': 0, 'humidity': 0}
         EXTERNAL_PREVIOUS_HUMIDITY = 0
+        ambientprevious_output = {'temperature': 0, 'humidity': 0}
+        AMBIENT_PREVIOUS_HUMIDITY = 0
 
         schedule_tasks(int_interval=TASK_INTERNAL, fan_interval=TASK_FAN)
 
