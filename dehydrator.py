@@ -744,10 +744,10 @@ if __name__ == "__main__":
     BUTTON_HOLD_TIME = 3
     humidity_changed = False
     mode = None
-    INTERNAL_TEMP = 0
-    INTERNAL_HUMIDITY = 0
-    EXTERNAL_TEMP = 0
-    EXTERNAL_HUMIDITY = 0
+    INTERNAL_TEMP, INTERNAL_HUMIDITY = 0
+    EXTERNAL_TEMP, EXTERNAL_HUMIDITY = 0
+    AMBIENT_TEMP, AMBIENT_HUMIDITY = 0
+
 
     # Global state variables
     humidity_mode = "selection"  # Can be 'selection' or 'edit'
