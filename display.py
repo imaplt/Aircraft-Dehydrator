@@ -319,7 +319,15 @@ class BONNETDisplay:
 
             # Draw text starting at y
             position = (x_position, y)
-            print("Position:", position)
+            # print("Position:", position)
+            # Number
+            # Lines: 6
+            # Position: (0, 0)
+            # Position: (0, 30)
+            # Position: (0, 60)
+            # Position: (0, 90)
+            # Position: (0, 120)
+            # Position: (0, 150)
             self.draw.text(position, text, font=self.font, fill=color)
             self.draw.text(position, text, font=self.font, fill=color)
 
