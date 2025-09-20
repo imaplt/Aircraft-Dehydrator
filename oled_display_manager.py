@@ -57,14 +57,15 @@ class Screen(Enum):
     DEFAULT = (0, "Internal Sensor Screen")
     FAN = (1, "Fan Status Screen")
     INTERNAL = (2, "Internal Stats Screen")
-    AMBIENT = (3, "External Stats Screen")
-    HUMIDITY = (4, "Humidity Set Screen")
-    RESET = (5, "Reset")
-    FAN_LIMIT = (6, "Fan Limit")
-    SHUTDOWN = (7, "Shutdown")
-    INITIAL = (8, "Initial")
-    FAN_START = (9, "Fan Start")
-    FAN_STOP = (10, "Fan Stop")
+    EXTERNAL = (3, "External Stats Screen")
+    AMBIENT = (4, "External Stats Screen")
+    HUMIDITY = (5, "Humidity Set Screen")
+    RESET = (6, "Reset")
+    FAN_LIMIT = (7, "Fan Limit")
+    SHUTDOWN = (8, "Shutdown")
+    INITIAL = (9, "Initial")
+    FAN_START = (10, "Fan Start")
+    FAN_STOP = (11, "Fan Stop")
 
     def __init__(self, index, title):
         self.index = index                  # The screen index (for switching)
@@ -78,7 +79,7 @@ class OLEDDisplayManager:
         self.font = font
 
         # Initialize 8 different image buffers for the OLED
-        self.images = [Image.new('RGB', (self.width, self.height), "black") for _ in range(11)]
+        self.images = [Image.new('RGB', (self.width, self.height), "black") for _ in range(12)]
 
         # Initialize a list of drawing objects for each image buffer
         self.draws = [ImageDraw.Draw(img) for img in self.images]
@@ -90,11 +91,11 @@ class OLEDDisplayManager:
 
         # Dictionary mapping screen indexes to update methods
         self.screen_update_methods = {
-            8 : self.initial_screen,
-            7 : self.shutdown_screen,
-            6 : self.fan_limit_screen,
-            9 : self.fan_start_screen,
-            10 : self.fan_stop_screen,
+            9 : self.initial_screen,
+            8 : self.shutdown_screen,
+            7 : self.fan_limit_screen,
+            10 : self.fan_start_screen,
+            11 : self.fan_stop_screen,
         }
         # Initialize lines
         self.oled_lines = [""] * 5
@@ -124,6 +125,13 @@ class OLEDDisplayManager:
 
     def update_internal_screen(self, texts):
         self.current_image_index = Screen.INTERNAL.index
+        self.image = self.images[self.current_image_index]
+        self.draw = self.draws[self.current_image_index]
+        self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen
+        display_rows(self, texts, justification='left')
+
+    def update_external_screen(self, texts):
+        self.current_image_index = Screen.EXTERNAL.index
         self.image = self.images[self.current_image_index]
         self.draw = self.draws[self.current_image_index]
         self.draw.rectangle((0, 0, self.width, self.height), fill="black")  # Clear the screen

@@ -447,13 +447,19 @@ def display_stats_reset():
 
 def update_stats():
     internal_max_temp = INTERNAL_HIGH_TEMP
+    external_max_temp = EXTERNAL_HIGH_TEMP
     ambient_max_temp = EXTERNAL_HIGH_TEMP
-    internal_min_temp = INTERNAL_HIGH_TEMP
-    ambient_min_temp = EXTERNAL_HIGH_TEMP
+    internal_min_temp = INTERNAL_LOW_TEMP
+    external_min_temp = EXTERNAL_LOW_TEMP
+    ambient_min_temp = EXTERNAL_LOW_TEMP
 
     display_manager.update_internal_screen(texts=["Internal Stats:", f"Max Temp {internal_max_temp}F",
                                            f"Min Temp {internal_min_temp}F", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
                                            f"Min Hum {INTERNAL_LOW_HUMIDITY}"])
+
+    display_manager.update_external_screen(texts=["External Stats:", f"Max Temp {external_max_temp}F",
+                                                  f"Min Temp {external_min_temp}F", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
+                                                  f"Min Hum {EXTERNAL_LOW_HUMIDITY}"])
 
     display_manager.update_ambient_screen(texts=["Ambient Stats:", f"Max Temp {ambient_max_temp}F",
                                            f"Min Temp {ambient_min_temp}F", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
@@ -478,6 +484,9 @@ def show_page(page_index):
         display_manager.display_current_image(BONNETDisplay.disp)
     elif page_index == Screen.INTERNAL.index:
         display_manager.switch_image(Screen.INTERNAL)
+        display_manager.display_current_image(BONNETDisplay.disp)
+    elif page_index == Screen.EXTERNAL.index:
+        display_manager.switch_image(Screen.EXTERNAL)
         display_manager.display_current_image(BONNETDisplay.disp)
     elif page_index == Screen.AMBIENT.index:
         display_manager.switch_image(Screen.AMBIENT)
@@ -759,7 +768,7 @@ if __name__ == "__main__":
     humidity_selected = "max"  # Can be 'max' or 'min'
     humidity_blink_state = True  # Used for blinking the value in edit mode
     current_page = 0
-    total_pages = 6
+    total_pages = 7
     selected_option = 1
     max_color = "white"
     min_color = "white"
