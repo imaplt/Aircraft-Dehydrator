@@ -247,11 +247,11 @@ def task_update():
         if current_page == Screen.DEFAULT.index:
             with lock:
                 BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°F",
-                                           x_pos=5,y_pos=30, color_name="white", brightness_factor=1.0)
+                                           x_pos=0,y_pos=30, color_name="white", brightness_factor=1.0)
                 BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°F",
-                                           x_pos=5,y_pos=90, color_name="white", brightness_factor=1.0)
+                                           x_pos=0,y_pos=90, color_name="white", brightness_factor=1.0)
                 BONNETDisplay.display_text(text=f"{AMBIENT_HUMIDITY}% - {AMBIENT_TEMP}°F",
-                                           x_pos=5, y_pos=150, color_name="white", brightness_factor=1.0)
+                                           x_pos=0, y_pos=150, color_name="white", brightness_factor=1.0)
 
                 frame = get_next_frame()
                 BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
