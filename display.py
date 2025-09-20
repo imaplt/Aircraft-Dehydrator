@@ -293,15 +293,13 @@ class BONNETDisplay:
     def display_rows_top(self, texts, current_page, fan_running=False, color_name="white",
                          brightness_factor=1.0, justification='center'):
         self.clear_screen()
-        num_lines = min(6, len(texts))  # allow up to 6 lines
-        line_height = self.font.getbbox("Ag")[3] + 2  # consistent line spacing from font height + padding
+        num_lines = min(6, len(texts))
+        line_height = self.font.getbbox("Ag")[3] + 4  # padding between lines
 
         # Get color with brightness applied
         color = self.set_brightness(color_name, brightness_factor)
 
-        # Start drawing from the top
         y = 0
-        print("Number Lines:", num_lines)
         for i in range(num_lines):
             text = texts[i]
             self.oled_lines[i] = text
@@ -309,32 +307,22 @@ class BONNETDisplay:
             text_width = bbox[2] - bbox[0]
             text_height = bbox[3] - bbox[1]
 
+            # Alternate indent for every other line
+            x_indent = 4 if i % 2 == 1 else 0
+
             # Calculate horizontal position based on justification
             if justification == 'left':
-                x_position = 0
+                x_position = x_indent
             elif justification == 'right':
-                x_position = self.width - text_width
-            else:  # default to center
-                x_position = (self.width - text_width) // 2
+                x_position = self.width - text_width - x_indent
+            else:  # center
+                x_position = (self.width - text_width) // 2 + x_indent
 
-            # Draw text starting at y
             position = (x_position, y)
-            # print("Position:", position)
-            # Number
-            # Lines: 6
-            # Position: (0, 0)
-            # Position: (0, 30)
-            # Position: (0, 60)
-            # Position: (0, 90)
-            # Position: (0, 120)
-            # Position: (0, 150)
             self.draw.text(position, text, font=self.font, fill=color)
-            self.draw.text(position, text, font=self.font, fill=color)
-
-            # Move down for next line
             y += line_height
 
-        # --- Fan icon (only for page 0) ---
+        # Fan icon at bottom (for page 0)
         if current_page == 0:
             fan_icon = Image.open("fan_icon.png").convert("RGBA").resize((32, 32))
             fan_color = (0, 255, 0, 255) if fan_running else (255, 255, 255, 255)
