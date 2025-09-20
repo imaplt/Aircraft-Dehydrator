@@ -319,6 +319,8 @@ class BONNETDisplay:
 
             # Draw text starting at y
             position = (x_position, y)
+            print("Position:", position)
+            self.draw.text(position, text, font=self.font, fill=color)
             self.draw.text(position, text, font=self.font, fill=color)
 
             # Move down for next line
