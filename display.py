@@ -100,7 +100,7 @@ class BONNETDisplay:
         self.set_font(self.config_manager.get_font_path(), self.config_manager.get_font_size())
 
         # Initialize lines
-        self.oled_lines = [""] * 5
+        self.oled_lines = [""] * 6
 
     def release(self):
         """Release display and SPI for other use."""
