@@ -301,6 +301,7 @@ class BONNETDisplay:
 
         # Start drawing from the top
         y = 0
+        print("Number Lines:", num_lines)
         for i in range(num_lines):
             text = texts[i]
             self.oled_lines[i] = text
