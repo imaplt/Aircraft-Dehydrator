@@ -464,6 +464,6 @@ class BONNETDisplay:
 
     def close(self):
         self.spi.deinit()
-        self.cs.deinit()
-        self.dc.deinit()
-        self.reset.deinit()
+        self.cs_pin.deinit()
+        self.dc_pin.deinit()
+        self.reset_pin.deinit()
