@@ -372,9 +372,9 @@ def read_installed_devices(config):
 
 def display_default_page():
     # Render static data from global variables
-    BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C",
-                                       "External Sensor:", f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C",
-                                       "Ambient Sensor:", f"{AMBIENT_HUMIDITY}%" f" - {AMBIENT_TEMP}°C"],
+    BONNETDisplay.display_rows_top(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°F",
+                                       "External Sensor:", f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°F",
+                                       "Ambient Sensor:", f"{AMBIENT_HUMIDITY}%" f" - {AMBIENT_TEMP}°F"],
                                       0, FAN_RUNNING,'white', 1.0, justification='left')
 
 def edit_humidity_set(button):
@@ -493,9 +493,9 @@ def show_page(page_index):
     elif page_index == Screen.AMBIENT.index:
         display_manager.switch_image(Screen.AMBIENT)
         display_manager.display_current_image(BONNETDisplay.disp)
-    elif page_index == 4:
-        display_set_humidity()
     elif page_index == 5:
+        display_set_humidity()
+    elif page_index == 6:
         display_stats_reset()
 
 def button_pressed_callback(button):

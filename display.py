@@ -290,6 +290,48 @@ class BONNETDisplay:
             self.image.paste(colored_fan_icon, (10, 190), colored_fan_icon.split()[-1])  # Paste with transparency mask
         self.disp.image(self.image)
 
+    def display_rows_top(self, texts, current_page, fan_running=False, color_name="white",
+                         brightness_factor=1.0, justification='center'):
+        self.clear_screen()
+        num_lines = min(6, len(texts))  # allow up to 6 lines
+        line_height = self.font.getbbox("Ag")[3] + 2  # consistent line spacing from font height + padding
+
+        # Get color with brightness applied
+        color = self.set_brightness(color_name, brightness_factor)
+
+        # Start drawing from the top
+        y = 0
+        for i in range(num_lines):
+            text = texts[i]
+            self.oled_lines[i] = text
+            bbox = self.draw.textbbox((0, 0), text, font=self.font)
+            text_width = bbox[2] - bbox[0]
+            text_height = bbox[3] - bbox[1]
+
+            # Calculate horizontal position based on justification
+            if justification == 'left':
+                x_position = 0
+            elif justification == 'right':
+                x_position = self.width - text_width
+            else:  # default to center
+                x_position = (self.width - text_width) // 2
+
+            # Draw text starting at y
+            position = (x_position, y)
+            self.draw.text(position, text, font=self.font, fill=color)
+
+            # Move down for next line
+            y += line_height
+
+        # --- Fan icon (only for page 0) ---
+        if current_page == 0:
+            fan_icon = Image.open("fan_icon.png").convert("RGBA").resize((32, 32))
+            fan_color = (0, 255, 0, 255) if fan_running else (255, 255, 255, 255)
+            colored_fan_icon = tint_icon(fan_icon, fan_color)
+            self.image.paste(colored_fan_icon, (10, self.height - 40), colored_fan_icon.split()[-1])
+
+        self.disp.image(self.image)
+
     def display_ok_clear(self, text, ok_text="OK", clear_text="CLEAR", color_name="white", brightness_factor=1.0,
                          selected=1):
         # Clear the screen
