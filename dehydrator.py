@@ -372,8 +372,10 @@ def read_installed_devices(config):
 
 def display_default_page():
     # Render static data from global variables
-    BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C", "Ambient Sensor:",
-                                       f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C", " "],0, FAN_RUNNING,'white', 1.0, justification='left')
+    BONNETDisplay.display_rows_center(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°C",
+                                       "External Sensor:", f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°C",
+                                       "Ambient Sensor:", f"{AMBIENT_HUMIDITY}%" f" - {AMBIENT_TEMP}°C"],
+                                      0, FAN_RUNNING,'white', 1.0, justification='left')
 
 def edit_humidity_set(button):
     global MIN_HUMIDITY, MAX_HUMIDITY, humidity_mode, humidity_selected, humidity_blink_state, max_color, min_color
@@ -448,10 +450,10 @@ def display_stats_reset():
 def update_stats():
     internal_max_temp = INTERNAL_HIGH_TEMP
     external_max_temp = EXTERNAL_HIGH_TEMP
-    ambient_max_temp = EXTERNAL_HIGH_TEMP
+    ambient_max_temp = AMBIENT_HIGH_TEMP
     internal_min_temp = INTERNAL_LOW_TEMP
     external_min_temp = EXTERNAL_LOW_TEMP
-    ambient_min_temp = EXTERNAL_LOW_TEMP
+    ambient_min_temp = AMBIENT_LOW_TEMP
 
     display_manager.update_internal_screen(texts=["Internal Stats:", f"Max Temp {internal_max_temp}F",
                                            f"Min Temp {internal_min_temp}F", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
