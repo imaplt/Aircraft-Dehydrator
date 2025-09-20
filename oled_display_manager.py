@@ -90,7 +90,7 @@ class OLEDDisplayManager:
 
         # Dictionary mapping screen indexes to update methods
         self.screen_update_methods = {
-            Screen.INITIAL : self.initial_screen,
+            8 : self.initial_screen,
             Screen.SHUTDOWN: self.shutdown_screen,
             Screen.FAN_LIMIT: self.fan_limit_screen,
             Screen.FAN_START: self.fan_start_screen,
