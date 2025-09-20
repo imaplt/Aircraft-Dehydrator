@@ -77,8 +77,8 @@ class NotificationManager:
         """
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         if not os.path.exists(log_path):
-            print(f"⚠️ Log not found: {log_path}")
-            self.logger.log(timestamp, 'WARN', 'SYSTEM', 'NOTIFICATION', f"⚠️ Log not found: {log_path}")
+            print(f"Log not found: {log_path}")
+            self.logger.log(timestamp, 'WARN', 'SYSTEM', 'NOTIFICATION', f"Log not found: {log_path}")
             return
         gz_path = self._compress_log(log_path)
         self.logger.log(timestamp, 'INFO', 'SYSTEM', 'NOTIFICATION', f"Log file sent: {log_path}")
@@ -142,7 +142,7 @@ class NotificationManager:
 
             # try send
             if self._deliver(msg):
-                print(f"✅ Delivered: {msg.get('subject')}")
+                print(f"Delivered: {msg.get('subject')}")
                 self._cleanup_attachments(msg, success=True)
             else:
                 # schedule retry
@@ -173,7 +173,7 @@ class NotificationManager:
                 part["Content-Disposition"] = f'attachment; filename="{os.path.basename(path)}"'
                 mime.attach(part)
             except Exception as e:
-                print(f"⚠️ Could not attach {path}: {e}")
+                print(f"Could not attach {path}: {e}")
 
         try:
             if cfg["ssl"]:
@@ -188,7 +188,7 @@ class NotificationManager:
                     server.sendmail(self.email, msg["recipients"], mime.as_string())
             return True
         except Exception as e:
-            print(f"✉️ Send failed: {e}")
+            print(f"Send failed: {e}")
             return False
 
     # ---------- Utilities ----------
@@ -215,4 +215,4 @@ class NotificationManager:
             with open(self.queue_file, "w") as f:
                 json.dump(self.queue, f)
         except Exception as e:
-            print(f"⚠️ Could not save queue: {e}")
+            print(f"Could not save queue: {e}")

@@ -90,11 +90,11 @@ class OLEDDisplayManager:
 
         # Dictionary mapping screen indexes to update methods
         self.screen_update_methods = {
-            7: self.initial_screen,
-            6: self.shutdown_screen,
-            5: self.fan_limit_screen,
-            8: self.fan_start_screen,
-            9: self.fan_stop_screen,
+            Screen.INITIAL : self.initial_screen,
+            Screen.SHUTDOWN: self.shutdown_screen,
+            Screen.FAN_LIMIT: self.fan_limit_screen,
+            Screen.FAN_START: self.fan_start_screen,
+            Screen.FAN_STOP: self.fan_stop_screen,
         }
         # Initialize lines
         self.oled_lines = [""] * 5
