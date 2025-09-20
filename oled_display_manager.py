@@ -78,7 +78,7 @@ class OLEDDisplayManager:
         self.font = font
 
         # Initialize 8 different image buffers for the OLED
-        self.images = [Image.new('RGB', (self.width, self.height), "black") for _ in range(10)]
+        self.images = [Image.new('RGB', (self.width, self.height), "black") for _ in range(11)]
 
         # Initialize a list of drawing objects for each image buffer
         self.draws = [ImageDraw.Draw(img) for img in self.images]
