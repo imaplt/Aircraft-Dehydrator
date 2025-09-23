@@ -1,5 +1,6 @@
 import configparser
 from datetime import timedelta
+from system_status import system_status
 
 
 class ConfigManager:
@@ -15,6 +16,30 @@ class ConfigManager:
             return self.config["DEFAULT"][key]
         else:
             raise KeyError(f"Config for DEFAULT/{key} not found.")
+
+def load_config():
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILE)
+
+    # Example section [SETTINGS] in config.ini
+    system_status.min_temp = config.getint("SETTINGS", "min_temp", fallback=40)
+    system_status.max_temp = config.getint("SETTINGS", "max_temp", fallback=70)
+    system_status.min_humidity = config.getint("SETTINGS", "min_humidity", fallback=20)
+    system_status.max_humidity = config.getint("SETTINGS", "max_humidity", fallback=60)
+    system_status.fan_cycle_time = config.getint("SETTINGS", "fan_cycle_time", fallback=30)
+
+def save_config():
+    config = configparser.ConfigParser()
+    config["SETTINGS"] = {
+        "min_temp": str(system_status.min_temp),
+        "max_temp": str(system_status.max_temp),
+        "min_humidity": str(system_status.min_humidity),
+        "max_humidity": str(system_status.max_humidity),
+        "fan_cycle_time": str(system_status.fan_cycle_time),
+    }
+
+    with open(CONFIG_FILE, "w") as f:
+        config.write(f)
 
     def get_int_config(self, key):
         if "CUSTOM" in self.config and key in self.config["CUSTOM"]:
