@@ -358,7 +358,7 @@ def read_installed_devices(config):
 
 def display_default_page():
     # Render static data from global variables
-    BONNETDisplay.display_rows_top(["Internal Sensor:", f"system_state.{system_state.INTERNAL_HUMIDITY}%" f" - {system_state.INTERNAL_TEMP}°F",
+    BONNETDisplay.display_rows_top(["Internal Sensor:", f"{system_state.INTERNAL_HUMIDITY}%" f" - {system_state.INTERNAL_TEMP}°F",
                                        "External Sensor:", f"{system_state.EXTERNAL_HUMIDITY}%" f" - {system_state.EXTERNAL_TEMP}°F",
                                        "Ambient Sensor:", f"{system_state.AMBIENT_HUMIDITY}%" f" - {system_state.AMBIENT_TEMP}°F"],
                                       0, system_state.FAN_RUNNING,'white', 1.0, justification='left')
@@ -598,10 +598,9 @@ def stats_reset():
 
 def cleanup():
     # Want to add code here to update display, update log with run time etc
-    global running
     stop_event.set()
     print('Cleaning Up')
-    running = False
+    system_state.running = False
     sensor_thread.join()  # Wait for the sensor thread to finish
     notifier.stop_worker()
     try:
