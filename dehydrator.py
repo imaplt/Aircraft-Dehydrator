@@ -358,7 +358,7 @@ def read_installed_devices(config):
 
 def display_default_page():
     # Render static data from global variables
-    BONNETDisplay.display_rows_top(["Internal Sensor:", f"system_state.{INTERNAL_HUMIDITY}%" f" - {system_state.INTERNAL_TEMP}°F",
+    BONNETDisplay.display_rows_top(["Internal Sensor:", f"system_state.{system_state.INTERNAL_HUMIDITY}%" f" - {system_state.INTERNAL_TEMP}°F",
                                        "External Sensor:", f"{system_state.EXTERNAL_HUMIDITY}%" f" - {system_state.EXTERNAL_TEMP}°F",
                                        "Ambient Sensor:", f"{system_state.AMBIENT_HUMIDITY}%" f" - {system_state.AMBIENT_TEMP}°F"],
                                       0, system_state.FAN_RUNNING,'white', 1.0, justification='left')
@@ -431,12 +431,12 @@ def display_stats_reset():
                                    brightness_factor=1.0, selected=system_state.selected_option)
 
 def update_stats():
-    internal_max_temp = INTERNAL_HIGH_TEMP
-    external_max_temp = EXTERNAL_HIGH_TEMP
-    ambient_max_temp = AMBIENT_HIGH_TEMP
-    internal_min_temp = INTERNAL_LOW_TEMP
-    external_min_temp = EXTERNAL_LOW_TEMP
-    ambient_min_temp = AMBIENT_LOW_TEMP
+    internal_max_temp = system_state.INTERNAL_HIGH_TEMP
+    external_max_temp = system_state.EXTERNAL_HIGH_TEMP
+    ambient_max_temp = system_state.AMBIENT_HIGH_TEMP
+    internal_min_temp = system_state.INTERNAL_LOW_TEMP
+    external_min_temp = system_state.EXTERNAL_LOW_TEMP
+    ambient_min_temp = system_state.AMBIENT_LOW_TEMP
 
     display_manager.update_internal_screen(texts=["Internal Stats:", f"Max Temp {internal_max_temp}F",
                                            f"Min Temp {internal_min_temp}F", f"Max Hum {system_state.INTERNAL_HIGH_HUMIDITY}",
@@ -733,26 +733,29 @@ if __name__ == "__main__":
 
         # Initialize previous output values to None
         internalprevious_output = {'temperature': 0, 'humidity': 0}
-        INTERNAL_PREVIOUS_HUMIDITY = 0
         externalprevious_output = {'temperature': 0, 'humidity': 0}
-        EXTERNAL_PREVIOUS_HUMIDITY = 0
         ambientprevious_output = {'temperature': 0, 'humidity': 0}
-        AMBIENT_PREVIOUS_HUMIDITY = 0
 
         # This should happen when things are reset
         if system_state.INITIAL_STARTUP == "True":
             ambientoutput = ambientsensor.read_sensor()
-            AMBIENT_TEMP = AMBIENT_LOW_TEMP = AMBIENT_HIGH_TEMP = ambientoutput['temperature'] = celsius_to_fahrenheit(ambientoutput['temperature'])
+            system_state.AMBIENT_TEMP = system_state.AMBIENT_LOW_TEMP = system_state.AMBIENT_HIGH_TEMP = (
+                ambientoutput)['temperature'] = celsius_to_fahrenheit(ambientoutput['temperature'])
             ambientprevious_output = ambientoutput
-            AMBIENT_PREVIOUS_HUMIDITY = AMBIENT_HUMIDITY = AMBIENT_LOW_HUMIDITY = AMBIENT_HIGH_HUMIDITY = ambientoutput['humidity']
+            system_state.AMBIENT_PREVIOUS_HUMIDITY = system_state.AMBIENT_HUMIDITY = system_state.AMBIENT_LOW_HUMIDITY = (
+                system_state).AMBIENT_HIGH_HUMIDITY = ambientoutput['humidity']
             internaloutput = internalsensor.read_sensor()
-            INTERNAL_TEMP = INTERNAL_LOW_TEMP = INTERNAL_HIGH_TEMP = internaloutput['temperature'] = celsius_to_fahrenheit(internaloutput['temperature'])
+            system_state.INTERNAL_TEMP = system_state.INTERNAL_LOW_TEMP = system_state.INTERNAL_HIGH_TEMP = (
+                internaloutput)['temperature'] = celsius_to_fahrenheit(internaloutput['temperature'])
             internalprevious_output = internaloutput
-            INTERNAL_PREVIOUS_HUMIDITY = INTERNAL_HUMIDITY = INTERNAL_LOW_HUMIDITY = INTERNAL_HIGH_HUMIDITY = internaloutput['humidity']
+            system_state.INTERNAL_PREVIOUS_HUMIDITY = system_state.INTERNAL_HUMIDITY = (
+                system_state).INTERNAL_LOW_HUMIDITY = system_state.INTERNAL_HIGH_HUMIDITY = internaloutput['humidity']
             externaloutput = externalsensor.read_sensor()
-            EXTERNAL_TEMP = EXTERNAL_LOW_TEMP = EXTERNAL_HIGH_TEMP = externaloutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
+            system_state.EXTERNAL_TEMP = system_state.EXTERNAL_LOW_TEMP = system_state.EXTERNAL_HIGH_TEMP = (
+                externaloutput)['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
             externalprevious_output = externaloutput
-            EXTERNAL_PREVIOUS_HUMIDITY = EXTERNAL_HUMIDITY = EXTERNAL_LOW_HUMIDITY = EXTERNAL_HIGH_HUMIDITY = externaloutput['humidity']
+            system_state.EXTERNAL_PREVIOUS_HUMIDITY = system_state.EXTERNAL_HUMIDITY = (
+                system_state).EXTERNAL_LOW_HUMIDITY = system_state.EXTERNAL_HIGH_HUMIDITY = externaloutput['humidity']
             save_config()
 
         schedule_tasks(int_interval=system_state.TASK_INTERNAL, fan_interval=system_state.TASK_FAN)
