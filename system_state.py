@@ -32,7 +32,7 @@ class SystemState:
         self.runtime = 0
         self.FAN_RUNNING = False
         self.FAN_RUNNING_TIME = 0
-        self.FAN_DURATION = 0.0
+        self.FAN_DURATION = 0
         self.INTERNAL_PREVIOUS_HUMIDITY = 0
         self.EXTERNAL_PREVIOUS_HUMIDITY = 0
         self.AMBIENT_PREVIOUS_HUMIDITY = 0
