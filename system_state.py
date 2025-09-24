@@ -77,6 +77,7 @@ class SystemState:
         self.BUTTON_HOLD_TIME = 3
 
         self.shutdown_timer = None
+        self.running = False
 
 
     def update_from_config(self, parser):

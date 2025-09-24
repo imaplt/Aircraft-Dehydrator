@@ -26,7 +26,8 @@ system_state = SystemState()
 configManager = ConfigManager('config.ini', system_state)
 configManager.load_config()
 print("Config loaded")
-print("Cycle Count: ", system_state.CYCLE_COUNT)
+print("DEBUG: CYCLE_COUNT =", system_state.CYCLE_COUNT, type(system_state.CYCLE_COUNT))
+
 
 # Initialize logging system
 logger = Log(system_state.LOGFILE, system_state.MAX_LOG_SIZE, system_state.MAX_ARCHIVE_SIZE)
@@ -62,7 +63,7 @@ def celsius_to_fahrenheit(celsius):
     return round(fahrenheit, 1)
 
 def sensor(stop_event):
-    while running and not stop_event.is_set():
+    while system_state.running and not stop_event.is_set():
         try:
             ### BEGIN Internal Sensor Code block
             internaloutput = internalsensor.read_sensor()
@@ -690,7 +691,7 @@ if __name__ == "__main__":
     oled_lines = [""] * 5  # For five line bonnet display...
     lcd_lines = [""] * 4  # For four line ssd1306_display...
 
-    running = True
+    system_state.running = True
     stop_event = threading.Event()
     sensor_thread = threading.Thread(target=sensor, args=(stop_event,))
 
