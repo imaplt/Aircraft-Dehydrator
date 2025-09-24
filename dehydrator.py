@@ -752,7 +752,6 @@ if __name__ == "__main__":
             externalprevious_output = externaloutput
             system_state.EXTERNAL_PREVIOUS_HUMIDITY = system_state.EXTERNAL_HUMIDITY = (
                 system_state).EXTERNAL_LOW_HUMIDITY = system_state.EXTERNAL_HIGH_HUMIDITY = externaloutput['humidity']
-            save_config()
 
         schedule_tasks(int_interval=system_state.TASK_INTERNAL, fan_interval=system_state.TASK_FAN)
 
