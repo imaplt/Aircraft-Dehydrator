@@ -21,8 +21,8 @@ class SystemState:
         self.AMBIENT_HIGH_HUMIDITY = 0
         self.AMBIENT_LOW_HUMIDITY = 0
         self.CYCLE_COUNT = 0
-        self.FAN_TOTAL_DURATION = 0.0
-        self.FAN_MAX_RUNTIME = 0.0
+        self.FAN_TOTAL_DURATION = 0
+        self.FAN_MAX_RUNTIME = 0
         self.FAN_LIMIT = 120
         self.FAN_LIMIT_TIMEOUT = 60
         self.fan_limit_exceeded_count = 0
