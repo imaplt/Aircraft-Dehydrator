@@ -307,7 +307,7 @@ def _cycle_fan():
 def log_system_status():
     global system_stats
     log_path = os.path.expanduser("~/dehydrator/Aircraft-Dehydrator")
-    stats = get_system_stats(log_dir=log_path)
+    stats = get_system_stats(log_dir=log_path, system_state=system_state)
     if "error" in stats:
         print(f"System monitor error: {stats['error']}")
         log_line = f"System monitor error: {stats['error']}"
