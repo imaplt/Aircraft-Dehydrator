@@ -32,7 +32,7 @@ class ConfigManager:
         self.system_state.AMBIENT_LOW_TEMP = self.get_float_config('LOG', 'ambient_low_temp')
         self.system_state.AMBIENT_HIGH_HUMIDITY = self.get_float_config('LOG', 'ambient_high_humidity')
         self.system_state.AMBIENT_LOW_HUMIDITY = self.get_float_config('LOG', 'ambient_low_humidity')
-        self.system_state.CYCLE_COUNT = self.get_int_config('LOG''cycle_count')
+        self.system_state.CYCLE_COUNT = self.get_int_config('LOG','cycle_count')
         self.system_state.FAN_TOTAL_DURATION = self.get_duration_config('LOG', 'FAN_TOTAL_DURATION')
         self.system_state.FAN_MAX_RUNTIME = self.get_duration_config('LOG', 'FAN_MAX_RUNTIME')
         self.system_state.FAN_LIMIT = self.get_duration_config('DEFAULT', 'FAN_LIMIT')
