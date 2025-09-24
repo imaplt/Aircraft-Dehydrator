@@ -644,8 +644,7 @@ if __name__ == "__main__":
 
     # BEGIN STATUS CHECKS ETC
     # First check for the installed devices.
-    installed_devices = read_installed_devices(configManager)
-    overall_status, statuses = systemstatus.query_i2c_devices(installed_devices)
+    overall_status, statuses = systemstatus.query_i2c_devices(system_state.installed_devices)
     print(f"Overall status: {overall_status}")
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     for status in statuses:
@@ -735,6 +734,8 @@ if __name__ == "__main__":
         internalprevious_output = {'temperature': 0, 'humidity': 0}
         externalprevious_output = {'temperature': 0, 'humidity': 0}
         ambientprevious_output = {'temperature': 0, 'humidity': 0}
+
+        print("DEBUG: INITIAL_STARTUP =", system_state.INITIAL_STARTUP , type(system_state.INITIAL_STARTUP ))
 
         # This should happen when things are reset
         if system_state.INITIAL_STARTUP == "True":
