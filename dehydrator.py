@@ -246,6 +246,9 @@ def task_update():
                 frame = get_next_frame()
                 BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
 
+    print("DEBUG: MAX_HUMIDITY =", system_state.MAX_HUMIDITY , type(system_state.MAX_HUMIDITY ))
+    print("DEBUG: MIN_HUMIDITY =", system_state.MIN_HUMIDITY, type(system_state.MIN_HUMIDITY))
+
     # Handle fan start logic based on humidity thresholds
     if system_state.INTERNAL_HUMIDITY > system_state.MAX_HUMIDITY:
         started, run_time = fanController.set_fan_speed(100)
@@ -735,8 +738,6 @@ if __name__ == "__main__":
         internalprevious_output = {'temperature': 0, 'humidity': 0}
         externalprevious_output = {'temperature': 0, 'humidity': 0}
         ambientprevious_output = {'temperature': 0, 'humidity': 0}
-
-        print("DEBUG: INITIAL_STARTUP =", system_state.INITIAL_STARTUP , type(system_state.INITIAL_STARTUP ))
 
         # This should happen when things are reset
         if system_state.INITIAL_STARTUP == "True":
