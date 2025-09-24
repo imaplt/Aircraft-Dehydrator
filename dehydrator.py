@@ -274,7 +274,7 @@ def send_status(message="Status"):
     for s in statuses:
         current_status += f"{s}\n"
     current_status += f"{system_stats}\n"
-    startup_stats = get_system_stats()
+    startup_stats = get_system_stats(system_state)
     current_status += (f"CPU: {startup_stats['cpu_percent']}%, "
                     f"Mem: {startup_stats['memory_percent']}% ({startup_stats['memory_used_mb']}MB), "
                     f"Disk Free: {startup_stats['disk_free_gb']}GB, "

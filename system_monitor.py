@@ -1,13 +1,9 @@
 import psutil
 import os
 import glob
-from config_manager import ConfigManager
-from system_state import SystemState
 
-system_state = SystemState()
-configManager = ConfigManager('config.ini', system_state)
 
-def get_system_stats(log_dir="."):
+def get_system_stats(system_state, log_dir="."):
     try:
         cpu_percent = psutil.cpu_percent(interval=0.1)  # very short sample
         mem = psutil.virtual_memory()
@@ -22,7 +18,7 @@ def get_system_stats(log_dir="."):
             "disk_free_gb": disk.free // (1024 * 1024 * 1024),
             "cpu_temp": get_cpu_temp(temps),
             "logs": log_file_summary(log_dir=log_dir),
-            "sensors": sensor_summary_stats()
+            "sensors": sensor_summary_stats(system_state)
         }
     except Exception as e:
         return {"error": str(e)}
@@ -102,47 +98,32 @@ def log_file_summary(log_dir=".", log_base="log.csv"):
         f"archive total size: {fmt(archive_total)}"
     )
 
-def sensor_summary_stats():
+def sensor_summary_stats(system_state):
     """
     Return multi-line summary for internal, external, and fan stats.
     Uses global config variables already loaded.
     """
-    # Initialise the logging and pull numbers from the config.
-    INTERNAL_HIGH_TEMP = configManager.get_float_config('LOG', 'internal_high_temp')
-    INTERNAL_LOW_TEMP = configManager.get_float_config('LOG', 'internal_low_temp')
-    INTERNAL_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'internal_high_humidity')
-    INTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'internal_low_humidity')
-    EXTERNAL_HIGH_TEMP = configManager.get_float_config('LOG', 'external_high_temp')
-    EXTERNAL_LOW_TEMP = configManager.get_float_config('LOG', 'external_low_temp')
-    EXTERNAL_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'external_high_humidity')
-    EXTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'external_low_humidity')
-    AMBIENT_HIGH_TEMP = configManager.get_float_config('LOG', 'ambient_high_temp')
-    AMBIENT_LOW_TEMP = configManager.get_float_config('LOG', 'ambient_low_temp')
-    AMBIENT_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'ambient_high_humidity')
-    AMBIENT_LOW_HUMIDITY = configManager.get_float_config('LOG', 'ambient_low_humidity')
-    CYCLE_COUNT = configManager.get_int_config('cycle_count')
-    FAN_TOTAL_DURATION = configManager.get_duration_config('LOG', 'FAN_TOTAL_DURATION')
-    FAN_MAX_RUNTIME = configManager.get_duration_config('LOG', 'FAN_MAX_RUNTIME')
+
     # Internal environment
     internal_line = (
-        f"Temp: {INTERNAL_LOW_TEMP:.1f}–{INTERNAL_HIGH_TEMP:.1f}°F  "
-        f"Humidity: {INTERNAL_LOW_HUMIDITY:.1f}–{INTERNAL_HIGH_HUMIDITY:.1f}%"
+        f"Temp: {system_state.INTERNAL_LOW_TEMP:.1f}–{system_state.INTERNAL_HIGH_TEMP:.1f}°F  "
+        f"Humidity: {system_state.INTERNAL_LOW_HUMIDITY:.1f}–{system_state.INTERNAL_HIGH_HUMIDITY:.1f}%"
     )
     # External environment
     external_line = (
-        f"Temp: {EXTERNAL_LOW_TEMP:.1f}–{EXTERNAL_HIGH_TEMP:.1f}°F  "
-        f"Humidity: {EXTERNAL_LOW_HUMIDITY:.1f}–{EXTERNAL_HIGH_HUMIDITY:.1f}%"
+        f"Temp: {system_state.EXTERNAL_LOW_TEMP:.1f}–{system_state.EXTERNAL_HIGH_TEMP:.1f}°F  "
+        f"Humidity: {system_state.EXTERNAL_LOW_HUMIDITY:.1f}–{system_state.EXTERNAL_HIGH_HUMIDITY:.1f}%"
     )
     # External environment
     ambient_line = (
-        f"Temp: {AMBIENT_LOW_TEMP:.1f}–{AMBIENT_HIGH_TEMP:.1f}°F  "
-        f"Humidity: {AMBIENT_LOW_HUMIDITY:.1f}–{AMBIENT_HIGH_HUMIDITY:.1f}%"
+        f"Temp: {system_state.AMBIENT_LOW_TEMP:.1f}–{system_state.AMBIENT_HIGH_TEMP:.1f}°F  "
+        f"Humidity: {system_state.AMBIENT_LOW_HUMIDITY:.1f}–{system_state.AMBIENT_HIGH_HUMIDITY:.1f}%"
     )
     # Fan stats
     fan_line = (
-        f"Cycles: {CYCLE_COUNT}, "
-        f"Total Runtime: {FAN_TOTAL_DURATION}, "
-        f"Max Runtime: {FAN_MAX_RUNTIME}"
+        f"Cycles: {system_state.CYCLE_COUNT}, "
+        f"Total Runtime: {system_state.FAN_TOTAL_DURATION}, "
+        f"Max Runtime: {system_state.FAN_MAX_RUNTIME}"
     )
 
     return {
