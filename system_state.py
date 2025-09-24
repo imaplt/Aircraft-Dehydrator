@@ -30,7 +30,7 @@ class SystemState:
         self.UOM = "F"
 
         self.runtime = 0
-        self.FAN_RUNNING = True
+        self.FAN_RUNNING = False
         self.FAN_RUNNING_TIME = 0
         self.FAN_DURATION = 0.0
         self.INTERNAL_PREVIOUS_HUMIDITY = 0

@@ -19,10 +19,26 @@ class ConfigManager:
         self.system_state.FONTSIZE = self.get_int_config("fontsize", fallback=self.system_state.FONTSIZE)
         self.system_state.BORDER = self.get_int_config("border", fallback=self.system_state.BORDER)
 
-        self.system_state.INTERNAL_HIGH_TEMP = self.get_float_config("LOG", "internal_high_temp",
-                                                               fallback=self.system_state.INTERNAL_HIGH_TEMP)
-        self.system_state.INTERNAL_LOW_TEMP = self.get_float_config("LOG", "internal_low_temp",
-                                                              fallback=self.system_state.INTERNAL_LOW_TEMP)
+        # Initialise the logging and pull numbers from the config.
+        self.system_state.INTERNAL_HIGH_TEMP = self.get_float_config('LOG', 'internal_high_temp')
+        self.system_state.INTERNAL_LOW_TEMP = self.get_float_config('LOG', 'internal_low_temp')
+        self.system_state.INTERNAL_HIGH_HUMIDITY = self.get_float_config('LOG', 'internal_high_humidity')
+        self.system_state.INTERNAL_LOW_HUMIDITY = self.get_float_config('LOG', 'internal_low_humidity')
+        self.system_state.EXTERNAL_HIGH_TEMP = self.get_float_config('LOG', 'external_high_temp')
+        self.system_state.EXTERNAL_LOW_TEMP = self.get_float_config('LOG', 'external_low_temp')
+        self.system_state.EXTERNAL_HIGH_HUMIDITY = self.get_float_config('LOG', 'external_high_humidity')
+        self.system_state.EXTERNAL_LOW_HUMIDITY = self.get_float_config('LOG', 'external_low_humidity')
+        self.system_state.AMBIENT_HIGH_TEMP = self.get_float_config('LOG', 'ambient_high_temp')
+        self.system_state.AMBIENT_LOW_TEMP = self.get_float_config('LOG', 'ambient_low_temp')
+        self.system_state.AMBIENT_HIGH_HUMIDITY = self.get_float_config('LOG', 'ambient_high_humidity')
+        self.system_state.AMBIENT_LOW_HUMIDITY = self.get_float_config('LOG', 'ambient_low_humidity')
+        self.system_state.CYCLE_COUNT = self.get_int_config('cycle_count')
+        self.system_state.FAN_TOTAL_DURATION = self.get_duration_config('LOG', 'FAN_TOTAL_DURATION')
+        self.system_state.FAN_MAX_RUNTIME = self.get_duration_config('LOG', 'FAN_MAX_RUNTIME')
+        self.system_state.FAN_LIMIT = self.get_duration_config('DEFAULT', 'FAN_LIMIT')
+        self.system_state.FAN_LIMIT_TIMEOUT = self.get_duration_config('DEFAULT', 'FAN_LIMIT_TIMEOUT')
+
+        self.system_state.UOM = self.get_config('UOM')
         # … and so on for the rest …
 
     def save_config(self):

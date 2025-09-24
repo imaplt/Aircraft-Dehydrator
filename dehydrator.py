@@ -688,9 +688,6 @@ if __name__ == "__main__":
     oled_lines = [""] * 5  # For five line bonnet display...
     lcd_lines = [""] * 4  # For four line ssd1306_display...
 
-    FAN_RUNNING = False
-    FAN_RUNNING_TIME = 0
-
     running = True
     stop_event = threading.Event()
     sensor_thread = threading.Thread(target=sensor, args=(stop_event,))
