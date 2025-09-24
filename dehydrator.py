@@ -355,7 +355,7 @@ def heat_sensor():
     internalsensor.heat_sensor()
     logger.log(timestamp, 'INFO', 'SYSTEM', 'INTERNAL', "Heating Internal sensor...")
 
-def read_installed_devices(config):
+def read_installed_devices():
     devices = system_state.installed_devices.split(",")
     devices = [device.strip() for device in devices]  # Remove any extra whitespace
     return devices
@@ -644,7 +644,8 @@ if __name__ == "__main__":
 
     # BEGIN STATUS CHECKS ETC
     # First check for the installed devices.
-    overall_status, statuses = systemstatus.query_i2c_devices(system_state.installed_devices)
+    devices = read_installed_devices()
+    overall_status, statuses = systemstatus.query_i2c_devices(devices)
     print(f"Overall status: {overall_status}")
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     for status in statuses:
