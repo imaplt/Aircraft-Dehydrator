@@ -104,7 +104,7 @@ class ConfigManager:
         return timedelta(seconds=seconds)
 
     def set_duration_config(self, key, value, section="LOG"):
-        if not self.parser.has_section(section):
+        if section != "DEFAULT" and not self.parser.has_section(section):
             self.parser.add_section(section)
         self.parser.set(section, key, str(int(value.total_seconds())))
 
