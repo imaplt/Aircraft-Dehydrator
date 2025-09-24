@@ -33,6 +33,7 @@ print("DEBUG: CYCLE_COUNT =", system_state.CYCLE_COUNT, type(system_state.CYCLE_
 logger = Log(system_state.LOGFILE, system_state.MAX_LOG_SIZE, system_state.MAX_ARCHIVE_SIZE)
 
 notifier = NotificationManager(
+    system_state = system_state,
     logger = logger,
     provider="yahoo",                       # "yahoo" | "icloud" | "apple"
     email="imaplt@yahoo.com",

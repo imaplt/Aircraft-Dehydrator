@@ -4,9 +4,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
-from config_manager import ConfigManager
 import time
-from system_state import SystemState
 
 class NotificationManager:
     SMTP_CONFIGS = {
@@ -18,14 +16,10 @@ class NotificationManager:
 
     # minutes: 5, 30, 60, 360 (6h), 720 (12h), 1440 (24h)
     BACKOFF_SCHEDULE = [5, 30, 60, 360, 720, 1440]
-    system_state = SystemState()
-    configManager = ConfigManager('config.ini', system_state)
-    LOGFILE = configManager.get_config('logfile')
-    MAX_LOG_SIZE = configManager.get_int_config('max_log_size')
-    MAX_ARCHIVE_SIZE = configManager.get_int_config('max_archive_size')
 
     def __init__(
         self,
+        system_state,
         logger,
         provider: str,
         email: str,
@@ -34,7 +28,8 @@ class NotificationManager:
         queue_file: str = "email_queue.json",
         retry_days: int = 7,
         poll_interval: int = 300,        # seconds between background checks
-        auto_start: bool = True,
+        auto_start: bool = True
+
     ):
         provider = provider.lower()
         if provider not in self.SMTP_CONFIGS:
