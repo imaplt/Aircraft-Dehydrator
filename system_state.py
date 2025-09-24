@@ -79,6 +79,8 @@ class SystemState:
         self.shutdown_timer = None
         self.running = False
 
+        self.installed_devices = "BONNET, MUX, SHT4X_Internal, SHT4X_External, SHT4X_Ambient, EMC2101, FAN"
+
 
     def update_from_config(self, parser):
         self.INITIAL_STARTUP = parser.get_config("initial_startup")
@@ -127,6 +129,8 @@ class SystemState:
         self.BTN_C_PIN = parser.get_int_config('BTN_C_PIN')
         self.BTN_A_PIN = parser.get_int_config('BTN_A_PIN')
         self.BTN_B_PIN = parser.get_int_config('BTN_B_PIN')
+
+        self.installed_devices = parser.get_list_config("installed_devices")
 
     def save_to_config(self, parser):
         parser.set_config("initial_startup", self.INITIAL_STARTUP)
