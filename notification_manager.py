@@ -6,6 +6,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from config_manager import ConfigManager
 import time
+from system_state import SystemState
 
 class NotificationManager:
     SMTP_CONFIGS = {
@@ -17,8 +18,8 @@ class NotificationManager:
 
     # minutes: 5, 30, 60, 360 (6h), 720 (12h), 1440 (24h)
     BACKOFF_SCHEDULE = [5, 30, 60, 360, 720, 1440]
-
-    configManager = ConfigManager('config.ini')
+    system_state = SystemState()
+    configManager = ConfigManager('config.ini', system_state)
     LOGFILE = configManager.get_config('logfile')
     MAX_LOG_SIZE = configManager.get_int_config('max_log_size')
     MAX_ARCHIVE_SIZE = configManager.get_int_config('max_archive_size')
