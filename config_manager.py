@@ -11,13 +11,13 @@ class ConfigManager:
     def load_config(self):
         self.parser.read(self.config_file)
 
-        self.system_state.INITIAL_STARTUP = self.get_config("initial_startup", fallback=self.system_state.INITIAL_STARTUP)
-        self.system_state.LOGFILE = self.get_config("logfile", fallback=self.system_state.LOGFILE)
-        self.system_state.MAX_LOG_SIZE = self.get_int_config("max_log_size", fallback=self.system_state.MAX_LOG_SIZE)
-        self.system_state.MAX_ARCHIVE_SIZE = self.get_int_config("max_archive_size", fallback=self.system_state.MAX_ARCHIVE_SIZE)
-        self.system_state.FONT = self.get_config("font", fallback=self.system_state.FONT)
-        self.system_state.FONTSIZE = self.get_int_config("fontsize", fallback=self.system_state.FONTSIZE)
-        self.system_state.BORDER = self.get_int_config("border", fallback=self.system_state.BORDER)
+        self.system_state.INITIAL_STARTUP = self.get_config('DEFAULT',"initial_startup", fallback=self.system_state.INITIAL_STARTUP)
+        self.system_state.LOGFILE = self.get_config('DEFAULT',"logfile", fallback=self.system_state.LOGFILE)
+        self.system_state.MAX_LOG_SIZE = self.get_int_config('DEFAULT',"max_log_size", fallback=self.system_state.MAX_LOG_SIZE)
+        self.system_state.MAX_ARCHIVE_SIZE = self.get_int_config('DEFAULT',"max_archive_size", fallback=self.system_state.MAX_ARCHIVE_SIZE)
+        self.system_state.FONT = self.get_config('DEFAULT',"font", fallback=self.system_state.FONT)
+        self.system_state.FONTSIZE = self.get_int_config('DEFAULT',"fontsize", fallback=self.system_state.FONTSIZE)
+        self.system_state.BORDER = self.get_int_config('DEFAULT',"border", fallback=self.system_state.BORDER)
 
         # Initialise the logging and pull numbers from the config.
         self.system_state.INTERNAL_HIGH_TEMP = self.get_float_config('LOG', 'internal_high_temp')
