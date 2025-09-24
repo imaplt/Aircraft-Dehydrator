@@ -38,7 +38,6 @@ class ConfigManager:
         self.system_state.FAN_LIMIT = self.get_duration_config('DEFAULT', 'FAN_LIMIT')
         self.system_state.FAN_LIMIT_TIMEOUT = self.get_duration_config('DEFAULT', 'FAN_LIMIT_TIMEOUT')
 
-        self.system_state.UOM = self.get_config('UOM')
         # … and so on for the rest …
 
     def save_config(self):
