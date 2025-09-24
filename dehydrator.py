@@ -15,19 +15,20 @@ import signal
 import os
 from safei2c import SafeI2C
 from system_status import SystemStatus
+from system_state import SystemState
 
 print("Dehydrator main loaded")
 
 # Spinner frames to simulate rotation
 spinner_frames = ['▖', '▘', '▝', '▗']
 # Get configuration items
-configManager = ConfigManager('config.ini')
-INITIAL_STARTUP = configManager.get_config('initial_startup')
-LOGFILE = configManager.get_config('logfile')
-MAX_LOG_SIZE = configManager.get_int_config('max_log_size')
-MAX_ARCHIVE_SIZE = configManager.get_int_config('max_archive_size')
+system_state = SystemState()
+configManager = ConfigManager('config.ini', system_state)
+configManager.load_config()
+
 # Initialize logging system
-logger = Log(LOGFILE, MAX_LOG_SIZE, MAX_ARCHIVE_SIZE)
+logger = Log(system_state.LOGFILE, system_state.MAX_LOG_SIZE, system_state.MAX_ARCHIVE_SIZE)
+
 notifier = NotificationManager(
     logger = logger,
     provider="yahoo",                       # "yahoo" | "icloud" | "apple"
@@ -51,7 +52,7 @@ def get_next_frame():
 
 # Initialize the lock
 lock = threading.Lock()
-shutdown_timer = None
+system_state.shutdown_timer = None
 systemstatus = SystemStatus()
 
 def celsius_to_fahrenheit(celsius):
@@ -59,13 +60,6 @@ def celsius_to_fahrenheit(celsius):
     return round(fahrenheit, 1)
 
 def sensor(stop_event):
-    global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY,\
-     INTERNAL_TEMP, INTERNAL_HUMIDITY, INTERNAL_PREVIOUS_HUMIDITY, EXTERNAL_TEMP, EXTERNAL_LOW_TEMP, \
-        EXTERNAL_HIGH_TEMP, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_HUMIDITY, EXTERNAL_TEMP, \
-        EXTERNAL_HUMIDITY, EXTERNAL_PREVIOUS_HUMIDITY
-    global AMBIENT_HIGH_TEMP, AMBIENT_HIGH_HUMIDITY, AMBIENT_LOW_TEMP, AMBIENT_LOW_HUMIDITY,\
-     AMBIENT_TEMP, AMBIENT_HUMIDITY, AMBIENT_PREVIOUS_HUMIDITY
-
     while running and not stop_event.is_set():
         try:
             ### BEGIN Internal Sensor Code block
@@ -73,36 +67,36 @@ def sensor(stop_event):
             internaloutput['temperature'] = celsius_to_fahrenheit(internaloutput['temperature'])
 
             # Main block to handle sensor change and fan control
-            INTERNAL_HUMIDITY = internaloutput['humidity']
-            INTERNAL_TEMP = internaloutput['temperature']
+            system_state.INTERNAL_HUMIDITY = internaloutput['humidity']
+            system_state.INTERNAL_TEMP = internaloutput['temperature']
 
-            if abs(INTERNAL_HUMIDITY - INTERNAL_PREVIOUS_HUMIDITY) > 0.3:
+            if abs(system_state.INTERNAL_HUMIDITY - system_state.INTERNAL_PREVIOUS_HUMIDITY) > 0.3:
                 """Log internal sensor reading and update previous output values."""
                 logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SENSORS', 'INTERNAL',
                            f"Temperature: {internaloutput['temperature']}F, Humidity: {internaloutput['humidity']}%")
-                INTERNAL_PREVIOUS_HUMIDITY = INTERNAL_HUMIDITY
+                system_state.INTERNAL_PREVIOUS_HUMIDITY = system_state.INTERNAL_HUMIDITY
 
             # Update the config file with stats
-            new_high_humidity = max(INTERNAL_HIGH_HUMIDITY, internaloutput['humidity'])
-            new_low_humidity = min(INTERNAL_LOW_HUMIDITY, internaloutput['humidity'])
+            new_high_humidity = max(system_state.INTERNAL_HIGH_HUMIDITY, internaloutput['humidity'])
+            new_low_humidity = min(system_state.INTERNAL_LOW_HUMIDITY, internaloutput['humidity'])
 
-            new_high_temp = max(INTERNAL_HIGH_TEMP, internaloutput['temperature'])
-            new_low_temp = min(INTERNAL_LOW_TEMP, internaloutput['temperature'])
+            new_high_temp = max(system_state.INTERNAL_HIGH_TEMP, internaloutput['temperature'])
+            new_low_temp = min(system_state.INTERNAL_LOW_TEMP, internaloutput['temperature'])
 
             # Check if any of the values changed
             log_changed = (
-                    new_high_humidity != INTERNAL_HIGH_HUMIDITY or
-                    new_low_humidity != INTERNAL_LOW_HUMIDITY or
-                    new_high_temp != INTERNAL_HIGH_TEMP or
-                    new_low_temp != INTERNAL_LOW_TEMP
+                    new_high_humidity != system_state.INTERNAL_HIGH_HUMIDITY or
+                    new_low_humidity != system_state.INTERNAL_LOW_HUMIDITY or
+                    new_high_temp != system_state.INTERNAL_HIGH_TEMP or
+                    new_low_temp != system_state.INTERNAL_LOW_TEMP
             )
 
             # Update the variables if they changed
             if log_changed:
-                INTERNAL_HIGH_HUMIDITY = new_high_humidity
-                INTERNAL_LOW_HUMIDITY = new_low_humidity
-                INTERNAL_HIGH_TEMP = new_high_temp
-                INTERNAL_LOW_TEMP = new_low_temp
+                system_state.INTERNAL_HIGH_HUMIDITY = new_high_humidity
+                system_state.INTERNAL_LOW_HUMIDITY = new_low_humidity
+                system_state.INTERNAL_HIGH_TEMP = new_high_temp
+                system_state.INTERNAL_LOW_TEMP = new_low_temp
                 save_config()
 
             ambient_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) # type: ignore
@@ -112,76 +106,76 @@ def sensor(stop_event):
             externaloutput['temperature'] = celsius_to_fahrenheit(externaloutput['temperature'])
 
             # Calculate new high and low values
-            new_high_humidity = max(EXTERNAL_HIGH_HUMIDITY, externaloutput['humidity'])
-            new_low_humidity = min(EXTERNAL_LOW_HUMIDITY, externaloutput['humidity'])
+            new_high_humidity = max(system_state.EXTERNAL_HIGH_HUMIDITY, externaloutput['humidity'])
+            new_low_humidity = min(system_state.EXTERNAL_LOW_HUMIDITY, externaloutput['humidity'])
 
-            new_high_temp = max(EXTERNAL_HIGH_TEMP, externaloutput['temperature'])
-            new_low_temp = min(EXTERNAL_LOW_TEMP, externaloutput['temperature'])
+            new_high_temp = max(system_state.EXTERNAL_HIGH_TEMP, externaloutput['temperature'])
+            new_low_temp = min(system_state.EXTERNAL_LOW_TEMP, externaloutput['temperature'])
 
             # Check if any values changed
             log_changed = (
-                    new_high_humidity != EXTERNAL_HIGH_HUMIDITY or
-                    new_low_humidity != EXTERNAL_LOW_HUMIDITY or
-                    new_high_temp != EXTERNAL_HIGH_TEMP or
-                    new_low_temp != EXTERNAL_LOW_TEMP
+                    new_high_humidity != system_state.EXTERNAL_HIGH_HUMIDITY or
+                    new_low_humidity != system_state.EXTERNAL_LOW_HUMIDITY or
+                    new_high_temp != system_state.EXTERNAL_HIGH_TEMP or
+                    new_low_temp != system_state.EXTERNAL_LOW_TEMP
             )
 
             # Update the variables if they changed
             if log_changed:
-                EXTERNAL_HIGH_HUMIDITY = new_high_humidity
-                EXTERNAL_LOW_HUMIDITY = new_low_humidity
-                EXTERNAL_HIGH_TEMP = new_high_temp
-                EXTERNAL_LOW_TEMP = new_low_temp
+                system_state.EXTERNAL_HIGH_HUMIDITY = new_high_humidity
+                system_state.EXTERNAL_LOW_HUMIDITY = new_low_humidity
+                system_state.EXTERNAL_HIGH_TEMP = new_high_temp
+                system_state.EXTERNAL_LOW_TEMP = new_low_temp
                 save_config()
 
-            if abs(EXTERNAL_HUMIDITY - EXTERNAL_PREVIOUS_HUMIDITY) > 0.3:
+            if abs(system_state.EXTERNAL_HUMIDITY - system_state.EXTERNAL_PREVIOUS_HUMIDITY) > 0.3:
                 """Log external sensor reading and update previous output values."""
                 logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'EXTERNAL',
                            f"Temperature: {externaloutput['temperature']}F,"
                            f" Humidity: {externaloutput['humidity']}%")
-                EXTERNAL_PREVIOUS_HUMIDITY = EXTERNAL_HUMIDITY
+                system_state.EXTERNAL_PREVIOUS_HUMIDITY = system_state.EXTERNAL_HUMIDITY
 
             # Update the global variables and print the reading
-            EXTERNAL_TEMP = externaloutput['temperature']
-            EXTERNAL_HUMIDITY = externaloutput['humidity']
+            system_state.EXTERNAL_TEMP = externaloutput['temperature']
+            system_state.EXTERNAL_HUMIDITY = externaloutput['humidity']
 
             ### BEGIN AMBIENT Sensor Code block
             ambientoutput = ambientsensor.read_sensor()
             ambientoutput['temperature'] = celsius_to_fahrenheit(ambientoutput['temperature'])
 
             # Calculate new high and low values
-            new_high_humidity = max(AMBIENT_HIGH_HUMIDITY, ambientoutput['humidity'])
-            new_low_humidity = min(AMBIENT_LOW_HUMIDITY, ambientoutput['humidity'])
+            new_high_humidity = max(system_state.AMBIENT_HIGH_HUMIDITY, ambientoutput['humidity'])
+            new_low_humidity = min(system_state.AMBIENT_LOW_HUMIDITY, ambientoutput['humidity'])
 
-            new_high_temp = max(AMBIENT_HIGH_TEMP, ambientoutput['temperature'])
-            new_low_temp = min(AMBIENT_LOW_TEMP, ambientoutput['temperature'])
+            new_high_temp = max(system_state.AMBIENT_HIGH_TEMP, ambientoutput['temperature'])
+            new_low_temp = min(system_state.AMBIENT_LOW_TEMP, ambientoutput['temperature'])
 
             # Check if any values changed
             log_changed = (
-                    new_high_humidity != AMBIENT_HIGH_HUMIDITY or
-                    new_low_humidity != AMBIENT_LOW_HUMIDITY or
-                    new_high_temp != AMBIENT_HIGH_TEMP or
-                    new_low_temp != AMBIENT_LOW_TEMP
+                    new_high_humidity != system_state.AMBIENT_HIGH_HUMIDITY or
+                    new_low_humidity != system_state.AMBIENT_LOW_HUMIDITY or
+                    new_high_temp != system_state.AMBIENT_HIGH_TEMP or
+                    new_low_temp != system_state.AMBIENT_LOW_TEMP
             )
 
             # Update the variables if they changed
             if log_changed:
-                AMBIENT_HIGH_HUMIDITY = new_high_humidity
-                AMBIENT_LOW_HUMIDITY = new_low_humidity
-                AMBIENT_HIGH_TEMP = new_high_temp
-                AMBIENT_LOW_TEMP = new_low_temp
+                system_state.AMBIENT_HIGH_HUMIDITY = new_high_humidity
+                system_state.AMBIENT_LOW_HUMIDITY = new_low_humidity
+                system_state.AMBIENT_HIGH_TEMP = new_high_temp
+                system_state.AMBIENT_LOW_TEMP = new_low_temp
                 save_config()
 
-            if abs(AMBIENT_HUMIDITY - AMBIENT_PREVIOUS_HUMIDITY) > 0.3:
+            if abs(system_state.AMBIENT_HUMIDITY - system_state.AMBIENT_PREVIOUS_HUMIDITY) > 0.3:
                 """Log ambient sensor reading and update previous output values."""
                 logger.log(ambient_timestamp, 'INFO', 'SENSORS', 'AMBIENT',
                            f"Temperature: {ambientoutput['temperature']}F,"
                            f" Humidity: {ambientoutput['humidity']}%")
-                AMBIENT_PREVIOUS_HUMIDITY = AMBIENT_HUMIDITY
+                system_state.AMBIENT_PREVIOUS_HUMIDITY = system_state.AMBIENT_HUMIDITY
 
             # Update the global variables and print the reading
-            AMBIENT_TEMP = ambientoutput['temperature']
-            AMBIENT_HUMIDITY = ambientoutput['humidity']
+            system_state.AMBIENT_TEMP = ambientoutput['temperature']
+            system_state.AMBIENT_HUMIDITY = ambientoutput['humidity']
 
 
         except Exception as e:
@@ -191,77 +185,69 @@ def sensor(stop_event):
             cleanup()
 
 def task_update():
-    global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, INTERNAL_LOW_TEMP, INTERNAL_LOW_HUMIDITY, \
-        CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_RUNNING, FAN_RUNNING_TIME, FAN_MAX_RUNTIME,\
-        INTERNAL_TEMP, INTERNAL_HUMIDITY, current_page, EXTERNAL_TEMP, page_changed
-    global EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP, EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY
-    global AMBIENT_LOW_TEMP, AMBIENT_HIGH_TEMP, AMBIENT_LOW_HUMIDITY, AMBIENT_HIGH_HUMIDITY
-    global runtime
     task_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     def handle_fan_operation(fan_started, fan_stopped, run_time, action):
-        global FAN_RUNNING, FAN_RUNNING_TIME, FAN_TOTAL_DURATION, CYCLE_COUNT  # Explicitly declare global variables
         """Handle fan start/stop operations, including logging, display updates, and timing."""
         if action == "start" and fan_started:
             fanController.start_time = time.time()
-            logger.log(task_timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan started, exceeded MAX humidity of {MAX_HUMIDITY}%")
-            print(f"Fan started, exceeded set humidity of: {MAX_HUMIDITY}%")
+            logger.log(task_timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan started, exceeded MAX humidity of {system_state.MAX_HUMIDITY}%")
+            print(f"Fan started, exceeded set humidity of: {system_state.MAX_HUMIDITY}%")
             display_manager.switch_image(Screen.FAN_START)
             display_manager.display_current_image(BONNETDisplay.disp)
-            FAN_RUNNING = True
-            CYCLE_COUNT += 1
+            system_state.FAN_RUNNING = True
+            system_state.CYCLE_COUNT += 1
             update_stats()
             time.sleep(2)
-            show_page(current_page)
+            show_page(system_state.current_page)
         elif action == "stop" and fan_stopped:
-            print(f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
-            logger.log(task_timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan stopped, passed MIN humidity of: {MIN_HUMIDITY}%")
+            print(f"Fan stopped, passed MIN humidity of: {system_state.MIN_HUMIDITY}%")
+            logger.log(task_timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan stopped, passed MIN humidity of: {system_state.MIN_HUMIDITY}%")
             logger.log(task_timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan run time: {str(timedelta(seconds=run_time))}")
-            FAN_TOTAL_DURATION += timedelta(seconds=int(run_time))
+            system_state.FAN_TOTAL_DURATION += timedelta(seconds=int(run_time))
             print(f"Fab Total Duration: {str(timedelta(seconds=run_time))}")
-            FAN_RUNNING = False
+            system_state.FAN_RUNNING = False
             display_manager.switch_image(Screen.FAN_STOP)
             display_manager.display_current_image(BONNETDisplay.disp)
             update_stats()
             save_config()
             time.sleep(2)
-            show_page(current_page)
+            show_page(system_state.current_page)
 
     def fan_runtime_exceeded(run_time):
         """Check if the fan runtime exceeds set limits and handle warnings."""
-        global FAN_MAX_RUNTIME, FAN_RUNNING_TIME  # Explicitly declare global variables
         if run_time is None:
-            FAN_RUNNING_TIME = timedelta(seconds=0)
+            system_state.FAN_RUNNING_TIME = timedelta(seconds=0)
         else:
-            FAN_RUNNING_TIME = timedelta(seconds=int(run_time))
+            system_state.FAN_RUNNING_TIME = timedelta(seconds=int(run_time))
 
-        if FAN_RUNNING_TIME > FAN_MAX_RUNTIME:
-            FAN_MAX_RUNTIME = FAN_RUNNING_TIME
-        if FAN_RUNNING_TIME > FAN_LIMIT:
+        if system_state.FAN_RUNNING_TIME > system_state.FAN_MAX_RUNTIME:
+            system_state.FAN_MAX_RUNTIME = system_state.FAN_RUNNING_TIME
+        if system_state.FAN_RUNNING_TIME > system_state.FAN_LIMIT:
             print("Fan limit exceeded")
             logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM',
-                        'FAN', f"Fan time limit exceeded: {FAN_LIMIT}")
+                        'FAN', f"Fan time limit exceeded: {system_state.FAN_LIMIT}")
             _fan_limit_exceeded()
 
     def update_current_page():
         """Update the default page display if needed."""
-        if current_page == Screen.DEFAULT.index:
+        if system_state.current_page == Screen.DEFAULT.index:
             with lock:
-                BONNETDisplay.display_text(text=f"{INTERNAL_HUMIDITY}% - {INTERNAL_TEMP}°F",
-                                           x_pos=4,y_pos=32, color_name="white", brightness_factor=1.0)
-                BONNETDisplay.display_text(text=f"{EXTERNAL_HUMIDITY}% - {EXTERNAL_TEMP}°F",
-                                           x_pos=4,y_pos=96, color_name="white", brightness_factor=1.0)
-                BONNETDisplay.display_text(text=f"{AMBIENT_HUMIDITY}% - {AMBIENT_TEMP}°F",
-                                           x_pos=4, y_pos=160, color_name="white", brightness_factor=1.0)
+                BONNETDisplay.display_text(text=f"{system_state.INTERNAL_HUMIDITY}% - {system_state.INTERNAL_TEMP}°F",
+                                           x_pos=6,y_pos=32, color_name="white", brightness_factor=1.0)
+                BONNETDisplay.display_text(text=f"{system_state.EXTERNAL_HUMIDITY}% - {system_state.EXTERNAL_TEMP}°F",
+                                           x_pos=6,y_pos=96, color_name="white", brightness_factor=1.0)
+                BONNETDisplay.display_text(text=f"{system_state.AMBIENT_HUMIDITY}% - {system_state.AMBIENT_TEMP}°F",
+                                           x_pos=6, y_pos=160, color_name="white", brightness_factor=1.0)
 
                 frame = get_next_frame()
                 BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
 
     # Handle fan start logic based on humidity thresholds
-    if INTERNAL_HUMIDITY > MAX_HUMIDITY:
+    if system_state.INTERNAL_HUMIDITY > system_state.MAX_HUMIDITY:
         started, run_time = fanController.set_fan_speed(100)
         print(f"Started fan run time: {str(run_time)}")
         handle_fan_operation(started, False, run_time, "start")
-    elif INTERNAL_HUMIDITY < MIN_HUMIDITY:
+    elif system_state.INTERNAL_HUMIDITY < system_state.MIN_HUMIDITY:
         stopped, run_time = fanController.set_fan_speed(0)
         handle_fan_operation(False, stopped, run_time, "stop")
 
@@ -269,16 +255,16 @@ def task_update():
         fan_runtime_exceeded(int(time.time() -  fanController.start_time))
         update_stats()
 
-    if page_changed and current_page < 6:
-        page_changed = False
-        show_page(current_page)
+    if system_state.page_changed and system_state.current_page < 6:
+        system_state.page_changed = False
+        show_page(system_state.current_page)
 
     # Display the updated information on the current page if applicable
     update_current_page()
 
-    if time.time() - last_page_changed  > 8 and (0 < current_page < 6):
-        current_page = Screen.DEFAULT.index
-        show_page(current_page)
+    if time.time() - last_page_changed  > 8 and (0 < system_state.current_page < 7):
+        system_state.current_page = Screen.DEFAULT.index
+        show_page(system_state.current_page)
 
 def send_status(message="Status"):
     #TODO: Update the code for below
@@ -306,13 +292,17 @@ def send_daily_log():
     notifier.send_log(log_file)
 
 def _cycle_fan():
-    # TODO: How do we want to engage this?
-    logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
-               'INFO', 'SYSTEM', 'FAN', "Fan Cycle Started...")
-    print("Fan Cycle Started...")
-    fanController.set_fan_speed(100)
-    time.sleep(FAN_DURATION)
-    fanController.set_fan_speed(0)
+    if not system_state.FAN_RUNNING:
+        logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                   'INFO', 'SYSTEM', 'FAN', "Fan Cycle Started...")
+        print("Fan Cycle Started...")
+        fanController.set_fan_speed(100)
+        time.sleep(system_state.FAN_DURATION)
+        fanController.set_fan_speed(0)
+    else:
+        print("Fan Cycle Skipped...")
+        logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                   'INFO', 'SYSTEM', 'FAN', "Fan running, skipping fan cycle...")
 
 def log_system_status():
     global system_stats
@@ -368,80 +358,77 @@ def read_installed_devices(config):
 
 def display_default_page():
     # Render static data from global variables
-    BONNETDisplay.display_rows_top(["Internal Sensor:", f"{INTERNAL_HUMIDITY}%" f" - {INTERNAL_TEMP}°F",
-                                       "External Sensor:", f"{EXTERNAL_HUMIDITY}%" f" - {EXTERNAL_TEMP}°F",
-                                       "Ambient Sensor:", f"{AMBIENT_HUMIDITY}%" f" - {AMBIENT_TEMP}°F"],
-                                      0, FAN_RUNNING,'white', 1.0, justification='left')
+    BONNETDisplay.display_rows_top(["Internal Sensor:", f"system_state.{INTERNAL_HUMIDITY}%" f" - {system_state.INTERNAL_TEMP}°F",
+                                       "External Sensor:", f"{system_state.EXTERNAL_HUMIDITY}%" f" - {system_state.EXTERNAL_TEMP}°F",
+                                       "Ambient Sensor:", f"{system_state.AMBIENT_HUMIDITY}%" f" - {system_state.AMBIENT_TEMP}°F"],
+                                      0, system_state.FAN_RUNNING,'white', 1.0, justification='left')
 
 def edit_humidity_set(button):
-    global MIN_HUMIDITY, MAX_HUMIDITY, humidity_mode, humidity_selected, humidity_blink_state, max_color, min_color
-
     print("Running Edit Humidity")
     print(button.pin.number)
-    if humidity_mode == "selection":
+    if system_state.humidity_mode == "selection":
         # In selection mode: toggle between 'max' and 'min' with U and D buttons
-        if button.pin.number == BTN_U_PIN or button.pin.number == BTN_D_PIN:
-            humidity_selected = "min" if humidity_selected == "max" else "max"
+        if button.pin.number == system_state.BTN_U_PIN or button.pin.number == system_state.BTN_D_PIN:
+            humidity_selected = "min" if system_state.humidity_selected == "max" else "max"
             if humidity_selected == "max":
-                max_color = "red" if humidity_blink_state or humidity_mode == "selection" else "black"
+                max_color = "red" if system_state.humidity_blink_state or system_state.humidity_mode == "selection" else "black"
                 min_color = "white"
             else:
                 max_color = "white"
-                min_color = "red" if humidity_blink_state or humidity_mode == "selection" else "black"
-            BONNETDisplay.display_text(f"{MAX_HUMIDITY}%", 100, 80, color_name=max_color)
-            BONNETDisplay.display_text(f"{MIN_HUMIDITY}%", 100, 120, color_name=min_color)
+                min_color = "red" if system_state.humidity_blink_state or system_state.humidity_mode == "selection" else "black"
+            BONNETDisplay.display_text(f"{system_state.MAX_HUMIDITY}%", 100, 80, color_name=max_color)
+            BONNETDisplay.display_text(f"{system_state.MIN_HUMIDITY}%", 100, 120, color_name=min_color)
 
         # Enter edit mode when 'A' button is pressed
-        elif button.pin.number == BTN_A_PIN:
-            humidity_mode = "edit"
-            humidity_blink_state = True
+        elif button.pin.number == system_state.BTN_A_PIN:
+            system_state.humidity_mode = "edit"
+            system_state.humidity_blink_state = True
 
-    elif humidity_mode == "edit":
+    elif system_state.humidity_mode == "edit":
         # In edit mode: adjust the selected humidity value with U and D buttons
-        if button.pin.number == BTN_U_PIN:
-            if humidity_selected == "max":
-                MAX_HUMIDITY = round(MAX_HUMIDITY + 1, 1)
-                BONNETDisplay.display_text(f"{MAX_HUMIDITY}%", 100, 80, color_name=max_color)
+        if button.pin.number == system_state.BTN_U_PIN:
+            if system_state.humidity_selected == "max":
+                system_state.MAX_HUMIDITY = round(system_state.MAX_HUMIDITY + 1, 1)
+                BONNETDisplay.display_text(f"{system_state.MAX_HUMIDITY}%", 100, 80, color_name=system_state.max_color)
             else:
-                MIN_HUMIDITY = round(MIN_HUMIDITY + 1, 1)
-                BONNETDisplay.display_text(f"{MIN_HUMIDITY}%", 100, 120, color_name=min_color)
+                system_state.MIN_HUMIDITY = round(system_state.MIN_HUMIDITY + 1, 1)
+                BONNETDisplay.display_text(f"{system_state.MIN_HUMIDITY}%", 100, 120, color_name=system_state.min_color)
 
-        elif button.pin.number == BTN_D_PIN:
-            if humidity_selected == "max":
-                MAX_HUMIDITY = round(MAX_HUMIDITY - 1, 1)
-                BONNETDisplay.display_text(f"{MAX_HUMIDITY}%", 100, 80, color_name=max_color)
+        elif button.pin.number == system_state.BTN_D_PIN:
+            if system_state.humidity_selected == "max":
+                system_state.MAX_HUMIDITY = round(system_state.MAX_HUMIDITY - 1, 1)
+                BONNETDisplay.display_text(f"{system_state.MAX_HUMIDITY}%", 100, 80, color_name=system_state.max_color)
             else:
-                MIN_HUMIDITY = round(MIN_HUMIDITY - 1, 1)
-                BONNETDisplay.display_text(f"{MIN_HUMIDITY}%", 100, 120, color_name=min_color)
+                system_state.MIN_HUMIDITY = round(system_state.MIN_HUMIDITY - 1, 1)
+                BONNETDisplay.display_text(f"{system_state.MIN_HUMIDITY}%", 100, 120, color_name=system_state.min_color)
 
         # Save the value and exit edit mode when 'B' button is pressed
-        elif button.pin.number == BTN_B_PIN:
-            humidity_mode = "selection"
-            humidity_blink_state = True
+        elif button.pin.number == system_state.BTN_B_PIN:
+            system_state.humidity_mode = "selection"
+            system_state.humidity_blink_state = True
 
 def display_set_humidity():
     BONNETDisplay.clear_screen()
     BONNETDisplay.display_text("Humidity Set", 1, 40)
     # Highlight selected values
-    if humidity_selected == "max":
-        max_color = "red" if humidity_blink_state or humidity_mode == "selection" else "black"
-        min_color = "white"
+    if system_state.humidity_selected == "max":
+        system_state.max_color = "red" if system_state.humidity_blink_state or system_state.humidity_mode == "selection" else "black"
+        system_state.min_color = "white"
     else:
-        max_color = "white"
-        min_color = "red" if humidity_blink_state or humidity_mode == "selection" else "black"
+        system_state.max_color = "white"
+        system_state.min_color = "red" if system_state.humidity_blink_state or system_state.humidity_mode == "selection" else "black"
 
     # Display the values with corresponding highlighting
     BONNETDisplay.display_text("Max:", 1, 80, color_name="white")
-    BONNETDisplay.display_text(f"{MAX_HUMIDITY}%", 100, 80, color_name=max_color)
+    BONNETDisplay.display_text(f"{system_state.MAX_HUMIDITY}%", 100, 80, color_name=system_state.max_color)
 
     BONNETDisplay.display_text("Min:", 1, 120, color_name="white")
-    BONNETDisplay.display_text(f"{MIN_HUMIDITY}%", 100, 120, color_name=min_color)
+    BONNETDisplay.display_text(f"{system_state.MIN_HUMIDITY}%", 100, 120, color_name=system_state.min_color)
 
 def display_stats_reset():
-    global selected_option, current_page
-    current_page = Screen.RESET.index
+    system_state.current_page = Screen.RESET.index
     BONNETDisplay.display_ok_clear("Stats Reset",ok_text="OK", clear_text="CANCEL", color_name="white",
-                                   brightness_factor=1.0, selected=selected_option)
+                                   brightness_factor=1.0, selected=system_state.selected_option)
 
 def update_stats():
     internal_max_temp = INTERNAL_HIGH_TEMP
@@ -452,29 +439,28 @@ def update_stats():
     ambient_min_temp = AMBIENT_LOW_TEMP
 
     display_manager.update_internal_screen(texts=["Internal Stats:", f"Max Temp {internal_max_temp}F",
-                                           f"Min Temp {internal_min_temp}F", f"Max Hum {INTERNAL_HIGH_HUMIDITY}",
-                                           f"Min Hum {INTERNAL_LOW_HUMIDITY}"])
+                                           f"Min Temp {internal_min_temp}F", f"Max Hum {system_state.INTERNAL_HIGH_HUMIDITY}",
+                                           f"Min Hum {system_state.INTERNAL_LOW_HUMIDITY}"])
 
     display_manager.update_external_screen(texts=["External Stats:", f"Max Temp {external_max_temp}F",
-                                                  f"Min Temp {external_min_temp}F", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
-                                                  f"Min Hum {EXTERNAL_LOW_HUMIDITY}"])
+                                                  f"Min Temp {external_min_temp}F", f"Max Hum {system_state.EXTERNAL_HIGH_HUMIDITY}",
+                                                  f"Min Hum {system_state.EXTERNAL_LOW_HUMIDITY}"])
 
     display_manager.update_ambient_screen(texts=["Ambient Stats:", f"Max Temp {ambient_max_temp}F",
-                                           f"Min Temp {ambient_min_temp}F", f"Max Hum {EXTERNAL_HIGH_HUMIDITY}",
-                                           f"Min Hum {EXTERNAL_LOW_HUMIDITY}"])
+                                           f"Min Temp {ambient_min_temp}F", f"Max Hum {system_state.EXTERNAL_HIGH_HUMIDITY}",
+                                           f"Min Hum {system_state.EXTERNAL_LOW_HUMIDITY}"])
 
-    display_manager.update_fan_screen(texts=["Fan Stats:", f"Current: {FAN_RUNNING_TIME}", f"Max: {FAN_MAX_RUNTIME}",
-                                             f"Total: {FAN_TOTAL_DURATION}", f"Cycles: {CYCLE_COUNT} "])
+    display_manager.update_fan_screen(texts=["Fan Stats:", f"Current: {system_state.FAN_RUNNING_TIME}", f"Max: {system_state.FAN_MAX_RUNTIME}",
+                                             f"Total: {system_state.FAN_TOTAL_DURATION}", f"Cycles: {system_state.CYCLE_COUNT} "])
 
 def draw_fan_limit():
-    global selected_option, current_page
-    current_page = 6
+    system_state.current_page = 6
     BONNETDisplay.display_ok_clear("Fan Limit Exceeded",ok_text="OK", clear_text="CLEAR", color_name="white",
-                                   brightness_factor=1.0, selected=selected_option)
+                                   brightness_factor=1.0, selected=system_state.selected_option)
 
 def show_page(page_index):
-    global last_page_changed
-    last_page_changed = time.time()
+    system_state.last_page_changed = time.time()
+    system_state.current_page = page_index
     if page_index == Screen.DEFAULT.index:
         display_default_page()
     elif page_index == Screen.FAN.index:
@@ -495,89 +481,84 @@ def show_page(page_index):
         display_stats_reset()
 
 def button_pressed_callback(button):
-    global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page, humidity_blink_state, \
-        humidity_mode, FAN_LIMIT, selected_option, page_changed, shutdown_timer, fan_limit_exceeded_count
 
-    if shutdown_timer:  # noinspection PyUnreachableCode
-        shutdown_timer.cancel() # type: ignore
-        shutdown_timer = None
+    if system_state.shutdown_timer:  # noinspection PyUnreachableCode
+        system_state.shutdown_timer.cancel() # type: ignore
+        system_state.shutdown_timer = None
 
-    if button.pin.number == BTN_L_PIN:
+    if button.pin.number == system_state.BTN_L_PIN:
         print("Button L pressed")
-        if current_page == Screen.FAN_LIMIT.index:
-            selected_option = 1
+        if system_state.current_page == Screen.FAN_LIMIT.index:
+            system_state.selected_option = 1
             draw_fan_limit()
         else:
-            current_page -= 1
-            if current_page < 0:
+            system_state.current_page -= 1
+            if system_state.current_page < 0:
                 # Wrap around to the last page accounting for config page
-                current_page = total_pages - 1
-            page_changed = True
-            humidity_mode = "selection"  # Reset humidity mode when changing page
-    elif button.pin.number == BTN_R_PIN:
+                system_state.current_page = system_state.total_pages - 1
+            system_state.page_changed = True
+            system_state.humidity_mode = "selection"  # Reset humidity mode when changing page
+    elif button.pin.number == system_state.BTN_R_PIN:
         print("Button R Pressed")
-        if current_page == Screen.FAN_LIMIT.index:
-            selected_option = 2
+        if system_state.current_page == Screen.FAN_LIMIT.index:
+            system_state.selected_option = 2
             draw_fan_limit()
         else:
-            current_page += 1
-            if current_page >= total_pages:
-                current_page = Screen.DEFAULT.index  # Wrap around to the first page
-            page_changed = True
-            humidity_mode = "selection"  # Reset humidity mode when changing pages
-    elif button.pin.number == BTN_U_PIN:
+            system_state.current_page += 1
+            if system_state.current_page >= system_state.total_pages:
+                system_state.current_page = Screen.DEFAULT.index  # Wrap around to the first page
+            system_state.page_changed = True
+            system_state.humidity_mode = "selection"  # Reset humidity mode when changing pages
+    elif button.pin.number == system_state.BTN_U_PIN:
         print("Up button pressed")
-    elif button.pin.number == BTN_D_PIN:
+    elif button.pin.number == system_state.BTN_D_PIN:
         print("Down button pressed")
-    elif button.pin.number == BTN_C_PIN:
+    elif button.pin.number == system_state.BTN_C_PIN:
         print("Center button pressed")
         cleanup()
         os.system("sudo shutdown -h now")
-    elif button.pin.number == BTN_A_PIN:
+    elif button.pin.number == system_state.BTN_A_PIN:
         print("A button pressed")
-        if current_page == Screen.FAN_LIMIT.index :
-            if selected_option == 1: # OK Selected
+        if system_state.current_page == Screen.FAN_LIMIT.index :
+            if system_state.selected_option == 1: # OK Selected
                 schedule.clear()
                 cleanup()
                 raise SystemExit
-            elif selected_option == 2: # CLEAR Selected
-                FAN_LIMIT *= 2  # Double the fan limit
-                fan_limit_exceeded_count += 1  # reset counter
-                current_page = Screen.DEFAULT.index  # Return to page 0
+            elif system_state.selected_option == 2: # CLEAR Selected
+                system_state.FAN_LIMIT *= 2  # Double the fan limit
+                system_state.fan_limit_exceeded_count += 1  # reset counter
+                system_state.current_page = Screen.DEFAULT.index  # Return to page 0
                 schedule_tasks()
-        elif current_page == Screen.RESET.index:
-            if selected_option == 1: # OK Selected
+        elif system_state.current_page == Screen.RESET.index:
+            if system_state.selected_option == 1: # OK Selected
                 stats_reset()
                 save_config()
-            elif selected_option == 2: # CANCEL Selected
-                current_page = Screen.DEFAULT.index  # Return to page 0
-    elif button.pin.number == BTN_B_PIN:
+            elif system_state.selected_option == 2: # CANCEL Selected
+                system_state.current_page = Screen.DEFAULT.index  # Return to page 0
+    elif button.pin.number == system_state.BTN_B_PIN:
          print("B button pressed")
     else:
         print("Unknown button")
 
 def button_hold_callback(button):
-    global MIN_HUMIDITY, MAX_HUMIDITY, last_press_time, humidity_changed, mode, current_page
-    if button.pin.number == BTN_B_PIN:
+    if button.pin.number == system_state.BTN_B_PIN:
         print("Button B held...")
         BONNETDisplay.reset_screen()
-        current_page = 0
+        system_state. current_page = 0
         display_default_page()
 
 def auto_shutdown():
     # Called if nobody presses a button in time
-    global current_page, FAN_LIMIT
-    FAN_LIMIT *= 2  # Double the fan limit
-    current_page = Screen.DEFAULT.index  # Return to page 0
+    system_state.FAN_LIMIT *= 2  # Double the fan limit
+    system_state.current_page = Screen.DEFAULT.index  # Return to page 0
     schedule_tasks()
 
 def _fan_limit_exceeded():
-    global current_page, fan_limit_exceeded_count
-    fan_limit_exceeded_count += 1
+    system_state.fan_limit_exceeded_count += 1
     schedule.clear()
-    current_page = 5
+    system_state.current_page = 5
     print("Fan limit exceeded too many times. Shutting down.")
-    if fan_limit_exceeded_count >= MAX_EXCEEDED_ATTEMPTS:
+    if system_state.fan_limit_exceeded_count >= system_state.MAX_EXCEEDED_ATTEMPTS:
         # Too many repeats — force shutdown
         print("Fan limit exceeded too many times. Shutting down.")
         logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'ERROR', 'SYSTEM', 'FAN',
@@ -597,29 +578,23 @@ def _fan_limit_exceeded():
     # Save any config changes
     save_config()
     # Start auto-shutdown timer (e.g., 30 seconds)
-    shutdown_timer = threading.Timer(FAN_LIMIT_TIMEOUT.total_seconds(), auto_shutdown)
-    shutdown_timer.start()
+    system_state.shutdown_timer = threading.Timer(system_state.FAN_LIMIT_TIMEOUT.total_seconds(), auto_shutdown)
+    system_state.shutdown_timer.start()
 
-def handle_shutdown(signum, frame):
+def handle_shutdown(signum):
     print(f"\nSignal {signum} received, shutting down...")
     logger.log(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'WARN', 'SYSTEM', 'SYSTEM',
                f"Signal {signum} received, shutting down...")
     raise KeyboardInterrupt
 
 def stats_reset():
-    global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
-    global INTERNAL_HIGH_TEMP, INTERNAL_LOW_TEMP
-    global EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
-    global AMBIENT_LOW_HUMIDITY, AMBIENT_HIGH_HUMIDITY, AMBIENT_LOW_TEMP, AMBIENT_HIGH_TEMP
-    global CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_MAX_RUNTIME
-
-    CYCLE_COUNT = FAN_TOTAL_DURATION = FAN_MAX_RUNTIME = 0
-    INTERNAL_HIGH_TEMP = INTERNAL_LOW_TEMP = INTERNAL_TEMP
-    INTERNAL_HIGH_HUMIDITY = INTERNAL_LOW_HUMIDITY = INTERNAL_HUMIDITY
-    EXTERNAL_HIGH_TEMP = EXTERNAL_LOW_TEMP = EXTERNAL_TEMP
-    EXTERNAL_HIGH_HUMIDITY = EXTERNAL_LOW_HUMIDITY = EXTERNAL_HUMIDITY
-    AMBIENT_HIGH_TEMP = AMBIENT_LOW_TEMP = AMBIENT_TEMP
-    AMBIENT_HIGH_HUMIDITY = AMBIENT_LOW_HUMIDITY = AMBIENT_HUMIDITY
+    system_state.CYCLE_COUNT = system_state.FAN_TOTAL_DURATION = system_state.FAN_MAX_RUNTIME = 0
+    system_state.INTERNAL_HIGH_TEMP = system_state.INTERNAL_LOW_TEMP = system_state.INTERNAL_TEMP
+    system_state.INTERNAL_HIGH_HUMIDITY = system_state.INTERNAL_LOW_HUMIDITY = system_state.INTERNAL_HUMIDITY
+    system_state.EXTERNAL_HIGH_TEMP = system_state.EXTERNAL_LOW_TEMP = system_state.EXTERNAL_TEMP
+    system_state.EXTERNAL_HIGH_HUMIDITY = system_state.EXTERNAL_LOW_HUMIDITY = system_state.EXTERNAL_HUMIDITY
+    system_state.AMBIENT_HIGH_TEMP = system_state.AMBIENT_LOW_TEMP = system_state.AMBIENT_TEMP
+    system_state.AMBIENT_HIGH_HUMIDITY = system_state.AMBIENT_LOW_HUMIDITY = system_state.AMBIENT_HUMIDITY
 
 def cleanup():
     # Want to add code here to update display, update log with run time etc
@@ -645,30 +620,7 @@ def cleanup():
                    'System', 'System', "System Shutting down..")
 
 def save_config():
-    global MIN_HUMIDITY, MAX_HUMIDITY, INTERNAL_LOW_HUMIDITY, INTERNAL_HIGH_HUMIDITY
-    global INTERNAL_HIGH_TEMP, INTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
-    global EXTERNAL_LOW_HUMIDITY, EXTERNAL_HIGH_HUMIDITY, EXTERNAL_LOW_TEMP, EXTERNAL_HIGH_TEMP
-    global AMBIENT_LOW_HUMIDITY, AMBIENT_HIGH_HUMIDITY, AMBIENT_LOW_TEMP, AMBIENT_HIGH_TEMP
-    global CYCLE_COUNT, FAN_TOTAL_DURATION, FAN_MAX_RUNTIME
-
-    configManager.update_config('min_humidity', MIN_HUMIDITY)
-    configManager.update_config('max_humidity', MAX_HUMIDITY)
-    configManager.update_config('internal_high_temp', INTERNAL_HIGH_TEMP, 'LOG')
-    configManager.update_config('internal_low_temp', INTERNAL_LOW_TEMP, 'LOG')
-    configManager.update_config('internal_high_humidity', INTERNAL_HIGH_HUMIDITY, 'LOG')
-    configManager.update_config('internal_low_humidity', INTERNAL_LOW_HUMIDITY, 'LOG')
-    configManager.update_config('external_high_temp', EXTERNAL_HIGH_TEMP, 'LOG')
-    configManager.update_config('external_low_temp', EXTERNAL_LOW_TEMP, 'LOG')
-    configManager.update_config('external_high_humidity', EXTERNAL_HIGH_HUMIDITY, 'LOG')
-    configManager.update_config('external_low_humidity', EXTERNAL_LOW_HUMIDITY, 'LOG')
-    configManager.update_config('ambient_high_temp', AMBIENT_HIGH_TEMP, 'LOG')
-    configManager.update_config('ambient_low_temp', AMBIENT_LOW_TEMP, 'LOG')
-    configManager.update_config('ambient_high_humidity', AMBIENT_HIGH_HUMIDITY, 'LOG')
-    configManager.update_config('ambient_low_humidity', AMBIENT_LOW_HUMIDITY, 'LOG')
-    configManager.update_config('cycle_count', CYCLE_COUNT, 'LOG')
-    configManager.set_duration_config('fan_total_duration', FAN_TOTAL_DURATION, 'LOG')
-    configManager.set_duration_config('MAX_FAN_RUNTIME', FAN_MAX_RUNTIME, 'LOG')
-    configManager.update_config('UOM', UOM)
+    configManager.save_config()
     logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'CONFIG',
                 "Config File Updated")
 
@@ -705,82 +657,24 @@ if __name__ == "__main__":
     log_system_status()
     # END STATUS CHECKS
 
-    MIN_HUMIDITY = configManager.get_int_config('min_humidity')
-    MAX_HUMIDITY = configManager.get_int_config('max_humidity')
-    FAN_DURATION = configManager.get_int_config('fan_duration')
-    # Set task intervals
-    TASK_FAN = configManager.get_int_config('TASK_FAN')
-    TASK_INTERNAL = configManager.get_int_config('TASK_INTERNAL')
-    TASK_EXTERNAL = configManager.get_int_config('TASK_EXTERNAL')
-
-    # Get button pin info
-    BTN_L_PIN = configManager.get_int_config('BTN_L_PIN')
-    BTN_R_PIN = configManager.get_int_config('BTN_R_PIN')
-    BTN_U_PIN = configManager.get_int_config('BTN_U_PIN')
-    BTN_D_PIN = configManager.get_int_config('BTN_D_PIN')
-    BTN_C_PIN = configManager.get_int_config('BTN_C_PIN')
-    BTN_A_PIN = configManager.get_int_config('BTN_A_PIN')
-    BTN_B_PIN = configManager.get_int_config('BTN_B_PIN')
-
-    # Get display related config info
-    FONT = configManager.get_config('font')
-    FONTSIZE = configManager.get_int_config('fontsize')
-    BORDER = configManager.get_int_config('border')
-
-    # Initialise the logging and pull numbers from the config.
-    INTERNAL_HIGH_TEMP = configManager.get_float_config('LOG', 'internal_high_temp')
-    INTERNAL_LOW_TEMP = configManager.get_float_config('LOG', 'internal_low_temp')
-    INTERNAL_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'internal_high_humidity')
-    INTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'internal_low_humidity')
-    EXTERNAL_HIGH_TEMP = configManager.get_float_config('LOG', 'external_high_temp')
-    EXTERNAL_LOW_TEMP = configManager.get_float_config('LOG', 'external_low_temp')
-    EXTERNAL_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'external_high_humidity')
-    EXTERNAL_LOW_HUMIDITY = configManager.get_float_config('LOG', 'external_low_humidity')
-    AMBIENT_HIGH_TEMP = configManager.get_float_config('LOG', 'ambient_high_temp')
-    AMBIENT_LOW_TEMP = configManager.get_float_config('LOG', 'ambient_low_temp')
-    AMBIENT_HIGH_HUMIDITY = configManager.get_float_config('LOG', 'ambient_high_humidity')
-    AMBIENT_LOW_HUMIDITY = configManager.get_float_config('LOG', 'ambient_low_humidity')
-    CYCLE_COUNT = configManager.get_int_config('cycle_count')
-    FAN_TOTAL_DURATION = configManager.get_duration_config('LOG', 'FAN_TOTAL_DURATION')
-    FAN_MAX_RUNTIME = configManager.get_duration_config('LOG', 'FAN_MAX_RUNTIME')
-    FAN_LIMIT = configManager.get_duration_config('DEFAULT', 'FAN_LIMIT')
-    FAN_LIMIT_TIMEOUT = configManager.get_duration_config('DEFAULT', 'FAN_LIMIT_TIMEOUT')
-    fan_limit_exceeded_count = 0
-    MAX_EXCEEDED_ATTEMPTS = 3
-    UOM = configManager.get_config('UOM')
     logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'SYSTEM',
                 "System Starting Up...")
 
     # Variables to manage button state and humidity values
     last_press_time = {'up': 0, 'dn': 0}
     last_page_changed = time.time()
-    BUTTON_HOLD_TIME = 3
-    humidity_changed = False
-    mode = None
-    INTERNAL_TEMP = INTERNAL_HUMIDITY = 0
-    EXTERNAL_TEMP = EXTERNAL_HUMIDITY = 0
-    AMBIENT_TEMP = AMBIENT_HUMIDITY = 0
 
     # Global state variables
-    humidity_mode = "selection"  # Can be 'selection' or 'edit'
-    humidity_selected = "max"  # Can be 'max' or 'min'
-    humidity_blink_state = True  # Used for blinking the value in edit mode
-    current_page = 0
-    total_pages = 7
-    selected_option = 1
-    max_color = "white"
-    min_color = "white"
     current_frame_index = 0
-    page_changed = False
 
     # GPIO setup using gpiozero for input buttons
-    btn_lt = Button(BTN_L_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
-    btn_rt = Button(BTN_R_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
-    btn_up = Button(BTN_U_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
-    btn_dn = Button(BTN_D_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
-    btn_ctr = Button(BTN_C_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
-    btn_a = Button(BTN_A_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
-    btn_b = Button(BTN_B_PIN, pull_up=True, bounce_time=0.1, hold_time=BUTTON_HOLD_TIME)
+    btn_lt = Button(system_state.BTN_L_PIN, pull_up=True, bounce_time=0.1, hold_time=system_state.BUTTON_HOLD_TIME)
+    btn_rt = Button(system_state.BTN_R_PIN, pull_up=True, bounce_time=0.1, hold_time=system_state.BUTTON_HOLD_TIME)
+    btn_up = Button(system_state.BTN_U_PIN, pull_up=True, bounce_time=0.1, hold_time=system_state.BUTTON_HOLD_TIME)
+    btn_dn = Button(system_state.BTN_D_PIN, pull_up=True, bounce_time=0.1, hold_time=system_state.BUTTON_HOLD_TIME)
+    btn_ctr = Button(system_state.BTN_C_PIN, pull_up=True, bounce_time=0.1, hold_time=system_state.BUTTON_HOLD_TIME)
+    btn_a = Button(system_state.BTN_A_PIN, pull_up=True, bounce_time=0.1, hold_time=system_state.BUTTON_HOLD_TIME)
+    btn_b = Button(system_state.BTN_B_PIN, pull_up=True, bounce_time=0.1, hold_time=system_state.BUTTON_HOLD_TIME)
 
     # Attach event handlers
     btn_lt.when_pressed = button_pressed_callback
@@ -806,7 +700,7 @@ if __name__ == "__main__":
         # Initialize displays...
         # Need to do this first so if there is an error cleanup can still work...
         print('Initializing Primary Display...')
-        BONNET_display_config = DisplayConfig(font_path=FONT, font_size=FONTSIZE, border_size=BORDER)
+        BONNET_display_config = DisplayConfig(font_path=system_state.FONT, font_size=system_state.FONTSIZE, border_size=system_state.BORDER)
         BONNETDisplay = BONNETDisplay(BONNET_display_config)
         display_manager = OLEDDisplayManager(BONNET_display_config,240,240, font=BONNETDisplay.font)
 
@@ -818,7 +712,7 @@ if __name__ == "__main__":
         update_stats()
 
         # Initialize to show the first page
-        show_page(current_page)
+        show_page(system_state.current_page)
 
         # Initialize fan controller
         print('Initializing fan controller...')
@@ -846,7 +740,7 @@ if __name__ == "__main__":
         AMBIENT_PREVIOUS_HUMIDITY = 0
 
         # This should happen when things are reset
-        if INITIAL_STARTUP == "True":
+        if system_state.INITIAL_STARTUP == "True":
             ambientoutput = ambientsensor.read_sensor()
             AMBIENT_TEMP = AMBIENT_LOW_TEMP = AMBIENT_HIGH_TEMP = ambientoutput['temperature'] = celsius_to_fahrenheit(ambientoutput['temperature'])
             ambientprevious_output = ambientoutput
@@ -861,7 +755,7 @@ if __name__ == "__main__":
             EXTERNAL_PREVIOUS_HUMIDITY = EXTERNAL_HUMIDITY = EXTERNAL_LOW_HUMIDITY = EXTERNAL_HIGH_HUMIDITY = externaloutput['humidity']
             save_config()
 
-        schedule_tasks(int_interval=TASK_INTERNAL, fan_interval=TASK_FAN)
+        schedule_tasks(int_interval=system_state.TASK_INTERNAL, fan_interval=system_state.TASK_FAN)
 
         # Send the startup status now?
         send_status(message="Startup status")

@@ -1,88 +1,99 @@
 import configparser
 from datetime import timedelta
-from system_status import system_status
 
 
 class ConfigManager:
-    def __init__(self, config_file):
-        self.config_file = config_file
-        self.config = configparser.ConfigParser()
-        self.config.read(config_file)
+    def __init__(self, filename, system_state):
+        self.config_file = filename
+        self.parser = configparser.ConfigParser()
+        self.system_state = system_state
 
-    def get_config(self, key):
-        if "CUSTOM" in self.config and key in self.config["CUSTOM"]:
-            return self.config["CUSTOM"][key]
-        elif "DEFAULT" in self.config and key in self.config["DEFAULT"]:
-            return self.config["DEFAULT"][key]
-        else:
-            raise KeyError(f"Config for DEFAULT/{key} not found.")
+    def load_config(self):
+        self.parser.read(self.config_file)
 
-def load_config():
-    config = configparser.ConfigParser()
-    config.read(CONFIG_FILE)
+        self.system_state.INITIAL_STARTUP = self.get_config("initial_startup", fallback=self.system_state.INITIAL_STARTUP)
+        self.system_state.LOGFILE = self.get_config("logfile", fallback=self.system_state.LOGFILE)
+        self.system_state.MAX_LOG_SIZE = self.get_int_config("max_log_size", fallback=self.system_state.MAX_LOG_SIZE)
+        self.system_state.MAX_ARCHIVE_SIZE = self.get_int_config("max_archive_size", fallback=self.system_state.MAX_ARCHIVE_SIZE)
+        self.system_state.FONT = self.get_config("font", fallback=self.system_state.FONT)
+        self.system_state.FONTSIZE = self.get_int_config("fontsize", fallback=self.system_state.FONTSIZE)
+        self.system_state.BORDER = self.get_int_config("border", fallback=self.system_state.BORDER)
 
-    # Example section [SETTINGS] in config.ini
-    system_status.min_temp = config.getint("SETTINGS", "min_temp", fallback=40)
-    system_status.max_temp = config.getint("SETTINGS", "max_temp", fallback=70)
-    system_status.min_humidity = config.getint("SETTINGS", "min_humidity", fallback=20)
-    system_status.max_humidity = config.getint("SETTINGS", "max_humidity", fallback=60)
-    system_status.fan_cycle_time = config.getint("SETTINGS", "fan_cycle_time", fallback=30)
-
-def save_config():
-    config = configparser.ConfigParser()
-    config["SETTINGS"] = {
-        "min_temp": str(system_status.min_temp),
-        "max_temp": str(system_status.max_temp),
-        "min_humidity": str(system_status.min_humidity),
-        "max_humidity": str(system_status.max_humidity),
-        "fan_cycle_time": str(system_status.fan_cycle_time),
-    }
-
-    with open(CONFIG_FILE, "w") as f:
-        config.write(f)
-
-    def get_int_config(self, key):
-        if "CUSTOM" in self.config and key in self.config["CUSTOM"]:
-            return int(self.config["CUSTOM"][key])
-        elif "DEFAULT" in self.config and key in self.config["DEFAULT"]:
-            return int(self.config["DEFAULT"][key])
-        elif "LOG" in self.config and key in self.config["LOG"]:
-            return int(self.config["LOG"][key])
-        else:
-            raise KeyError(f"Config for {key} not found.")
-
-    def get_float_config(self, section, key):
-        return float(self.config[section][key])
-
-    def get_boolean_config(self, key, section='DEFAULT'):
-        return self.config.getboolean(section, key)
-
-    def get_duration_config(self, section, key):
-        # Retrieve the total cycle duration in seconds
-        total_cycle_duration_seconds = int(self.config.getfloat(section, key))
-        # Convert the total seconds back to a timedelta object
-        return timedelta(seconds=total_cycle_duration_seconds)
-
-    def set_duration_config(self, key, value, section='LOG'):
-        self.config.set(section, key, str(value.total_seconds()))
-        self.save_config()
-
-    def display_config(self):
-        for section in self.config.sections():
-            print(f"[{section}]")
-            for key in self.config[section]:
-                print(f"{key} = {self.config[section][key]}")
-        if 'DEFAULT' in self.config:
-            print("[DEFAULT]")
-            for key in self.config['DEFAULT']:
-                print(f"{key} = {self.config['DEFAULT'][key]}")
-    
-    def update_config(self, key, value, section='CUSTOM'):
-        if not self.config.has_section(section):
-            self.config.add_section(section)
-        self.config.set(section, key, str(value))
-        self.save_config()
+        self.system_state.INTERNAL_HIGH_TEMP = self.get_float_config("LOG", "internal_high_temp",
+                                                               fallback=self.system_state.INTERNAL_HIGH_TEMP)
+        self.system_state.INTERNAL_LOW_TEMP = self.get_float_config("LOG", "internal_low_temp",
+                                                              fallback=self.system_state.INTERNAL_LOW_TEMP)
+        # … and so on for the rest …
 
     def save_config(self):
-        with open(self.config_file, 'w') as configfile:
-            self.config.write(configfile)
+        # General
+        self.update_config("initial_startup", self.system_state.INITIAL_STARTUP)
+        self.update_config("logfile", self.system_state.LOGFILE)
+        self.update_config("max_log_size", self.system_state.MAX_LOG_SIZE)
+        self.update_config("max_archive_size", self.system_state.MAX_ARCHIVE_SIZE)
+
+        # Display
+        self.update_config("font", self.system_state.FONT)
+        self.update_config("fontsize", self.system_state.FONTSIZE)
+        self.update_config("border", self.system_state.BORDER)
+
+        # Internal
+        self.update_config("internal_high_temp", self.system_state.INTERNAL_HIGH_TEMP, "LOG")
+        self.update_config("internal_low_temp", self.system_state.INTERNAL_LOW_TEMP, "LOG")
+        self.update_config("internal_high_humidity", self.system_state.INTERNAL_HIGH_HUMIDITY, "LOG")
+        self.update_config("internal_low_humidity", self.system_state.INTERNAL_LOW_HUMIDITY, "LOG")
+
+        # External
+        self.update_config("external_high_temp", self.system_state.EXTERNAL_HIGH_TEMP, "LOG")
+        self.update_config("external_low_temp", self.system_state.EXTERNAL_LOW_TEMP, "LOG")
+        self.update_config("external_high_humidity", self.system_state.EXTERNAL_HIGH_HUMIDITY, "LOG")
+        self.update_config("external_low_humidity", self.system_state.EXTERNAL_LOW_HUMIDITY, "LOG")
+
+        # Ambient
+        self.update_config("ambient_high_temp", self.system_state.AMBIENT_HIGH_TEMP, "LOG")
+        self.update_config("ambient_low_temp", self.system_state.AMBIENT_LOW_TEMP, "LOG")
+        self.update_config("ambient_high_humidity", self.system_state.AMBIENT_HIGH_HUMIDITY, "LOG")
+        self.update_config("ambient_low_humidity", self.system_state.AMBIENT_LOW_HUMIDITY, "LOG")
+
+        # Cycle / fan
+        self.update_config("cycle_count", self.system_state.CYCLE_COUNT, "LOG")
+        self.update_config("fan_total_duration", self.system_state.FAN_TOTAL_DURATION, "LOG")
+        self.update_config("fan_max_runtime", self.system_state.FAN_MAX_RUNTIME, "LOG")
+        self.update_config("fan_limit", self.system_state.FAN_LIMIT, "DEFAULT")
+        self.update_config("fan_limit_timeout", self.system_state.FAN_LIMIT_TIMEOUT, "DEFAULT")
+
+        # Misc
+        self.update_config("UOM", self.system_state.UOM)
+
+        # Write file
+        with open(self.config_file, "w") as configfile:
+            self.parser.write(configfile)
+
+    # --------------------------
+    # Helpers with fallbacks
+    # --------------------------
+    def get_config(self, key, section="DEFAULT", fallback=None):
+        return self.parser.get(section, key, fallback=fallback)
+
+    def get_int_config(self, key, section="DEFAULT", fallback=None):
+        return self.parser.getint(section, key, fallback=fallback)
+
+    def get_float_config(self, section, key, fallback=None):
+        return self.parser.getfloat(section, key, fallback=fallback)
+
+    def get_boolean_config(self, section, key, fallback=None):
+        return self.parser.getboolean(section, key, fallback=fallback)
+
+    def get_duration_config(self, section, key, fallback=None):
+        seconds = self.parser.getfloat(section, key, fallback=fallback.total_seconds() if fallback else 0)
+        return timedelta(seconds=seconds)
+
+    def set_duration_config(self, key, value, section="LOG"):
+        if not self.parser.has_section(section):
+            self.parser.add_section(section)
+        self.parser.set(section, key, str(int(value.total_seconds())))
+
+    def update_config(self, key, value, section="CUSTOM"):
+        if not self.parser.has_section(section):
+            self.parser.add_section(section)
+        self.parser.set(section, key, str(value))

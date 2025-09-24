@@ -308,7 +308,7 @@ class BONNETDisplay:
             text_height = bbox[3] - bbox[1]
 
             # Alternate indent for every other line
-            x_indent = 4 if i % 2 == 1 else 0
+            x_indent = 6 if i % 2 == 1 else 0
 
             # Calculate horizontal position based on justification
             if justification == 'left':
