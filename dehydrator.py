@@ -356,7 +356,7 @@ def heat_sensor():
     logger.log(timestamp, 'INFO', 'SYSTEM', 'INTERNAL', "Heating Internal sensor...")
 
 def read_installed_devices(config):
-    devices = config.get_config('installed_devices').split(',')
+    devices = system_state.installed_devices.split(",")
     devices = [device.strip() for device in devices]  # Remove any extra whitespace
     return devices
 
