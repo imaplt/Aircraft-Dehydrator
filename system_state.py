@@ -69,7 +69,7 @@ class SystemState:
         # Get button pin info
         self.BTN_L_PIN = 27
         self.BTN_R_PIN = 23
-        self.BTN_U_PIN = 27
+        self.BTN_U_PIN = 17
         self.BTN_D_PIN = 22
         self.BTN_C_PIN = 4
         self.BTN_A_PIN = 5
