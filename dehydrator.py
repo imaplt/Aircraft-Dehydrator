@@ -246,7 +246,7 @@ def task_update():
                 frame = get_next_frame()
                 BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
 
-    print("DEBUG: MAX_HUMIDITY =", system_state.MAX_HUMIDITY , type(system_state.MAX_HUMIDITY ))
+    print("DEBUG: MAX_HUMIDITY =", system_state.MAX_HUMIDITY , type(system_state.MAX_HUMIDITY))
     print("DEBUG: MIN_HUMIDITY =", system_state.MIN_HUMIDITY, type(system_state.MIN_HUMIDITY))
 
     # Handle fan start logic based on humidity thresholds
