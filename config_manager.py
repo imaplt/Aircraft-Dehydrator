@@ -88,10 +88,10 @@ class ConfigManager:
     # --------------------------
     # Helpers with fallbacks
     # --------------------------
-    def get_config(self, key, section="DEFAULT", fallback=None):
+    def get_config(self, section, key, fallback=None):
         return self.parser.get(section, key, fallback=fallback)
 
-    def get_int_config(self, key, section="DEFAULT", fallback=None):
+    def get_int_config(self, section, key, fallback=None):
         return self.parser.getint(section, key, fallback=fallback)
 
     def get_float_config(self, section, key, fallback=None):
@@ -110,6 +110,7 @@ class ConfigManager:
         self.parser.set(section, key, str(int(value.total_seconds())))
 
     def update_config(self, key, value, section="CUSTOM"):
-        if not self.parser.has_section(section):
+        if section != "DEFAULT" and not self.parser.has_section(section):
             self.parser.add_section(section)
         self.parser.set(section, key, str(value))
+
