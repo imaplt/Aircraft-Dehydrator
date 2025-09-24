@@ -2,8 +2,10 @@ import psutil
 import os
 import glob
 from config_manager import ConfigManager
+from system_state import SystemState
 
-configManager = ConfigManager('config.ini')
+system_state = SystemState()
+configManager = ConfigManager('config.ini', system_state)
 
 def get_system_stats(log_dir="."):
     try:
