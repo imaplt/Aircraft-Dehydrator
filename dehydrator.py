@@ -25,6 +25,8 @@ spinner_frames = ['▖', '▘', '▝', '▗']
 system_state = SystemState()
 configManager = ConfigManager('config.ini', system_state)
 configManager.load_config()
+print("Config loaded")
+print("Cycle Count: ", system_state.CYCLE_COUNT)
 
 # Initialize logging system
 logger = Log(system_state.LOGFILE, system_state.MAX_LOG_SIZE, system_state.MAX_ARCHIVE_SIZE)
