@@ -72,10 +72,10 @@ class ConfigManager:
 
         # Cycle / fan
         self.update_config("cycle_count", self.system_state.CYCLE_COUNT, "LOG")
-        self.update_config("fan_total_duration", self.system_state.FAN_TOTAL_DURATION, "LOG")
-        self.update_config("fan_max_runtime", self.system_state.FAN_MAX_RUNTIME, "LOG")
-        self.update_config("fan_limit", self.system_state.FAN_LIMIT, "DEFAULT")
-        self.update_config("fan_limit_timeout", self.system_state.FAN_LIMIT_TIMEOUT, "DEFAULT")
+        self.set_duration_config("fan_total_duration", self.system_state.FAN_TOTAL_DURATION, "LOG")
+        self.set_duration_config("fan_max_runtime", self.system_state.FAN_MAX_RUNTIME, "LOG")
+        self.set_duration_config("fan_limit", self.system_state.FAN_LIMIT, "DEFAULT")
+        self.set_duration_config("fan_limit_timeout", self.system_state.FAN_LIMIT_TIMEOUT, "DEFAULT")
 
         # Misc
         self.update_config("UOM", self.system_state.UOM)
