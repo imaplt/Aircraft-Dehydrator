@@ -1,3 +1,6 @@
+import time
+
+
 class SystemState:
     def __init__(self):
         # defaults (same as before)
@@ -60,6 +63,7 @@ class SystemState:
         self.page_index = 0
         self.last_press_time = 0
         self.total_pages = 7
+        self.last_page_changed = time.time()
 
         # Set task intervals
         self.TASK_FAN = 15
