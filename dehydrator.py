@@ -268,6 +268,8 @@ def task_update():
     update_current_page()
     print("DEBUG: last_page_changed =", last_page_changed, type(last_page_changed))
     print("DEBUG: system_state.current_page=", system_state.current_page, type(system_state.current_page))
+    print("DEBUG: Time =", time.time(), type(time.time()))
+    print("DEBUG: Result =", time.time() - last_page_changed, type(time.time() - last_page_changed))
 
     if time.time() - last_page_changed  > 8 and (0 < system_state.current_page < 7):
         print("Last PAge Changed Time Triggered")
