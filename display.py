@@ -319,7 +319,7 @@ class BONNETDisplay:
                 x_position = (self.width - text_width) // 2 + x_indent
 
             position = (x_position, y)
-            print("Position",position)
+            # print("Position",position)
             self.draw.text(position, text, font=self.font, fill=color)
             self.draw.text(position, text, font=self.font, fill=color)
             y += line_height

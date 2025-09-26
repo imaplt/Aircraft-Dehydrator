@@ -25,15 +25,14 @@ spinner_frames = ['▖', '▘', '▝', '▗']
 system_state = SystemState()
 configManager = ConfigManager('config.ini', system_state)
 configManager.load_config()
-print("Config loaded")
-print("DEBUG: CYCLE_COUNT =", system_state.CYCLE_COUNT, type(system_state.CYCLE_COUNT))
+# print("Config loaded")
+# print("DEBUG: CYCLE_COUNT =", system_state.CYCLE_COUNT, type(system_state.CYCLE_COUNT))
 
 
 # Initialize logging system
 logger = Log(system_state.LOGFILE, system_state.MAX_LOG_SIZE, system_state.MAX_ARCHIVE_SIZE)
 
 notifier = NotificationManager(
-    system_state = system_state,
     logger = logger,
     provider="yahoo",                       # "yahoo" | "icloud" | "apple"
     email="imaplt@yahoo.com",
@@ -208,7 +207,7 @@ def task_update():
             logger.log(task_timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan stopped, passed MIN humidity of: {system_state.MIN_HUMIDITY}%")
             logger.log(task_timestamp, 'INFO', 'SYSTEM', 'FAN', f"Fan run time: {str(timedelta(seconds=run_time))}")
             system_state.FAN_TOTAL_DURATION += timedelta(seconds=int(run_time))
-            print(f"Fab Total Duration: {str(timedelta(seconds=run_time))}")
+            print(f"Fan Total Duration: {str(timedelta(seconds=run_time))}")
             system_state.FAN_RUNNING = False
             display_manager.switch_image(Screen.FAN_STOP)
             display_manager.display_current_image(BONNETDisplay.disp)
@@ -246,13 +245,12 @@ def task_update():
                 frame = get_next_frame()
                 BONNETDisplay.display_text(text=frame, x_pos=190, y_pos=190, color_name="white", brightness_factor=1)
 
-    print("DEBUG: MAX_HUMIDITY =", system_state.MAX_HUMIDITY , type(system_state.MAX_HUMIDITY))
-    print("DEBUG: MIN_HUMIDITY =", system_state.MIN_HUMIDITY, type(system_state.MIN_HUMIDITY))
+    # print("DEBUG: MAX_HUMIDITY =", system_state.MAX_HUMIDITY , type(system_state.MAX_HUMIDITY))
+    # print("DEBUG: MIN_HUMIDITY =", system_state.MIN_HUMIDITY, type(system_state.MIN_HUMIDITY))
 
     # Handle fan start logic based on humidity thresholds
     if system_state.INTERNAL_HUMIDITY > system_state.MAX_HUMIDITY:
         started, run_time = fanController.set_fan_speed(100)
-        print(f"Started fan run time: {str(run_time)}")
         handle_fan_operation(started, False, run_time, "start")
     elif system_state.INTERNAL_HUMIDITY < system_state.MIN_HUMIDITY:
         stopped, run_time = fanController.set_fan_speed(0)
@@ -268,8 +266,11 @@ def task_update():
 
     # Display the updated information on the current page if applicable
     update_current_page()
+    print("DEBUG: last_page_changed =", last_page_changed, type(last_page_changed))
+    print("DEBUG: system_state.current_page=", system_state.current_page, type(system_state.current_page))
 
     if time.time() - last_page_changed  > 8 and (0 < system_state.current_page < 7):
+        print("Last PAge Changed Time Triggered")
         system_state.current_page = Screen.DEFAULT.index
         show_page(system_state.current_page)
 
@@ -326,11 +327,8 @@ def log_system_status():
                     f"Temp: {celsius_to_fahrenheit(stats['cpu_temp'])}°F")
         logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'MONITOR', log_line)
         logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'MONITOR', f"Logs: {stats['logs']}")
-        print(f"Sensors: {stats['sensors']}")
         for sensor, stat in stats["sensors"].items():
             logger.log( time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'INFO', 'SYSTEM', 'MONITOR', f"{sensor.capitalize()}: {stat}")
-
-        # you can also write to your output.log or CSV here
     system_stats = log_line
 
 def schedule_tasks(int_interval=1, fan_interval=10, system_interval=10):
@@ -371,7 +369,6 @@ def display_default_page():
                                       0, system_state.FAN_RUNNING,'white', 1.0, justification='left')
 
 def edit_humidity_set(button):
-    print("Running Edit Humidity")
     print(button.pin.number)
     if system_state.humidity_mode == "selection":
         # In selection mode: toggle between 'max' and 'min' with U and D buttons
@@ -494,7 +491,6 @@ def button_pressed_callback(button):
         system_state.shutdown_timer = None
 
     if button.pin.number == system_state.BTN_L_PIN:
-        print("Button L pressed")
         if system_state.current_page == Screen.FAN_LIMIT.index:
             system_state.selected_option = 1
             draw_fan_limit()
@@ -506,7 +502,6 @@ def button_pressed_callback(button):
             system_state.page_changed = True
             system_state.humidity_mode = "selection"  # Reset humidity mode when changing page
     elif button.pin.number == system_state.BTN_R_PIN:
-        print("Button R Pressed")
         if system_state.current_page == Screen.FAN_LIMIT.index:
             system_state.selected_option = 2
             draw_fan_limit()
@@ -549,7 +544,6 @@ def button_pressed_callback(button):
 
 def button_hold_callback(button):
     if button.pin.number == system_state.BTN_B_PIN:
-        print("Button B held...")
         BONNETDisplay.reset_screen()
         system_state. current_page = 0
         display_default_page()

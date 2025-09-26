@@ -19,7 +19,6 @@ class NotificationManager:
 
     def __init__(
         self,
-        system_state,
         logger,
         provider: str,
         email: str,
